@@ -1,13 +1,24 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Data 360 Developer Docs",
+  "name": "Salesforce Data 360",
   "colors": {
     "primary": "#0176D3",
     "light": "#1B96FF",
     "dark": "#032D60"
   },
   "favicon": "/favicon.svg",
+  "openapi": "openapi/data360-api.yaml",
+  "api": {
+    "playground": {
+      "mode": "simple"
+    },
+    "request": {
+      "example": {
+        "showOptionalParams": false
+      }
+    }
+  },
   "navigation": {
     "tabs": [
       {
@@ -42,7 +53,12 @@
           {
             "group": "Connect REST API",
             "pages": [
-              "apis/connect-api/index"
+              "apis/connect-api/index",
+              "apis/connect-api/data-ingestion",
+              "apis/connect-api/data-streams",
+              "apis/connect-api/identity-resolution",
+              "apis/connect-api/segments",
+              "apis/connect-api/activations"
             ]
           },
           {
@@ -58,6 +74,18 @@
               "apis/query-api/status-codes",
               "apis/query-api/sql-reference"
             ]
+          },
+          {
+            "group": "Metadata Types",
+            "pages": [
+              "apis/metadata-types/index",
+              "apis/metadata-types/data-source",
+              "apis/metadata-types/data-stream",
+              "apis/metadata-types/identity-resolution",
+              "apis/metadata-types/calculated-insights",
+              "apis/metadata-types/segments",
+              "apis/metadata-types/ingestion-schema"
+            ]
           }
         ]
       },
@@ -72,6 +100,24 @@
               "sdks/web-sdk/api-reference",
               "sdks/web-sdk/identity",
               "sdks/web-sdk/consent"
+            ]
+          },
+          {
+            "group": "Python SDK",
+            "pages": [
+              "sdks/python-sdk/index",
+              "sdks/python-sdk/authentication",
+              "sdks/python-sdk/queries",
+              "sdks/python-sdk/dataframes"
+            ]
+          },
+          {
+            "group": "JDBC Connector",
+            "pages": [
+              "sdks/jdbc/index",
+              "sdks/jdbc/authentication",
+              "sdks/jdbc/configuration",
+              "sdks/jdbc/examples"
             ]
           }
         ]

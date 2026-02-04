@@ -1,0 +1,417 @@
+---
+title: "IdentityResolutionSettings Metadata Type"
+description: "Configure identity resolution rules and survivorship logic for Data 360"
+---
+
+# IdentityResolutionSettings Metadata Type
+
+The `IdentityResolutionSettings` metadata type defines how Data 360 matches and merges customer records from multiple data sources into unified profiles.
+
+## Overview
+
+Identity resolution configuration includes:
+
+- **Match rules** - Criteria for identifying duplicate records
+- **Survivorship rules** - Logic for selecting master field values
+- **Reconciliation settings** - How profiles are merged and maintained
+
+## Metadata Structure
+
+### IdentityResolutionSettings
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<IdentityResolutionSettings xmlns="http://soap.sforce.com/2006/04/metadata">
+    <masterLabel>Customer Identity Resolution</masterLabel>
+    <developerName>Customer_Identity_Resolution</developerName>
+    <description>Identity resolution rules for customer profiles</description>
+    <isEnabled>true</isEnabled>
+    <targetDataModelObject>UnifiedIndividual__dlm</targetDataModelObject>
+
+    <matchRules>
+        <matchRule>
+            <name>Email_Exact_Match</name>
+            <priority>1</priority>
+            <isActive>true</isActive>
+            <matchCriteria>
+                <criterion>
+                    <fieldName>Email__c</fieldName>
+                    <matchType>Exact</matchType>
+                    <isCaseSensitive>false</isCaseSensitive>
+                    <normalization>LowercaseTrim</normalization>
+                </criterion>
+            </matchCriteria>
+            <minConfidence>0.95</minConfidence>
+        </matchRule>
+
+        <matchRule>
+            <name>Phone_Normalized_Match</name>
+            <priority>2</priority>
+            <isActive>true</isActive>
+            <matchCriteria>
+                <criterion>
+                    <fieldName>Phone__c</fieldName>
+                    <matchType>Normalized</matchType>
+                    <normalization>PhoneE164</normalization>
+                </criterion>
+            </matchCriteria>
+            <minConfidence>0.90</minConfidence>
+        </matchRule>
+
+        <matchRule>
+            <name>Name_Address_Fuzzy</name>
+            <priority>3</priority>
+            <isActive>true</isActive>
+            <matchCriteria>
+                <criterion>
+                    <fieldName>FirstName__c</fieldName>
+                    <matchType>Fuzzy</matchType>
+                    <fuzzyThreshold>0.85</fuzzyThreshold>
+                </criterion>
+                <criterion>
+                    <fieldName>LastName__c</fieldName>
+                    <matchType>Fuzzy</matchType>
+                    <fuzzyThreshold>0.90</fuzzyThreshold>
+                </criterion>
+                <criterion>
+                    <fieldName>PostalCode__c</fieldName>
+                    <matchType>Exact</matchType>
+                </criterion>
+            </matchCriteria>
+            <criteriaOperator>AND</criteriaOperator>
+            <minConfidence>0.80</minConfidence>
+        </matchRule>
+    </matchRules>
+
+    <survivorshipRules>
+        <defaultRule>MostRecent</defaultRule>
+        <fieldOverrides>
+            <override>
+                <fieldName>Email__c</fieldName>
+                <rule>MostComplete</rule>
+            </override>
+            <override>
+                <fieldName>Phone__c</fieldName>
+                <rule>MostComplete</rule>
+            </override>
+            <override>
+                <fieldName>FirstName__c</fieldName>
+                <rule>SourcePriority</rule>
+                <sourcePriorityOrder>Salesforce_CRM,Marketing_Cloud,Web_Engagement</sourcePriorityOrder>
+            </override>
+            <override>
+                <fieldName>LifetimeValue__c</fieldName>
+                <rule>Aggregate</rule>
+                <aggregationType>Sum</aggregationType>
+            </override>
+        </fieldOverrides>
+    </survivorshipRules>
+
+    <reconciliationSettings>
+        <reconciliationType>Incremental</reconciliationType>
+        <scheduleFrequency>Daily</scheduleFrequency>
+        <scheduleTime>02:00:00Z</scheduleTime>
+        <enableRealTimeMatching>true</enableRealTimeMatching>
+        <maxClusterSize>100</maxClusterSize>
+    </reconciliationSettings>
+</IdentityResolutionSettings>
+```
+
+## Field Reference
+
+### Top-Level Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `masterLabel` | string | Yes | Display name |
+| `developerName` | string | Yes | API name (unique) |
+| `description` | string | No | Description |
+| `isEnabled` | boolean | Yes | Whether ID resolution is active |
+| `targetDataModelObject` | string | Yes | Target unified object (e.g., `UnifiedIndividual__dlm`) |
+| `matchRules` | array | Yes | Match rule definitions |
+| `survivorshipRules` | object | Yes | Survivorship configuration |
+| `reconciliationSettings` | object | No | Reconciliation schedule |
+
+### Match Rule Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | Yes | Rule name |
+| `priority` | integer | Yes | Execution priority (lower = higher priority) |
+| `isActive` | boolean | Yes | Whether rule is enabled |
+| `matchCriteria` | array | Yes | Matching criteria |
+| `criteriaOperator` | enum | No | `AND` or `OR` (default: AND) |
+| `minConfidence` | decimal | No | Minimum confidence score (0.0-1.0) |
+
+### Match Criterion Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `fieldName` | string | Yes | Field to match on |
+| `matchType` | enum | Yes | Type of matching |
+| `normalization` | enum | No | Pre-match normalization |
+| `fuzzyThreshold` | decimal | Conditional | For Fuzzy match type |
+| `isCaseSensitive` | boolean | No | Case-sensitive matching |
+
+### Match Types
+
+| Type | Description | Use Case |
+|------|-------------|----------|
+| `Exact` | Exact string match | Email, ID fields |
+| `Normalized` | Match after normalization | Phone numbers |
+| `Fuzzy` | Similarity-based matching | Names, addresses |
+| `Phonetic` | Sound-based matching | Names with spelling variations |
+| `Custom` | Custom matching logic | Complex rules |
+
+### Normalization Types
+
+| Type | Description | Example |
+|------|-------------|---------|
+| `LowercaseTrim` | Lowercase and trim whitespace | `" John "` → `"john"` |
+| `PhoneE164` | E.164 phone format | `"(555) 123-4567"` → `"+15551234567"` |
+| `RemoveSpecialChars` | Remove non-alphanumeric | `"O'Brien"` → `"OBrien"` |
+| `EmailNormalize` | Standardize email format | `"John.Doe+test@GMAIL.com"` → `"johndoe@gmail.com"` |
+
+### Survivorship Rules
+
+| Rule | Description | Use Case |
+|------|-------------|----------|
+| `MostRecent` | Value from most recently updated record | Default for most fields |
+| `MostComplete` | Most populated/complete value | Names, addresses |
+| `SourcePriority` | Value from highest priority source | Authoritative systems |
+| `Aggregate` | Combine values | Lifetime value, total orders |
+| `First` | First value encountered | Original signup date |
+
+### Aggregate Types
+
+| Type | Description |
+|------|-------------|
+| `Sum` | Sum of all values |
+| `Average` | Average of values |
+| `Maximum` | Maximum value |
+| `Minimum` | Minimum value |
+| `Count` | Count of records |
+| `Concatenate` | Combine text values |
+
+## Deployment Examples
+
+### Retrieve Settings
+
+```bash
+# Retrieve all identity resolution settings
+sf project retrieve start -m IdentityResolutionSettings
+
+# Retrieve specific configuration
+sf project retrieve start -m IdentityResolutionSettings:Customer_Identity_Resolution
+```
+
+### Deploy Settings
+
+```bash
+# Deploy identity resolution settings
+sf project deploy start -m IdentityResolutionSettings:Customer_Identity_Resolution
+
+# Validate before deployment
+sf project deploy start -m IdentityResolutionSettings:Customer_Identity_Resolution --dry-run
+```
+
+### Package.xml Configuration
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>Customer_Identity_Resolution</members>
+        <name>IdentityResolutionSettings</name>
+    </types>
+    <version>64.0</version>
+</Package>
+```
+
+## Complete Examples
+
+### B2C Identity Resolution
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<IdentityResolutionSettings xmlns="http://soap.sforce.com/2006/04/metadata">
+    <masterLabel>B2C Customer Resolution</masterLabel>
+    <developerName>B2C_Customer_Resolution</developerName>
+    <description>Identity resolution for B2C customers across all channels</description>
+    <isEnabled>true</isEnabled>
+    <targetDataModelObject>UnifiedIndividual__dlm</targetDataModelObject>
+
+    <matchRules>
+        <!-- High-confidence email match -->
+        <matchRule>
+            <name>Email_Match</name>
+            <priority>1</priority>
+            <isActive>true</isActive>
+            <matchCriteria>
+                <criterion>
+                    <fieldName>Email__c</fieldName>
+                    <matchType>Exact</matchType>
+                    <normalization>EmailNormalize</normalization>
+                </criterion>
+            </matchCriteria>
+            <minConfidence>0.98</minConfidence>
+        </matchRule>
+
+        <!-- Phone + Last Name combo -->
+        <matchRule>
+            <name>Phone_LastName_Match</name>
+            <priority>2</priority>
+            <isActive>true</isActive>
+            <matchCriteria>
+                <criterion>
+                    <fieldName>Phone__c</fieldName>
+                    <matchType>Normalized</matchType>
+                    <normalization>PhoneE164</normalization>
+                </criterion>
+                <criterion>
+                    <fieldName>LastName__c</fieldName>
+                    <matchType>Exact</matchType>
+                    <normalization>LowercaseTrim</normalization>
+                </criterion>
+            </matchCriteria>
+            <criteriaOperator>AND</criteriaOperator>
+            <minConfidence>0.90</minConfidence>
+        </matchRule>
+
+        <!-- Loyalty ID match -->
+        <matchRule>
+            <name>LoyaltyId_Match</name>
+            <priority>3</priority>
+            <isActive>true</isActive>
+            <matchCriteria>
+                <criterion>
+                    <fieldName>LoyaltyMemberId__c</fieldName>
+                    <matchType>Exact</matchType>
+                </criterion>
+            </matchCriteria>
+            <minConfidence>0.99</minConfidence>
+        </matchRule>
+
+        <!-- Fuzzy name + address -->
+        <matchRule>
+            <name>NameAddress_Fuzzy</name>
+            <priority>4</priority>
+            <isActive>true</isActive>
+            <matchCriteria>
+                <criterion>
+                    <fieldName>FirstName__c</fieldName>
+                    <matchType>Fuzzy</matchType>
+                    <fuzzyThreshold>0.80</fuzzyThreshold>
+                </criterion>
+                <criterion>
+                    <fieldName>LastName__c</fieldName>
+                    <matchType>Fuzzy</matchType>
+                    <fuzzyThreshold>0.85</fuzzyThreshold>
+                </criterion>
+                <criterion>
+                    <fieldName>Street__c</fieldName>
+                    <matchType>Fuzzy</matchType>
+                    <fuzzyThreshold>0.75</fuzzyThreshold>
+                </criterion>
+                <criterion>
+                    <fieldName>PostalCode__c</fieldName>
+                    <matchType>Exact</matchType>
+                </criterion>
+            </matchCriteria>
+            <criteriaOperator>AND</criteriaOperator>
+            <minConfidence>0.75</minConfidence>
+        </matchRule>
+    </matchRules>
+
+    <survivorshipRules>
+        <defaultRule>MostRecent</defaultRule>
+        <fieldOverrides>
+            <override>
+                <fieldName>Email__c</fieldName>
+                <rule>MostComplete</rule>
+            </override>
+            <override>
+                <fieldName>Phone__c</fieldName>
+                <rule>MostComplete</rule>
+            </override>
+            <override>
+                <fieldName>FirstName__c</fieldName>
+                <rule>SourcePriority</rule>
+                <sourcePriorityOrder>CRM,Loyalty_System,Web</sourcePriorityOrder>
+            </override>
+            <override>
+                <fieldName>LastName__c</fieldName>
+                <rule>SourcePriority</rule>
+                <sourcePriorityOrder>CRM,Loyalty_System,Web</sourcePriorityOrder>
+            </override>
+            <override>
+                <fieldName>TotalPurchases__c</fieldName>
+                <rule>Aggregate</rule>
+                <aggregationType>Sum</aggregationType>
+            </override>
+            <override>
+                <fieldName>FirstPurchaseDate__c</fieldName>
+                <rule>Aggregate</rule>
+                <aggregationType>Minimum</aggregationType>
+            </override>
+            <override>
+                <fieldName>LastPurchaseDate__c</fieldName>
+                <rule>Aggregate</rule>
+                <aggregationType>Maximum</aggregationType>
+            </override>
+        </fieldOverrides>
+    </survivorshipRules>
+
+    <reconciliationSettings>
+        <reconciliationType>Incremental</reconciliationType>
+        <scheduleFrequency>Daily</scheduleFrequency>
+        <scheduleTime>03:00:00Z</scheduleTime>
+        <enableRealTimeMatching>true</enableRealTimeMatching>
+        <maxClusterSize>50</maxClusterSize>
+        <conflictResolution>Automatic</conflictResolution>
+    </reconciliationSettings>
+</IdentityResolutionSettings>
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Match Rule Design">
+    - Order rules by confidence (highest first)
+    - Start with high-confidence exact matches
+    - Add fuzzy rules with appropriate thresholds
+    - Test rules with sample data before production
+    - Monitor match rates and adjust thresholds
+  </Accordion>
+
+  <Accordion title="Survivorship Strategy">
+    - Define clear data source priorities
+    - Use `MostComplete` for contact information
+    - Use `Aggregate` for calculated fields
+    - Document survivorship logic decisions
+    - Review merged records periodically
+  </Accordion>
+
+  <Accordion title="Performance">
+    - Limit fuzzy matching to necessary fields
+    - Set appropriate max cluster sizes
+    - Schedule full reconciliation during off-peak
+    - Use incremental matching for real-time
+    - Monitor reconciliation job duration
+  </Accordion>
+
+  <Accordion title="Data Quality">
+    - Normalize data at ingestion
+    - Define clear match confidence thresholds
+    - Review split and merge decisions
+    - Track match rule effectiveness
+    - Handle edge cases (duplicates, false positives)
+  </Accordion>
+</AccordionGroup>
+
+## Related Resources
+
+- [Identity Resolution API](/apis/connect-api/identity-resolution) - Runtime ID resolution
+- [Profile API](/apis/query-api/profile-api) - Query unified profiles
+- [Universal ID Lookup](/apis/query-api/universal-id-lookup) - Look up unified IDs
+- [Identity Resolution Help](https://help.salesforce.com/s/articleView?id=data.c360_a_identity_resolution.htm&type=5) - Salesforce documentation

@@ -1,0 +1,471 @@
+---
+title: "Activations API"
+description: "Configure and manage activation targets and data exports in Data 360"
+openapi: "GET /services/data/v64.0/ssot/activation-targets"
+---
+
+# Activations API
+
+The Activations API enables you to programmatically manage activation targets, configure data exports, and monitor the delivery of segment data to external platforms.
+
+## Overview
+
+Activations in Data 360 allow you to:
+
+- **Export segments** to advertising platforms (Google Ads, Meta, etc.)
+- **Sync data** to marketing automation tools
+- **Send profiles** to data warehouses and analytics platforms
+- **Monitor delivery** status and troubleshoot issues
+
+## Endpoints
+
+### List Activation Targets
+
+#### GET /services/data/v64.0/ssot/activation-targets
+
+Retrieve all configured activation targets.
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `status` | string | Filter by status: `ACTIVE`, `INACTIVE`, `ERROR` |
+| `type` | string | Filter by type: `ADVERTISING`, `MARKETING`, `ANALYTICS`, `CLOUD_STORAGE` |
+| `limit` | integer | Maximum results (default: 100) |
+
+**Response:**
+
+```json
+{
+  "activationTargets": [
+    {
+      "id": "ACT_001",
+      "name": "Google_Ads_Target",
+      "displayName": "Google Ads - Main Account",
+      "type": "ADVERTISING",
+      "platform": "GOOGLE_ADS",
+      "status": "ACTIVE",
+      "connectedDate": "2024-01-01T00:00:00Z",
+      "lastSyncDate": "2024-01-15T08:00:00Z",
+      "activeSegments": 5
+    },
+    {
+      "id": "ACT_002",
+      "name": "Snowflake_DW",
+      "displayName": "Snowflake Data Warehouse",
+      "type": "CLOUD_STORAGE",
+      "platform": "SNOWFLAKE",
+      "status": "ACTIVE",
+      "connectedDate": "2024-01-05T00:00:00Z",
+      "lastSyncDate": "2024-01-15T06:00:00Z",
+      "activeSegments": 3
+    },
+    {
+      "id": "ACT_003",
+      "name": "Meta_Ads",
+      "displayName": "Meta Ads Manager",
+      "type": "ADVERTISING",
+      "platform": "META",
+      "status": "ACTIVE",
+      "connectedDate": "2024-01-02T00:00:00Z",
+      "lastSyncDate": "2024-01-15T07:30:00Z",
+      "activeSegments": 4
+    }
+  ],
+  "totalCount": 8
+}
+```
+
+### Get Activation Target Details
+
+#### GET /services/data/v64.0/ssot/activation-targets/{targetId}
+
+Retrieve detailed configuration for a specific activation target.
+
+<ParamField path="targetId" type="string" required>
+  The unique identifier of the activation target
+</ParamField>
+
+**Response:**
+
+```json
+{
+  "id": "ACT_001",
+  "name": "Google_Ads_Target",
+  "displayName": "Google Ads - Main Account",
+  "description": "Primary Google Ads account for customer acquisition campaigns",
+  "type": "ADVERTISING",
+  "platform": "GOOGLE_ADS",
+  "status": "ACTIVE",
+  "configuration": {
+    "accountId": "123-456-7890",
+    "customerId": "1234567890",
+    "matchType": "CUSTOMER_MATCH",
+    "identifierFields": ["email", "phone", "mobileId"]
+  },
+  "fieldMappings": [
+    {
+      "sourceField": "Email__c",
+      "destinationField": "hashedEmail",
+      "transformation": "SHA256"
+    },
+    {
+      "sourceField": "Phone__c",
+      "destinationField": "hashedPhone",
+      "transformation": "SHA256_E164"
+    }
+  ],
+  "syncSchedule": {
+    "frequency": "DAILY",
+    "time": "08:00:00Z"
+  },
+  "segments": [
+    {
+      "segmentId": "SEG_001",
+      "segmentName": "High Value Customers",
+      "status": "ACTIVE",
+      "lastSyncDate": "2024-01-15T08:00:00Z",
+      "membersSynced": 42500
+    }
+  ],
+  "statistics": {
+    "totalRecordsSynced": 125000,
+    "lastSyncDuration": "15m 30s",
+    "averageMatchRate": 0.72
+  }
+}
+```
+
+### List Activations
+
+#### GET /services/data/v64.0/ssot/activations
+
+Retrieve all segment-to-target activations.
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `segmentId` | string | Filter by segment |
+| `targetId` | string | Filter by activation target |
+| `status` | string | Filter by status: `ACTIVE`, `PAUSED`, `ERROR` |
+
+**Response:**
+
+```json
+{
+  "activations": [
+    {
+      "id": "ACTV_001",
+      "segmentId": "SEG_001",
+      "segmentName": "High Value Customers",
+      "targetId": "ACT_001",
+      "targetName": "Google Ads - Main Account",
+      "status": "ACTIVE",
+      "syncStatus": "SUCCESS",
+      "lastSyncDate": "2024-01-15T08:00:00Z",
+      "membersSynced": 42500,
+      "matchRate": 0.72
+    },
+    {
+      "id": "ACTV_002",
+      "segmentId": "SEG_002",
+      "segmentName": "Recent Purchasers",
+      "targetId": "ACT_003",
+      "targetName": "Meta Ads Manager",
+      "status": "ACTIVE",
+      "syncStatus": "SUCCESS",
+      "lastSyncDate": "2024-01-15T07:30:00Z",
+      "membersSynced": 11200,
+      "matchRate": 0.68
+    }
+  ],
+  "totalCount": 12
+}
+```
+
+### Create Activation
+
+#### POST /services/data/v64.0/ssot/activations
+
+Create a new activation to sync a segment to a target.
+
+**Request Body:**
+
+```json Request {2-3,4-14,15-18}
+{
+  "segmentId": "SEG_003",
+  "targetId": "ACT_001",
+  "fieldMappings": [
+    {
+      "sourceField": "Email__c",
+      "destinationField": "hashedEmail"
+    },
+    {
+      "sourceField": "Phone__c",
+      "destinationField": "hashedPhone"
+    }
+  ],
+  "syncSchedule": {
+    "frequency": "DAILY",
+    "time": "06:00:00Z"
+  },
+  "options": {
+    "includeNewMembers": true,
+    "removeExitedMembers": true
+  }
+}
+```
+
+**Response:**
+
+```json Response {2-3}
+{
+  "id": "ACTV_003",
+  "status": "PENDING",
+  "message": "Activation created. Initial sync will begin at scheduled time."
+}
+```
+
+### Trigger Activation Sync
+
+#### POST /services/data/v64.0/ssot/activations/{activationId}/sync
+
+Manually trigger an immediate sync for an activation.
+
+<ParamField path="activationId" type="string" required>
+  The unique identifier of the activation
+</ParamField>
+
+**Request Body (Optional):**
+
+```json
+{
+  "syncType": "FULL",
+  "priority": "HIGH"
+}
+```
+
+**Response:**
+
+```json
+{
+  "activationId": "ACTV_001",
+  "syncJobId": "SYNC_001",
+  "status": "RUNNING",
+  "estimatedCompletionTime": "2024-01-15T10:45:00Z"
+}
+```
+
+### Get Activation Sync History
+
+#### GET /services/data/v64.0/ssot/activations/{activationId}/history
+
+Retrieve sync history for an activation.
+
+<ParamField path="activationId" type="string" required>
+  The unique identifier of the activation
+</ParamField>
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `startDate` | datetime | History from this date |
+| `endDate` | datetime | History until this date |
+| `limit` | integer | Maximum results |
+
+**Response:**
+
+```json
+{
+  "activationId": "ACTV_001",
+  "history": [
+    {
+      "syncId": "SYNC_001",
+      "startTime": "2024-01-15T08:00:00Z",
+      "endTime": "2024-01-15T08:15:30Z",
+      "status": "SUCCESS",
+      "statistics": {
+        "segmentSize": 45230,
+        "recordsSent": 45230,
+        "recordsMatched": 32566,
+        "matchRate": 0.72,
+        "newRecords": 1250,
+        "removedRecords": 850
+      }
+    },
+    {
+      "syncId": "SYNC_000",
+      "startTime": "2024-01-14T08:00:00Z",
+      "endTime": "2024-01-14T08:14:45Z",
+      "status": "SUCCESS",
+      "statistics": {
+        "segmentSize": 44830,
+        "recordsSent": 44830,
+        "recordsMatched": 32128,
+        "matchRate": 0.72,
+        "newRecords": 980,
+        "removedRecords": 720
+      }
+    }
+  ]
+}
+```
+
+### Pause/Resume Activation
+
+#### PATCH /services/data/v64.0/ssot/activations/{activationId}
+
+Update activation status (pause or resume).
+
+<ParamField path="activationId" type="string" required>
+  The unique identifier of the activation
+</ParamField>
+
+**Request Body:**
+
+```json
+{
+  "status": "PAUSED"
+}
+```
+
+**Response:**
+
+```json
+{
+  "id": "ACTV_001",
+  "status": "PAUSED",
+  "message": "Activation paused. No further syncs will occur until resumed."
+}
+```
+
+## Supported Platforms
+
+### Advertising Platforms
+
+| Platform | Type | Identifiers Supported |
+|----------|------|----------------------|
+| Google Ads | Customer Match | Email, Phone, Mobile ID, Address |
+| Meta (Facebook) | Custom Audiences | Email, Phone, Mobile ID |
+| LinkedIn | Matched Audiences | Email, Company |
+| TikTok | Custom Audiences | Email, Phone, Mobile ID |
+| The Trade Desk | First-Party Data | Email, UID2 |
+
+### Marketing Platforms
+
+| Platform | Type | Data Types |
+|----------|------|------------|
+| Marketing Cloud | Journeys, Audiences | Full profiles |
+| Pardot | Prospects | Lead data |
+| HubSpot | Contacts | Profile + engagement |
+
+### Cloud Storage / Data Warehouses
+
+| Platform | Format | Options |
+|----------|--------|---------|
+| Snowflake | Table | Full refresh, Incremental |
+| Amazon S3 | CSV, Parquet, JSON | Partitioned by date |
+| Google BigQuery | Table | Streaming, Batch |
+| Azure Blob | CSV, Parquet | Incremental |
+
+## Code Examples
+
+<CodeGroup>
+```bash cURL icon=terminal
+curl -X POST "https://{instance}.salesforce.com/services/data/v64.0/ssot/activations" \
+  -H "Authorization: Bearer {access_token}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "segmentId": "SEG_001",
+    "targetId": "ACT_001",
+    "fieldMappings": [
+      {"sourceField": "Email__c", "destinationField": "hashedEmail"}
+    ],
+    "syncSchedule": {
+      "frequency": "DAILY",
+      "time": "06:00:00Z"
+    }
+  }'
+```
+
+```python trigger_sync.py icon=python lines {4-8,9,11-13}
+import requests
+
+activation_id = "ACTV_001"
+url = f"https://{instance}.salesforce.com/services/data/v64.0/ssot/activations/{activation_id}/sync"
+headers = {
+    "Authorization": f"Bearer {access_token}",
+    "Content-Type": "application/json"
+}
+payload = {"syncType": "INCREMENTAL"}
+
+response = requests.post(url, headers=headers, json=payload)
+result = response.json()
+print(f"Sync job {result['syncJobId']} started with status: {result['status']}")
+```
+
+```java GetSyncHistory.java icon=java lines {5-9}
+HttpClient client = HttpClient.newHttpClient();
+
+String url = "https://{instance}.salesforce.com/services/data/v64.0/ssot/activations/ACTV_001/history?limit=10";
+
+HttpRequest request = HttpRequest.newBuilder()
+    .uri(URI.create(url))
+    .header("Authorization", "Bearer " + accessToken)
+    .GET()
+    .build();
+
+HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+System.out.println(response.body());
+```
+</CodeGroup>
+
+## Sync Types
+
+| Type | Description | Use Case |
+|------|-------------|----------|
+| `FULL` | Re-sync all segment members | Initial sync, data reconciliation |
+| `INCREMENTAL` | Only sync changes since last sync | Regular scheduled syncs |
+| `ADDITIONS_ONLY` | Only add new members | Suppression list use cases |
+| `REMOVALS_ONLY` | Only remove exited members | Cleanup operations |
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Connection Security">
+    - Use OAuth 2.0 for platform authentication
+    - Rotate credentials regularly
+    - Enable data encryption in transit
+    - Review connected app permissions periodically
+  </Accordion>
+
+  <Accordion title="Sync Optimization">
+    - Use incremental syncs for large segments
+    - Schedule syncs during platform low-usage periods
+    - Monitor match rates and optimize identifier mappings
+    - Set up alerts for sync failures
+  </Accordion>
+
+  <Accordion title="Data Privacy">
+    - Hash PII before sending to ad platforms
+    - Review data sharing agreements
+    - Implement consent-based activation filters
+    - Maintain audit logs of data exports
+  </Accordion>
+
+  <Accordion title="Troubleshooting">
+    - Check sync history for error patterns
+    - Verify field mappings match platform requirements
+    - Test with small segments before large-scale activation
+    - Contact platform support for persistent match rate issues
+  </Accordion>
+</AccordionGroup>
+
+## Related Resources
+
+- [Segments API](/apis/connect-api/segments) - Create and manage segments
+- [Data Streams](/apis/connect-api/data-streams) - Configure data inputs
+- [Activation Targets](https://help.salesforce.com/s/articleView?id=data.c360_a_activation_targets.htm&type=5) - Setup guide
+- [Data Sharing Best Practices](https://help.salesforce.com/s/articleView?id=data.c360_a_data_sharing.htm&type=5) - Privacy guidelines

@@ -1,0 +1,215 @@
+---
+title: "Metadata Types Overview"
+description: "Salesforce Metadata API types for deploying and managing Data 360 configurations"
+---
+
+# Data 360 Metadata Types
+
+Salesforce Metadata API enables you to deploy, retrieve, and manage Data 360 configurations programmatically. This allows you to version control your Data 360 setup, promote configurations between environments, and automate deployment processes.
+
+## Overview
+
+Data 360 metadata types represent the configuration artifacts that define how your Data 360 environment is set up:
+
+<CardGroup cols={2}>
+  <Card title="Data Source" icon="database" href="/apis/metadata-types/data-source">
+    External data source configurations and connections
+  </Card>
+  <Card title="Data Stream" icon="water" href="/apis/metadata-types/data-stream">
+    Data stream definitions and schemas
+  </Card>
+  <Card title="Identity Resolution" icon="users" href="/apis/metadata-types/identity-resolution">
+    Identity resolution rules and configurations
+  </Card>
+  <Card title="Calculated Insights" icon="chart-line" href="/apis/metadata-types/calculated-insights">
+    Calculated insight definitions and metrics
+  </Card>
+  <Card title="Segments" icon="users-rectangle" href="/apis/metadata-types/segments">
+    Segment definitions and criteria
+  </Card>
+  <Card title="Ingestion Schema" icon="file-code" href="/apis/metadata-types/ingestion-schema">
+    Ingestion API schemas and configurations
+  </Card>
+</CardGroup>
+
+## Available Metadata Types
+
+| Metadata Type | API Name | Description |
+|---------------|----------|-------------|
+| **DataSource** | `DataSource` | External data source configuration |
+| **DataSourceBundleDefinition** | `DataSourceBundleDefinition` | Bundle of data source definitions |
+| **DataSourceObject** | `DataSourceObject` | Object within a data source |
+| **DataStream** | `DataStream` | Data stream configuration |
+| **DataStreamDefinition** | `DataStreamDefinition` | Data stream schema definition |
+| **DataStreamTemplate** | `DataStreamTemplate` | Reusable stream templates |
+| **IdentityResolutionSettings** | `IdentityResolutionSettings` | Identity resolution configuration |
+| **CalculatedInsightDefinition** | `CalculatedInsightDefinition` | Calculated insight definitions |
+| **SegmentDefinition** | `SegmentDefinition` | Segment configuration |
+| **DataCloudIngestionApiSchema** | `DataCloudIngestionApiSchema` | Ingestion API schemas |
+| **ExternalDataSource** | `ExternalDataSource` | External data source connections |
+
+## Working with Metadata API
+
+### Retrieve Metadata
+
+Use the Metadata API `retrieve()` call or Salesforce CLI to retrieve Data 360 metadata:
+
+```bash
+# Using Salesforce CLI
+sf project retrieve start -m DataStreamDefinition
+
+# Retrieve all Data 360 metadata types
+sf project retrieve start -m DataSource,DataStreamDefinition,CalculatedInsightDefinition,SegmentDefinition
+```
+
+### Deploy Metadata
+
+Deploy Data 360 configurations to target orgs:
+
+```bash
+# Deploy specific metadata
+sf project deploy start -m DataStreamDefinition:MyDataStream
+
+# Deploy from manifest
+sf project deploy start -x manifest/package.xml
+```
+
+### Package.xml Example
+
+Include Data 360 metadata types in your package manifest:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>*</members>
+        <name>DataSource</name>
+    </types>
+    <types>
+        <members>*</members>
+        <name>DataStreamDefinition</name>
+    </types>
+    <types>
+        <members>*</members>
+        <name>DataStreamTemplate</name>
+    </types>
+    <types>
+        <members>*</members>
+        <name>CalculatedInsightDefinition</name>
+    </types>
+    <types>
+        <members>*</members>
+        <name>SegmentDefinition</name>
+    </types>
+    <types>
+        <members>*</members>
+        <name>IdentityResolutionSettings</name>
+    </types>
+    <types>
+        <members>*</members>
+        <name>DataCloudIngestionApiSchema</name>
+    </types>
+    <version>64.0</version>
+</Package>
+```
+
+## Deployment Best Practices
+
+<AccordionGroup>
+  <Accordion title="Environment Strategy">
+    - Maintain separate sandboxes for development, testing, and staging
+    - Use scratch orgs for feature development
+    - Implement CI/CD pipelines for automated deployments
+    - Version control all metadata configurations
+  </Accordion>
+
+  <Accordion title="Dependency Management">
+    - Deploy dependent metadata in correct order:
+      1. External Data Sources
+      2. Data Sources and Objects
+      3. Data Streams and Definitions
+      4. Identity Resolution Settings
+      5. Calculated Insights
+      6. Segments
+    - Use destructive changes carefully
+    - Test deployments in sandbox before production
+  </Accordion>
+
+  <Accordion title="Configuration as Code">
+    - Store metadata in version control (Git)
+    - Use meaningful commit messages for changes
+    - Implement code review processes for metadata changes
+    - Document configuration decisions
+  </Accordion>
+
+  <Accordion title="Testing">
+    - Validate deployments in sandbox environments
+    - Test data flows after configuration changes
+    - Verify identity resolution rules produce expected results
+    - Check calculated insights return correct values
+  </Accordion>
+</AccordionGroup>
+
+## Common Deployment Scenarios
+
+### New Data Source Setup
+
+Deploy a new data source with its schema and streams:
+
+```bash
+# 1. Deploy data source configuration
+sf project deploy start -m DataSource:MyExternalSource
+
+# 2. Deploy data stream definitions
+sf project deploy start -m DataStreamDefinition:MyDataStream
+
+# 3. Deploy ingestion schema
+sf project deploy start -m DataCloudIngestionApiSchema:MyIngestionSchema
+```
+
+### Calculated Insight Migration
+
+Move calculated insights between environments:
+
+```bash
+# Retrieve from source org
+sf project retrieve start -m CalculatedInsightDefinition:CustomerLTV -o source-org
+
+# Deploy to target org
+sf project deploy start -m CalculatedInsightDefinition:CustomerLTV -o target-org
+```
+
+### Full Environment Promotion
+
+Promote all Data 360 configurations to a new environment:
+
+```bash
+# Create deployment package
+sf project retrieve start -x manifest/data360-package.xml -o source-org
+
+# Validate deployment
+sf project deploy start -x manifest/data360-package.xml -o target-org --dry-run
+
+# Execute deployment
+sf project deploy start -x manifest/data360-package.xml -o target-org
+```
+
+## Metadata Type Details
+
+Click on each metadata type below for detailed field specifications and examples:
+
+| Type | Documentation | Key Fields |
+|------|---------------|------------|
+| [DataSource](/apis/metadata-types/data-source) | Data source setup | `masterLabel`, `connectionType`, `credentials` |
+| [DataStream](/apis/metadata-types/data-stream) | Stream configuration | `streamLabel`, `category`, `sourceObject` |
+| [IdentityResolutionSettings](/apis/metadata-types/identity-resolution) | ID resolution rules | `matchRules`, `survivorshipRules` |
+| [CalculatedInsightDefinition](/apis/metadata-types/calculated-insights) | Insight definitions | `expression`, `dimensions`, `measures` |
+| [SegmentDefinition](/apis/metadata-types/segments) | Segment criteria | `criteria`, `refreshSchedule` |
+| [DataCloudIngestionApiSchema](/apis/metadata-types/ingestion-schema) | API schemas | `fields`, `primaryKeys` |
+
+## Related Resources
+
+- [Metadata API Developer Guide](https://developer.salesforce.com/docs/atlas.en-us.api_meta.meta/api_meta/meta_intro.htm)
+- [Salesforce CLI Command Reference](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference.htm)
+- [Data 360 Connect API](/apis/connect-api/index) - REST API for runtime operations
+- [Query API](/apis/query-api/index) - Query Data 360 data

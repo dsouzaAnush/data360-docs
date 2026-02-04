@@ -1,0 +1,358 @@
+---
+title: "Data Ingestion API"
+description: "Stream data into Salesforce Data 360 using the Connect REST API ingestion endpoints"
+openapi: "POST /services/data/v64.0/ssot/streaming/{streamName}"
+---
+
+# Data Ingestion API
+
+The Data Ingestion API enables you to stream data into Data 360 in real-time using REST endpoints. This is the primary method for ingesting data from external systems, applications, and IoT devices.
+
+## Overview
+
+Data 360 supports multiple ingestion methods:
+
+| Method | Use Case | Latency |
+|--------|----------|---------|
+| **Streaming Ingestion** | Real-time events, user interactions | Near real-time |
+| **Batch Ingestion** | Large data volumes, scheduled loads | Minutes to hours |
+| **Connector-based** | Pre-built connectors for common sources | Varies |
+
+## Streaming Ingestion Endpoint
+
+### POST /services/data/v64.0/ssot/streaming/{streamName}
+
+Ingest records into a specific data stream in real-time.
+
+<ParamField path="streamName" type="string" required>
+  The API name of the target data stream (e.g., `WebEngagement_Stream`)
+</ParamField>
+
+#### Request Headers
+
+| Header | Required | Description |
+|--------|----------|-------------|
+| `Authorization` | Yes | `Bearer {access_token}` |
+| `Content-Type` | Yes | `application/json` |
+
+#### Request Body
+
+```json Request Body {2-12}
+{
+  "data": [
+    {
+      "EventId__c": "evt_001",
+      "EventType__c": "page_view",
+      "UserId__c": "user_12345",
+      "PageUrl__c": "https://example.com/products",
+      "Timestamp__c": "2024-01-15T10:30:00Z",
+      "DeviceType__c": "mobile"
+    },
+    {
+      "EventId__c": "evt_002",
+      "EventType__c": "add_to_cart",
+      "UserId__c": "user_12345",
+      "ProductId__c": "SKU-789",
+      "Timestamp__c": "2024-01-15T10:32:15Z",
+      "DeviceType__c": "mobile"
+    }
+  ]
+}
+```
+
+#### Response
+
+<CodeGroup>
+```json Success (200) {2-3}
+{
+  "accepted": 2,
+  "rejected": 0,
+  "errors": []
+}
+```
+
+```json Partial Success (200) {2-3,5-9}
+{
+  "accepted": 1,
+  "rejected": 1,
+  "errors": [
+    {
+      "index": 1,
+      "errorCode": "INVALID_FIELD",
+      "message": "Field 'InvalidField__c' does not exist on stream"
+    }
+  ]
+}
+```
+
+```json Error (400)
+{
+  "error": "Invalid stream name",
+  "errorCode": "STREAM_NOT_FOUND",
+  "details": "Data stream 'InvalidStream' does not exist"
+}
+```
+</CodeGroup>
+
+## Code Examples
+
+<CodeGroup>
+```bash cURL icon=terminal
+curl -X POST "https://{instance}.salesforce.com/services/data/v64.0/ssot/streaming/WebEngagement_Stream" \
+  -H "Authorization: Bearer {access_token}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "data": [
+      {
+        "EventId__c": "evt_001",
+        "EventType__c": "page_view",
+        "UserId__c": "user_12345",
+        "Timestamp__c": "2024-01-15T10:30:00Z"
+      }
+    ]
+  }'
+```
+
+```python streaming_ingest.py icon=python lines
+import requests
+
+url = "https://{instance}.salesforce.com/services/data/v64.0/ssot/streaming/WebEngagement_Stream"
+headers = {
+    "Authorization": f"Bearer {access_token}",
+    "Content-Type": "application/json"
+}
+payload = {
+    "data": [
+        {
+            "EventId__c": "evt_001",
+            "EventType__c": "page_view",
+            "UserId__c": "user_12345",
+            "Timestamp__c": "2024-01-15T10:30:00Z"
+        }
+    ]
+}
+
+response = requests.post(url, headers=headers, json=payload)
+result = response.json()
+
+print(f"Accepted: {result['accepted']}, Rejected: {result['rejected']}")
+```
+
+```java StreamingIngest.java icon=java lines
+import java.net.http.*;
+import java.net.URI;
+
+HttpClient client = HttpClient.newHttpClient();
+
+String json = """
+{
+  "data": [
+    {
+      "EventId__c": "evt_001",
+      "EventType__c": "page_view",
+      "UserId__c": "user_12345",
+      "Timestamp__c": "2024-01-15T10:30:00Z"
+    }
+  ]
+}
+""";
+
+HttpRequest request = HttpRequest.newBuilder()
+    .uri(URI.create("https://{instance}.salesforce.com/services/data/v64.0/ssot/streaming/WebEngagement_Stream"))
+    .header("Authorization", "Bearer " + accessToken)
+    .header("Content-Type", "application/json")
+    .POST(HttpRequest.BodyPublishers.ofString(json))
+    .build();
+
+HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+System.out.println(response.body());
+```
+
+```apex ApexIngestion.cls icon=salesforce lines
+Http http = new Http();
+HttpRequest request = new HttpRequest();
+request.setEndpoint('callout:Data360/services/data/v64.0/ssot/streaming/WebEngagement_Stream');
+request.setMethod('POST');
+request.setHeader('Content-Type', 'application/json');
+request.setBody(JSON.serialize(new Map<String, Object>{
+    'data' => new List<Map<String, Object>>{
+        new Map<String, Object>{
+            'EventId__c' => 'evt_001',
+            'EventType__c' => 'page_view',
+            'UserId__c' => 'user_12345',
+            'Timestamp__c' => Datetime.now().formatGmt('yyyy-MM-dd\'T\'HH:mm:ss\'Z\'')
+        }
+    }
+}));
+
+HttpResponse response = http.send(request);
+System.debug(response.getBody());
+```
+</CodeGroup>
+
+## Batch Ingestion
+
+For larger data volumes, use batch ingestion which accepts multiple records and processes them asynchronously.
+
+### POST /services/data/v64.0/ssot/streaming-batch/{streamName}
+
+<ParamField path="streamName" type="string" required>
+  The API name of the target data stream
+</ParamField>
+
+#### Request Body
+
+```json Batch Request {2-5}
+{
+  "data": [
+    { "field1": "value1", "field2": "value2" },
+    { "field1": "value3", "field2": "value4" }
+    // Up to 100,000 records per batch
+  ]
+}
+```
+
+#### Response
+
+```json Batch Response {2-3}
+{
+  "batchId": "batch_abc123",
+  "status": "ACCEPTED",
+  "recordCount": 50000
+}
+```
+
+## Complete Ingestion Example
+
+Here's a complete example showing how to ingest multiple events with error handling:
+
+```python batch_ingest_example.py icon=python lines expandable
+import requests
+import json
+from datetime import datetime
+from typing import List, Dict, Any
+
+class Data360Ingester:
+    def __init__(self, instance_url: str, access_token: str):
+        self.instance_url = instance_url
+        self.access_token = access_token
+        self.base_url = f"{instance_url}/services/data/v64.0/ssot/streaming"
+
+    def ingest_events(self, stream_name: str, events: List[Dict[str, Any]]) -> Dict:
+        """Ingest events into a Data 360 stream."""
+        url = f"{self.base_url}/{stream_name}"
+        headers = {
+            "Authorization": f"Bearer {self.access_token}",
+            "Content-Type": "application/json"
+        }
+        payload = {"data": events}
+
+        response = requests.post(url, headers=headers, json=payload)
+        response.raise_for_status()
+        return response.json()
+
+    def ingest_with_retry(self, stream_name: str, events: List[Dict], max_retries: int = 3):
+        """Ingest with automatic retry for failed records."""
+        pending_events = events
+        all_results = {"accepted": 0, "rejected": 0, "errors": []}
+
+        for attempt in range(max_retries):
+            if not pending_events:
+                break
+
+            result = self.ingest_events(stream_name, pending_events)
+            all_results["accepted"] += result["accepted"]
+
+            if result["rejected"] == 0:
+                break
+
+            # Collect failed events for retry
+            failed_indices = {e["index"] for e in result["errors"]}
+            pending_events = [e for i, e in enumerate(pending_events) if i in failed_indices]
+            all_results["errors"].extend(result["errors"])
+
+            print(f"Attempt {attempt + 1}: {result['accepted']} accepted, {result['rejected']} rejected")
+
+        all_results["rejected"] = len(pending_events)
+        return all_results
+
+
+# Usage example
+if __name__ == "__main__":
+    ingester = Data360Ingester(
+        instance_url="https://your-instance.salesforce.com",
+        access_token="your_access_token"
+    )
+
+    events = [
+        {
+            "EventId__c": f"evt_{i}",
+            "EventType__c": "page_view",
+            "UserId__c": "user_12345",
+            "Timestamp__c": datetime.utcnow().isoformat() + "Z"
+        }
+        for i in range(100)
+    ]
+
+    result = ingester.ingest_with_retry("WebEngagement_Stream", events)
+    print(f"Final result: {result['accepted']} accepted, {result['rejected']} rejected")
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Optimize Batch Size">
+    - **Small batches** (1-100 records): Use for real-time, low-latency requirements
+    - **Medium batches** (100-1000 records): Balance between latency and throughput
+    - **Large batches** (1000+ records): Maximum throughput for bulk operations
+  </Accordion>
+
+  <Accordion title="Handle Errors Gracefully">
+    - Check the `rejected` count in responses
+    - Log and retry failed records with exponential backoff
+    - Monitor ingestion success rates
+  </Accordion>
+
+  <Accordion title="Schema Compliance">
+    - Ensure all required fields are present
+    - Use correct data types (dates in ISO 8601 format)
+    - Validate against the stream schema before sending
+  </Accordion>
+
+  <Accordion title="Implement Idempotency">
+    - Include unique identifiers for each record
+    - Use the same ID for retries to prevent duplicates
+    - Leverage Data 360's deduplication features
+  </Accordion>
+</AccordionGroup>
+
+## Rate Limits
+
+### Streaming Ingestion Limits
+
+| Limit Type | Value |
+|------------|-------|
+| Maximum payload size | 200 KB |
+| Maximum requests per second | 250 |
+| Records per request | Depends on payload size |
+
+### Bulk/Batch Ingestion Limits
+
+| Limit Type | Value |
+|------------|-------|
+| Maximum payload size | 150 MB |
+| Maximum files per job | 100 |
+| Maximum concurrent jobs | 5 |
+| Maximum requests per hour | 20 |
+| Job retention period | 7 days |
+| Typical processing time | ~3 minutes |
+
+<Note>
+Bulk ingestion jobs are processed asynchronously. The actual processing time may vary based on data volume and system load.
+</Note>
+
+## Related Resources
+
+- [Data Streams](/apis/connect-api/data-streams) - Manage data stream configurations
+- [Ingestion Schema Metadata](/apis/metadata-types/ingestion-schema) - Define ingestion schemas
+- [Data Stream Definition](https://help.salesforce.com/s/articleView?id=data.c360_a_set_up_ingestion_api.htm&type=5) - Setup guide

@@ -1,0 +1,438 @@
+---
+title: "DataStream Metadata Types"
+description: "Configure data stream definitions and templates for Data 360"
+---
+
+# DataStream Metadata Types
+
+Data stream metadata types define how data flows into and through Data 360. This includes stream configurations, schema definitions, and reusable templates.
+
+## Overview
+
+Data 360 uses several related metadata types for stream management:
+
+| Type | Purpose |
+|------|---------|
+| `DataStream` | Active stream configuration |
+| `DataStreamDefinition` | Schema and field definitions |
+| `DataStreamTemplate` | Reusable stream templates |
+
+## DataStreamDefinition
+
+The primary metadata type for defining data stream schemas.
+
+### Structure
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<DataStreamDefinition xmlns="http://soap.sforce.com/2006/04/metadata">
+    <masterLabel>Web Engagement Events</masterLabel>
+    <developerName>Web_Engagement_Events</developerName>
+    <description>Captures user interactions on the website</description>
+    <category>Engagement</category>
+    <sourceObject>Page_View_Event</sourceObject>
+    <dataSource>Customer_Events_S3</dataSource>
+    <isEnabled>true</isEnabled>
+    <refreshFrequency>Streaming</refreshFrequency>
+    <fields>
+        <field>
+            <name>EventId__c</name>
+            <label>Event ID</label>
+            <type>Text</type>
+            <length>100</length>
+            <isPrimaryKey>true</isPrimaryKey>
+            <isRequired>true</isRequired>
+        </field>
+        <field>
+            <name>UserId__c</name>
+            <label>User ID</label>
+            <type>Text</type>
+            <length>50</length>
+            <isRequired>false</isRequired>
+            <keyQualifierFieldName>DataSourceId__c</keyQualifierFieldName>
+        </field>
+        <field>
+            <name>EventType__c</name>
+            <label>Event Type</label>
+            <type>Text</type>
+            <length>50</length>
+            <isRequired>true</isRequired>
+        </field>
+        <field>
+            <name>EventTimestamp__c</name>
+            <label>Event Timestamp</label>
+            <type>DateTime</type>
+            <isRequired>true</isRequired>
+            <dateFormat>ISO8601</dateFormat>
+        </field>
+        <field>
+            <name>PageUrl__c</name>
+            <label>Page URL</label>
+            <type>Url</type>
+            <length>500</length>
+        </field>
+        <field>
+            <name>Revenue__c</name>
+            <label>Revenue</label>
+            <type>Currency</type>
+            <precision>18</precision>
+            <scale>2</scale>
+        </field>
+    </fields>
+</DataStreamDefinition>
+```
+
+## Field Reference
+
+### DataStreamDefinition Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `masterLabel` | string | Yes | Display name |
+| `developerName` | string | Yes | API name (unique) |
+| `description` | string | No | Stream description |
+| `category` | enum | Yes | `Profile`, `Engagement`, `Other` |
+| `sourceObject` | string | Conditional | Source object reference |
+| `dataSource` | string | Conditional | Data source reference |
+| `isEnabled` | boolean | Yes | Whether stream is active |
+| `refreshFrequency` | enum | Yes | How often data refreshes |
+| `fields` | array | Yes | Field definitions |
+
+### Refresh Frequency Options
+
+| Value | Description |
+|-------|-------------|
+| `Streaming` | Real-time, continuous ingestion |
+| `Hourly` | Refresh every hour |
+| `Daily` | Refresh once per day |
+| `Weekly` | Refresh once per week |
+| `OnDemand` | Manual refresh only |
+
+### Field Definition Attributes
+
+| Attribute | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `name` | string | Yes | Field API name (must end in `__c`) |
+| `label` | string | Yes | Display label |
+| `type` | enum | Yes | Data type |
+| `length` | integer | Conditional | For Text fields |
+| `precision` | integer | Conditional | For Number/Currency |
+| `scale` | integer | Conditional | For Number/Currency |
+| `isPrimaryKey` | boolean | No | Part of primary key |
+| `isRequired` | boolean | No | Required field |
+| `keyQualifierFieldName` | string | No | Key qualifier reference |
+| `dateFormat` | string | No | Date/time format |
+| `defaultValue` | string | No | Default value |
+
+### Supported Data Types
+
+| Type | Description | Config Options |
+|------|-------------|----------------|
+| `Text` | String data | `length` |
+| `LongText` | Large text (>255 chars) | `length` |
+| `Number` | Numeric data | `precision`, `scale` |
+| `Currency` | Monetary values | `precision`, `scale` |
+| `Boolean` | True/false | None |
+| `Date` | Date only | `dateFormat` |
+| `DateTime` | Date and time | `dateFormat` |
+| `Email` | Email address | None |
+| `Phone` | Phone number | None |
+| `Url` | Web URL | `length` |
+| `Picklist` | Enumerated values | `values` |
+
+## DataStreamTemplate
+
+Reusable templates for creating consistent stream definitions.
+
+### Structure
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<DataStreamTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <masterLabel>Standard Engagement Event</masterLabel>
+    <developerName>Standard_Engagement_Event</developerName>
+    <description>Template for standard engagement event streams</description>
+    <category>Engagement</category>
+    <templateFields>
+        <field>
+            <name>EventId__c</name>
+            <label>Event ID</label>
+            <type>Text</type>
+            <length>100</length>
+            <isPrimaryKey>true</isPrimaryKey>
+            <isRequired>true</isRequired>
+            <isTemplateField>true</isTemplateField>
+        </field>
+        <field>
+            <name>EventTimestamp__c</name>
+            <label>Event Timestamp</label>
+            <type>DateTime</type>
+            <isRequired>true</isRequired>
+            <isTemplateField>true</isTemplateField>
+        </field>
+        <field>
+            <name>UserId__c</name>
+            <label>User ID</label>
+            <type>Text</type>
+            <length>50</length>
+            <isTemplateField>true</isTemplateField>
+        </field>
+        <field>
+            <name>EventType__c</name>
+            <label>Event Type</label>
+            <type>Text</type>
+            <length>50</length>
+            <isRequired>true</isRequired>
+            <isTemplateField>true</isTemplateField>
+        </field>
+    </templateFields>
+    <allowCustomFields>true</allowCustomFields>
+</DataStreamTemplate>
+```
+
+## Deployment Examples
+
+### Retrieve Data Streams
+
+```bash
+# Retrieve all stream definitions
+sf project retrieve start -m DataStreamDefinition
+
+# Retrieve specific stream
+sf project retrieve start -m DataStreamDefinition:Web_Engagement_Events
+
+# Retrieve templates
+sf project retrieve start -m DataStreamTemplate
+```
+
+### Deploy Data Streams
+
+```bash
+# Deploy single stream
+sf project deploy start -m DataStreamDefinition:Web_Engagement_Events
+
+# Deploy all streams
+sf project deploy start -m DataStreamDefinition
+
+# Deploy with templates
+sf project deploy start -m DataStreamDefinition,DataStreamTemplate
+```
+
+### Package.xml Configuration
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>Web_Engagement_Events</members>
+        <members>Mobile_App_Events</members>
+        <members>Purchase_Events</members>
+        <name>DataStreamDefinition</name>
+    </types>
+    <types>
+        <members>Standard_Engagement_Event</members>
+        <members>Standard_Transaction_Event</members>
+        <name>DataStreamTemplate</name>
+    </types>
+    <version>64.0</version>
+</Package>
+```
+
+## Complete Examples
+
+### Profile Data Stream
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<DataStreamDefinition xmlns="http://soap.sforce.com/2006/04/metadata">
+    <masterLabel>Customer Profiles</masterLabel>
+    <developerName>Customer_Profiles</developerName>
+    <description>Customer profile data from CRM</description>
+    <category>Profile</category>
+    <sourceObject>Contact</sourceObject>
+    <dataSource>Salesforce_CRM</dataSource>
+    <isEnabled>true</isEnabled>
+    <refreshFrequency>Hourly</refreshFrequency>
+    <fields>
+        <field>
+            <name>CustomerId__c</name>
+            <label>Customer ID</label>
+            <type>Text</type>
+            <length>50</length>
+            <isPrimaryKey>true</isPrimaryKey>
+            <isRequired>true</isRequired>
+        </field>
+        <field>
+            <name>FirstName__c</name>
+            <label>First Name</label>
+            <type>Text</type>
+            <length>100</length>
+        </field>
+        <field>
+            <name>LastName__c</name>
+            <label>Last Name</label>
+            <type>Text</type>
+            <length>100</length>
+            <isRequired>true</isRequired>
+        </field>
+        <field>
+            <name>Email__c</name>
+            <label>Email</label>
+            <type>Email</type>
+        </field>
+        <field>
+            <name>Phone__c</name>
+            <label>Phone</label>
+            <type>Phone</type>
+        </field>
+        <field>
+            <name>BirthDate__c</name>
+            <label>Birth Date</label>
+            <type>Date</type>
+        </field>
+        <field>
+            <name>LoyaltyTier__c</name>
+            <label>Loyalty Tier</label>
+            <type>Picklist</type>
+            <values>Bronze,Silver,Gold,Platinum</values>
+        </field>
+        <field>
+            <name>LifetimeValue__c</name>
+            <label>Lifetime Value</label>
+            <type>Currency</type>
+            <precision>18</precision>
+            <scale>2</scale>
+        </field>
+    </fields>
+</DataStreamDefinition>
+```
+
+### Transaction Data Stream
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<DataStreamDefinition xmlns="http://soap.sforce.com/2006/04/metadata">
+    <masterLabel>Purchase Transactions</masterLabel>
+    <developerName>Purchase_Transactions</developerName>
+    <description>E-commerce purchase transactions</description>
+    <category>Engagement</category>
+    <sourceObject>Order</sourceObject>
+    <dataSource>ECommerce_System</dataSource>
+    <isEnabled>true</isEnabled>
+    <refreshFrequency>Streaming</refreshFrequency>
+    <fields>
+        <field>
+            <name>TransactionId__c</name>
+            <label>Transaction ID</label>
+            <type>Text</type>
+            <length>50</length>
+            <isPrimaryKey>true</isPrimaryKey>
+            <isRequired>true</isRequired>
+        </field>
+        <field>
+            <name>CustomerId__c</name>
+            <label>Customer ID</label>
+            <type>Text</type>
+            <length>50</length>
+            <isRequired>true</isRequired>
+            <keyQualifierFieldName>DataSourceId__c</keyQualifierFieldName>
+        </field>
+        <field>
+            <name>TransactionDate__c</name>
+            <label>Transaction Date</label>
+            <type>DateTime</type>
+            <isRequired>true</isRequired>
+        </field>
+        <field>
+            <name>Amount__c</name>
+            <label>Amount</label>
+            <type>Currency</type>
+            <precision>18</precision>
+            <scale>2</scale>
+            <isRequired>true</isRequired>
+        </field>
+        <field>
+            <name>ProductCategory__c</name>
+            <label>Product Category</label>
+            <type>Text</type>
+            <length>100</length>
+        </field>
+        <field>
+            <name>PaymentMethod__c</name>
+            <label>Payment Method</label>
+            <type>Picklist</type>
+            <values>Credit Card,Debit Card,PayPal,Apple Pay,Google Pay</values>
+        </field>
+        <field>
+            <name>StoreId__c</name>
+            <label>Store ID</label>
+            <type>Text</type>
+            <length>20</length>
+        </field>
+        <field>
+            <name>Channel__c</name>
+            <label>Channel</label>
+            <type>Picklist</type>
+            <values>Web,Mobile App,In-Store,Phone</values>
+        </field>
+    </fields>
+</DataStreamDefinition>
+```
+
+## Categories and Data Model Objects
+
+### Category Mapping
+
+| Category | Creates DMO Type | Use For |
+|----------|-----------------|---------|
+| `Profile` | Individual, Account | Customer identity data |
+| `Engagement` | Event, Activity | Behavioral/interaction data |
+| `Other` | Custom | Reference data, products |
+
+### Standard DMO Suffixes
+
+| Suffix | Meaning |
+|--------|---------|
+| `__dll` | Data Lake Object |
+| `__dlm` | Data Model Object |
+| `__c` | Custom field |
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Schema Design">
+    - Always define a clear primary key
+    - Use key qualifiers for identity resolution
+    - Choose appropriate data types
+    - Include timestamp fields for temporal analysis
+    - Plan field naming conventions
+  </Accordion>
+
+  <Accordion title="Performance">
+    - Minimize field count for streaming data
+    - Use appropriate refresh frequencies
+    - Consider data volume when choosing refresh type
+    - Index frequently queried fields
+  </Accordion>
+
+  <Accordion title="Data Quality">
+    - Mark required fields appropriately
+    - Use picklists for controlled values
+    - Define field lengths based on actual data
+    - Document field purposes in descriptions
+  </Accordion>
+
+  <Accordion title="Template Usage">
+    - Create templates for common patterns
+    - Allow custom fields when flexibility needed
+    - Version templates for different use cases
+    - Document template requirements
+  </Accordion>
+</AccordionGroup>
+
+## Related Resources
+
+- [Data Source Metadata](/apis/metadata-types/data-source) - Configure data sources
+- [Data Streams API](/apis/connect-api/data-streams) - Runtime stream management
+- [Data Ingestion API](/apis/connect-api/data-ingestion) - Ingest data
+- [Data Streams Help](https://help.salesforce.com/s/articleView?id=data.c360_a_data_streams.htm&type=5) - Salesforce documentation

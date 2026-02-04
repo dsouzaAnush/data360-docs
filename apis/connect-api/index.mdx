@@ -1,15 +1,125 @@
 ---
 title: "Connect REST API Overview"
-description: ":::note
-As of October 14, 2025, Data Cloud has been rebranded to Data 360. During this transition, you may see references to Data Cloud in our applica"
+description: "Comprehensive guide to the Salesforce Data 360 Connect REST API for building integrations and managing data"
 ---
 
 # Get Started with Data 360 Connect API
 
+<Note>
 As of October 14, 2025, Data Cloud has been rebranded to Data 360. During this transition, you may see references to Data Cloud in our application and documentation. While the name is new, the functionality and content remains unchanged.
+</Note>
 
 Salesforce Data 360 Connect REST API creates business value by organizing and simplifying interactions with Data 360 services. It's the preferred platform for customers to construct solutions on top of Data 360, offering uniform implementation and testing practices.
 
-Use the [Data 360 Connect REST API Postman collection](https://www.postman.com/salesforce-developers/workspace/salesforce-developers/collection/12721794-fa94cb66-3cb1-41e1-ad4b-7c0ec34bb430) to try out Data 360 Connect REST API resources with your own variables.
+## Quick Links
 
-The [Connect REST API Developer Guide](https://developer.salesforce.com/docs/atlas.en-us.chatterapi.meta/chatterapi/intro_working_with_chatter_connect.htm) contains additional information about how to get started using Connect API.
+<CardGroup cols={2}>
+  <Card title="Postman Collection" icon="rocket" href="https://www.postman.com/salesforce-developers/workspace/salesforce-developers/collection/12721794-fa94cb66-3cb1-41e1-ad4b-7c0ec34bb430">
+    Try out Data 360 Connect REST API resources interactively
+  </Card>
+  <Card title="Connect REST API Guide" icon="book" href="https://developer.salesforce.com/docs/atlas.en-us.chatterapi.meta/chatterapi/intro_working_with_chatter_connect.htm">
+    Official Salesforce Connect REST API Developer Guide
+  </Card>
+</CardGroup>
+
+## API Categories
+
+The Connect REST API provides endpoints across several functional areas:
+
+| Category | Description | Documentation |
+|----------|-------------|---------------|
+| **Data Ingestion** | Stream data into Data 360 via REST endpoints | [Data Ingestion](/apis/connect-api/data-ingestion) |
+| **Data Streams** | Manage data stream configurations and schemas | [Data Streams](/apis/connect-api/data-streams) |
+| **Identity Resolution** | Configure and run identity resolution jobs | [Identity Resolution](/apis/connect-api/identity-resolution) |
+| **Segments** | Create and manage customer segments | [Segments](/apis/connect-api/segments) |
+| **Activations** | Configure activation targets and destinations | [Activations](/apis/connect-api/activations) |
+| **Query** | Execute SQL queries against Data 360 data | [Query API](/apis/query-api/query-services) |
+
+## Authentication
+
+All Connect REST API requests require OAuth 2.0 authentication. Include your access token in the `Authorization` header:
+
+```bash
+curl -X GET "https://{instance}.salesforce.com/services/data/v64.0/ssot/..." \
+  -H "Authorization: Bearer {access_token}" \
+  -H "Content-Type: application/json"
+```
+
+<Accordion title="OAuth 2.0 Setup">
+1. **Create a Connected App** in Salesforce Setup
+2. **Configure OAuth scopes** including `cdp_api` and `api`
+3. **Obtain access token** using Client Credentials or JWT Bearer flow
+4. **Include token** in all API requests
+
+See [OAuth 2.0 Client Credentials Flow](https://help.salesforce.com/s/articleView?id=xcloud.remoteaccess_oauth_client_credentials_flow.htm&type=5) for detailed setup instructions.
+</Accordion>
+
+## Base URL
+
+All Connect REST API endpoints use the following base URL pattern:
+
+```
+https://{instance}.salesforce.com/services/data/v64.0/
+```
+
+Replace `{instance}` with your Salesforce org's instance (e.g., `na1`, `eu5`, `cs10`).
+
+## Core Endpoints Overview
+
+### SQL Query Endpoints
+
+Execute and manage SQL queries against your Data 360 data:
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/services/data/v64.0/ssot/query-sql` | Create and execute a SQL query |
+| `GET` | `/services/data/v64.0/ssot/query-sql/{queryId}` | Get query execution status |
+| `GET` | `/services/data/v64.0/ssot/query-sql/{queryId}/rows` | Retrieve query results |
+| `DELETE` | `/services/data/v64.0/ssot/query-sql/{queryId}` | Cancel a running query |
+
+### Data Management Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/services/data/v64.0/ssot/streaming/{streamName}` | Ingest streaming data |
+| `GET` | `/services/data/v64.0/ssot/data-streams` | List data streams |
+| `POST` | `/services/data/v64.0/ssot/segments` | Create a segment |
+| `GET` | `/services/data/v64.0/ssot/segments` | List segments |
+
+## Rate Limits and Guidelines
+
+<Warning>
+- **Query API**: Maximum 15 concurrent requests per organization
+- **Streaming Ingestion**: Limits vary based on license tier
+- **Batch Size**: Maximum 100MB per batch for streaming ingestion
+</Warning>
+
+| Resource | Limit |
+|----------|-------|
+| Concurrent queries | 15 per org |
+| Query result retention | 24 hours |
+| Max rows per query | 4,999 default (configurable) |
+| Fields per Profile API request | 50 maximum |
+
+## Error Handling
+
+The API returns standard HTTP status codes:
+
+| Code | Description |
+|------|-------------|
+| `200` | Success |
+| `400` | Bad request - invalid parameters |
+| `403` | Authorization failed |
+| `404` | Resource not found |
+| `422` | Unprocessable entity - invalid field |
+| `429` | Rate limit exceeded |
+| `500` | Internal server error |
+
+See [Status Codes](/apis/query-api/status-codes) for detailed error handling guidance.
+
+## Related Resources
+
+- [Query API Overview](/apis/query-api/index) - Detailed query API documentation
+- [Metadata Types](/apis/metadata-types/index) - Salesforce Metadata API types for Data 360
+- [Data 360 Developer Guide](https://developer.salesforce.com/docs/platform/data-cloud-dev/guide/get-started.html) - Official documentation
+- [API Limits and Guidelines](https://help.salesforce.com/s/articleView?id=data.c360_a_limits_and_guidelines.htm&type=5) - Usage limits

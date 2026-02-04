@@ -1,0 +1,329 @@
+---
+title: "Data Streams API"
+description: "Manage data stream configurations and schemas in Data 360"
+openapi: "GET /services/data/v64.0/ssot/data-streams"
+---
+
+# Data Streams API
+
+The Data Streams API allows you to programmatically manage data stream configurations, including creating, updating, and monitoring data streams that flow into Data 360.
+
+## Overview
+
+Data streams define how data enters Data 360 from external sources. Each stream has:
+
+- **Schema definition** - Fields, data types, and validation rules
+- **Source configuration** - Where data originates
+- **Processing rules** - How data is transformed and enriched
+
+## Endpoints
+
+### List Data Streams
+
+#### GET /services/data/v64.0/ssot/data-streams
+
+Retrieve all data streams configured in your org.
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `status` | string | Filter by stream status: `ACTIVE`, `INACTIVE`, `ERROR` |
+| `category` | string | Filter by category: `Engagement`, `Profile`, `Other` |
+| `limit` | integer | Maximum records to return (default: 100) |
+| `offset` | integer | Pagination offset |
+
+**Response:**
+
+```json Response {3-12}
+{
+  "dataStreams": [
+    {
+      "name": "WebEngagement_Stream",
+      "displayName": "Web Engagement Events",
+      "category": "Engagement",
+      "status": "ACTIVE",
+      "sourceType": "API",
+      "createdDate": "2024-01-01T00:00:00Z",
+      "lastModifiedDate": "2024-01-15T10:30:00Z",
+      "recordCount": 1500000
+    },
+    {
+      "name": "SalesforceContacts_Stream",
+      "displayName": "Salesforce Contacts",
+      "category": "Profile",
+      "status": "ACTIVE",
+      "sourceType": "CRM_CONNECTOR",
+      "createdDate": "2024-01-01T00:00:00Z",
+      "lastModifiedDate": "2024-01-14T08:00:00Z",
+      "recordCount": 250000
+    }
+  ],
+  "totalCount": 15,
+  "offset": 0,
+  "limit": 100
+}
+```
+
+### Get Data Stream Details
+
+#### GET /services/data/v64.0/ssot/data-streams/{streamName}
+
+Retrieve detailed information about a specific data stream.
+
+<ParamField path="streamName" type="string" required>
+  The API name of the data stream
+</ParamField>
+
+**Response:**
+
+```json
+{
+  "name": "WebEngagement_Stream",
+  "displayName": "Web Engagement Events",
+  "description": "Captures web engagement events from the company website",
+  "category": "Engagement",
+  "status": "ACTIVE",
+  "sourceType": "API",
+  "schema": {
+    "fields": [
+      {
+        "name": "EventId__c",
+        "type": "STRING",
+        "required": true,
+        "primaryKey": true
+      },
+      {
+        "name": "EventType__c",
+        "type": "STRING",
+        "required": true
+      },
+      {
+        "name": "UserId__c",
+        "type": "STRING",
+        "required": false
+      },
+      {
+        "name": "Timestamp__c",
+        "type": "DATETIME",
+        "required": true
+      }
+    ]
+  },
+  "metrics": {
+    "recordCount": 1500000,
+    "lastIngestionTime": "2024-01-15T10:30:00Z",
+    "averageRecordsPerDay": 50000,
+    "errorRate": 0.001
+  }
+}
+```
+
+### Get Data Stream Schema
+
+#### GET /services/data/v64.0/ssot/data-streams/{streamName}/schema
+
+Retrieve the full schema definition for a data stream.
+
+**Response:**
+
+```json
+{
+  "streamName": "WebEngagement_Stream",
+  "version": "1.2",
+  "fields": [
+    {
+      "name": "EventId__c",
+      "displayName": "Event ID",
+      "type": "STRING",
+      "length": 100,
+      "required": true,
+      "primaryKey": true,
+      "description": "Unique identifier for the event"
+    },
+    {
+      "name": "EventType__c",
+      "displayName": "Event Type",
+      "type": "STRING",
+      "length": 50,
+      "required": true,
+      "allowedValues": ["page_view", "click", "form_submit", "purchase"]
+    },
+    {
+      "name": "UserId__c",
+      "displayName": "User ID",
+      "type": "STRING",
+      "length": 50,
+      "required": false,
+      "description": "External user identifier"
+    },
+    {
+      "name": "Timestamp__c",
+      "displayName": "Event Timestamp",
+      "type": "DATETIME",
+      "required": true,
+      "format": "ISO8601"
+    },
+    {
+      "name": "PageUrl__c",
+      "displayName": "Page URL",
+      "type": "STRING",
+      "length": 500,
+      "required": false
+    },
+    {
+      "name": "Revenue__c",
+      "displayName": "Revenue",
+      "type": "DECIMAL",
+      "precision": 18,
+      "scale": 2,
+      "required": false
+    }
+  ],
+  "indexes": [
+    {
+      "name": "primary",
+      "fields": ["EventId__c"],
+      "type": "PRIMARY"
+    },
+    {
+      "name": "user_timestamp",
+      "fields": ["UserId__c", "Timestamp__c"],
+      "type": "SECONDARY"
+    }
+  ]
+}
+```
+
+### Get Data Stream Statistics
+
+#### GET /services/data/v64.0/ssot/data-streams/{streamName}/stats
+
+Retrieve ingestion statistics and health metrics.
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `startDate` | datetime | Start of the date range (ISO 8601) |
+| `endDate` | datetime | End of the date range (ISO 8601) |
+| `granularity` | string | `HOUR`, `DAY`, `WEEK`, `MONTH` |
+
+**Response:**
+
+```json
+{
+  "streamName": "WebEngagement_Stream",
+  "period": {
+    "start": "2024-01-01T00:00:00Z",
+    "end": "2024-01-15T23:59:59Z"
+  },
+  "summary": {
+    "totalRecords": 750000,
+    "successfulRecords": 749250,
+    "failedRecords": 750,
+    "successRate": 99.9
+  },
+  "timeSeries": [
+    {
+      "timestamp": "2024-01-15T00:00:00Z",
+      "recordCount": 50000,
+      "successCount": 49950,
+      "errorCount": 50
+    }
+  ],
+  "topErrors": [
+    {
+      "errorCode": "INVALID_FIELD_VALUE",
+      "count": 500,
+      "sampleMessage": "Invalid value for field 'Timestamp__c'"
+    },
+    {
+      "errorCode": "MISSING_REQUIRED_FIELD",
+      "count": 250,
+      "sampleMessage": "Required field 'EventId__c' is missing"
+    }
+  ]
+}
+```
+
+## Code Examples
+
+<CodeGroup>
+```bash cURL icon=terminal
+curl -X GET "https://{instance}.salesforce.com/services/data/v64.0/ssot/data-streams?status=ACTIVE" \
+  -H "Authorization: Bearer {access_token}"
+```
+
+```python get_stream_details.py icon=python lines {4-5,8-10}
+import requests
+
+url = f"https://{instance}.salesforce.com/services/data/v64.0/ssot/data-streams/WebEngagement_Stream"
+headers = {"Authorization": f"Bearer {access_token}"}
+
+response = requests.get(url, headers=headers)
+stream = response.json()
+
+print(f"Stream: {stream['displayName']}")
+print(f"Records: {stream['metrics']['recordCount']:,}")
+print(f"Error Rate: {stream['metrics']['errorRate']:.2%}")
+```
+
+```java GetStreamSchema.java icon=java lines {3-7}
+HttpClient client = HttpClient.newHttpClient();
+
+HttpRequest request = HttpRequest.newBuilder()
+    .uri(URI.create("https://{instance}.salesforce.com/services/data/v64.0/ssot/data-streams/WebEngagement_Stream/schema"))
+    .header("Authorization", "Bearer " + accessToken)
+    .GET()
+    .build();
+
+HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+System.out.println(response.body());
+```
+</CodeGroup>
+
+## Data Stream Categories
+
+| Category | Description | Examples |
+|----------|-------------|----------|
+| **Profile** | Customer identity and demographic data | Contacts, Accounts, Loyalty Members |
+| **Engagement** | Interaction and behavioral data | Web events, Email opens, Purchases |
+| **Other** | Reference and supporting data | Products, Locations, Campaigns |
+
+## Stream Status Values
+
+| Status | Description |
+|--------|-------------|
+| `ACTIVE` | Stream is accepting and processing data |
+| `INACTIVE` | Stream is paused, not accepting data |
+| `ERROR` | Stream has configuration or processing errors |
+| `PENDING` | Stream is being set up or modified |
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Monitor Stream Health">
+    - Regularly check error rates and ingestion statistics
+    - Set up alerts for unusual patterns or failures
+    - Review top errors to identify data quality issues
+  </Accordion>
+
+  <Accordion title="Schema Management">
+    - Document all field definitions and purposes
+    - Use descriptive display names for fields
+    - Plan for schema evolution and versioning
+  </Accordion>
+
+  <Accordion title="Performance Optimization">
+    - Create secondary indexes for frequently queried fields
+    - Choose appropriate data types to minimize storage
+    - Archive or purge old data as needed
+  </Accordion>
+</AccordionGroup>
+
+## Related Resources
+
+- [Data Ingestion](/apis/connect-api/data-ingestion) - Ingest data into streams
+- [Data Stream Metadata Type](/apis/metadata-types/data-stream) - Deploy stream configurations
+- [Data Cloud Data Streams](https://help.salesforce.com/s/articleView?id=data.c360_a_data_streams.htm&type=5) - Salesforce Help

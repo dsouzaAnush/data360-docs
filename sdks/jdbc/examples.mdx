@@ -1,0 +1,555 @@
+---
+title: "Examples"
+description: "Complete Java code examples for using the JDBC connector"
+---
+
+# Examples
+
+This page provides complete, runnable Java code examples for common use cases with the Data 360 JDBC connector.
+
+## Basic Query Example
+
+A complete example showing connection setup and query execution:
+
+```java BasicQueryExample.java icon=java lines expandable {12-15,17-24,36-40}
+import java.sql.*;
+import java.util.Properties;
+
+public class BasicQueryExample {
+    public static void main(String[] args) {
+        String url = "jdbc:salesforce-datacloud://login.salesforce.com";
+
+        Properties props = new Properties();
+        props.setProperty("user", "your.email@example.com");
+        props.setProperty("password", "YourPassword123!");
+        props.setProperty("clientId", "YOUR_CONSUMER_KEY");
+        props.setProperty("clientSecret", "YOUR_CONSUMER_SECRET");
+
+        try (Connection conn = DriverManager.getConnection(url, props);
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(
+                 "SELECT Id__c, FirstName__c, LastName__c, Email__c " +
+                 "FROM UnifiedIndividual__dlm " +
+                 "WHERE IsActive__c = true " +
+                 "LIMIT 100"
+             )) {
+
+            // Print column headers
+            ResultSetMetaData meta = rs.getMetaData();
+            int columnCount = meta.getColumnCount();
+
+            for (int i = 1; i <= columnCount; i++) {
+                System.out.print(meta.getColumnName(i) + "\t");
+            }
+            System.out.println();
+
+            // Print rows
+            while (rs.next()) {
+                for (int i = 1; i <= columnCount; i++) {
+                    System.out.print(rs.getString(i) + "\t");
+                }
+                System.out.println();
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Query failed: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+## Aggregation Query Example
+
+Execute aggregation queries to summarize data:
+
+```java AggregationExample.java icon=java lines expandable {11-14,18-27,33-38}
+import java.sql.*;
+import java.util.Properties;
+
+public class AggregationExample {
+    public static void main(String[] args) {
+        String url = "jdbc:salesforce-datacloud://login.salesforce.com";
+
+        Properties props = new Properties();
+        props.setProperty("user", System.getenv("SF_USERNAME"));
+        props.setProperty("password", System.getenv("SF_PASSWORD"));
+        props.setProperty("clientId", System.getenv("SF_CLIENT_ID"));
+        props.setProperty("clientSecret", System.getenv("SF_CLIENT_SECRET"));
+
+        try (Connection conn = DriverManager.getConnection(url, props);
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(
+                 "SELECT " +
+                 "    Region__c, " +
+                 "    COUNT(*) AS CustomerCount, " +
+                 "    SUM(LifetimeValue__c) AS TotalLTV, " +
+                 "    AVG(LifetimeValue__c) AS AvgLTV " +
+                 "FROM UnifiedIndividual__dlm " +
+                 "WHERE LifetimeValue__c > 0 " +
+                 "GROUP BY Region__c " +
+                 "ORDER BY TotalLTV DESC"
+             )) {
+
+            System.out.println("Region\t\tCustomers\tTotal LTV\tAvg LTV");
+            System.out.println("-".repeat(60));
+
+            while (rs.next()) {
+                String region = rs.getString("Region__c");
+                int count = rs.getInt("CustomerCount");
+                double totalLtv = rs.getDouble("TotalLTV");
+                double avgLtv = rs.getDouble("AvgLTV");
+
+                System.out.printf("%s\t\t%d\t\t$%.2f\t\t$%.2f%n",
+                    region, count, totalLtv, avgLtv);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+## Join Query Example
+
+Query data across multiple tables:
+
+```java JoinQueryExample.java icon=java lines expandable {12-25,30-36}
+import java.sql.*;
+import java.util.Properties;
+
+public class JoinQueryExample {
+    public static void main(String[] args) {
+        Properties props = createConnectionProperties();
+        String url = "jdbc:salesforce-datacloud://login.salesforce.com";
+
+        String query =
+            "SELECT " +
+            "    ui.Id__c AS ProfileId, " +
+            "    ui.FirstName__c, " +
+            "    ui.LastName__c, " +
+            "    cpe.Email__c, " +
+            "    cpp.PhoneNumber__c " +
+            "FROM UnifiedIndividual__dlm ui " +
+            "LEFT JOIN UnifiedContactPointEmail__dlm cpe " +
+            "    ON ui.Id__c = cpe.PartyId__c AND cpe.IsPrimary__c = true " +
+            "LEFT JOIN UnifiedContactPointPhone__dlm cpp " +
+            "    ON ui.Id__c = cpp.PartyId__c AND cpp.IsPrimary__c = true " +
+            "WHERE ui.IsActive__c = true " +
+            "LIMIT 500";
+
+        try (Connection conn = DriverManager.getConnection(url, props);
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+
+            while (rs.next()) {
+                System.out.printf("%s: %s %s - %s - %s%n",
+                    rs.getString("ProfileId"),
+                    rs.getString("FirstName__c"),
+                    rs.getString("LastName__c"),
+                    rs.getString("Email__c"),
+                    rs.getString("PhoneNumber__c")
+                );
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static Properties createConnectionProperties() {
+        Properties props = new Properties();
+        props.setProperty("user", System.getenv("SF_USERNAME"));
+        props.setProperty("password", System.getenv("SF_PASSWORD"));
+        props.setProperty("clientId", System.getenv("SF_CLIENT_ID"));
+        props.setProperty("clientSecret", System.getenv("SF_CLIENT_SECRET"));
+        return props;
+    }
+}
+```
+
+## Pagination Example
+
+Handle large result sets with pagination:
+
+```java PaginationExample.java icon=java lines expandable {24-31,38-39,43-46}
+import java.sql.*;
+import java.util.Properties;
+import java.util.ArrayList;
+import java.util.List;
+
+public class PaginationExample {
+    private static final int PAGE_SIZE = 1000;
+
+    public static void main(String[] args) {
+        Properties props = createConnectionProperties();
+        String url = "jdbc:salesforce-datacloud://login.salesforce.com";
+
+        try (Connection conn = DriverManager.getConnection(url, props)) {
+            List<String> allIds = fetchAllProfileIds(conn);
+            System.out.println("Total profiles fetched: " + allIds.size());
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static List<String> fetchAllProfileIds(Connection conn) throws SQLException {
+        List<String> allIds = new ArrayList<>();
+        int offset = 0;
+
+        while (true) {
+            String query = String.format(
+                "SELECT Id__c FROM UnifiedIndividual__dlm " +
+                "ORDER BY Id__c " +
+                "LIMIT %d OFFSET %d",
+                PAGE_SIZE, offset
+            );
+
+            try (Statement stmt = conn.createStatement();
+                 ResultSet rs = stmt.executeQuery(query)) {
+
+                int count = 0;
+                while (rs.next()) {
+                    allIds.add(rs.getString("Id__c"));
+                    count++;
+                }
+
+                System.out.printf("Fetched %d records (total: %d)%n", count, allIds.size());
+
+                // No more results
+                if (count < PAGE_SIZE) {
+                    break;
+                }
+
+                offset += PAGE_SIZE;
+            }
+        }
+
+        return allIds;
+    }
+
+    private static Properties createConnectionProperties() {
+        Properties props = new Properties();
+        props.setProperty("user", System.getenv("SF_USERNAME"));
+        props.setProperty("password", System.getenv("SF_PASSWORD"));
+        props.setProperty("clientId", System.getenv("SF_CLIENT_ID"));
+        props.setProperty("clientSecret", System.getenv("SF_CLIENT_SECRET"));
+        return props;
+    }
+}
+```
+
+## PreparedStatement Example
+
+Using PreparedStatement for reusable queries:
+
+```java PreparedStatementExample.java icon=java lines expandable {13-17,26-30}
+import java.sql.*;
+import java.util.Properties;
+
+public class PreparedStatementExample {
+    public static void main(String[] args) {
+        Properties props = createConnectionProperties();
+        String url = "jdbc:salesforce-datacloud://login.salesforce.com";
+
+        try (Connection conn = DriverManager.getConnection(url, props)) {
+
+            // Query customers by region
+            String[] regions = {"West", "East", "Central", "South"};
+
+            for (String region : regions) {
+                int count = getCustomerCountByRegion(conn, region);
+                System.out.printf("Region %s: %d customers%n", region, count);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static int getCustomerCountByRegion(Connection conn, String region)
+            throws SQLException {
+        // Note: Parameter substitution support varies by driver version
+        // This example shows the pattern; use string formatting as fallback
+        String query = String.format(
+            "SELECT COUNT(*) AS cnt FROM UnifiedIndividual__dlm WHERE Region__c = '%s'",
+            region.replace("'", "''") // Escape single quotes
+        );
+
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+
+            if (rs.next()) {
+                return rs.getInt("cnt");
+            }
+            return 0;
+        }
+    }
+
+    private static Properties createConnectionProperties() {
+        Properties props = new Properties();
+        props.setProperty("user", System.getenv("SF_USERNAME"));
+        props.setProperty("password", System.getenv("SF_PASSWORD"));
+        props.setProperty("clientId", System.getenv("SF_CLIENT_ID"));
+        props.setProperty("clientSecret", System.getenv("SF_CLIENT_SECRET"));
+        return props;
+    }
+}
+```
+
+## Export to CSV Example
+
+Export query results to a CSV file:
+
+```java ExportToCsvExample.java icon=java lines expandable {14-19,21-24,27-35,38-46}
+import java.sql.*;
+import java.util.Properties;
+import java.io.*;
+
+public class ExportToCsvExample {
+    public static void main(String[] args) {
+        Properties props = createConnectionProperties();
+        String url = "jdbc:salesforce-datacloud://login.salesforce.com";
+        String outputFile = "customers_export.csv";
+
+        String query =
+            "SELECT Id__c, FirstName__c, LastName__c, Email__c, " +
+            "       LifetimeValue__c, Region__c, CreatedDate__c " +
+            "FROM UnifiedIndividual__dlm " +
+            "WHERE IsActive__c = true " +
+            "LIMIT 10000";
+
+        try (Connection conn = DriverManager.getConnection(url, props);
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query);
+             PrintWriter writer = new PrintWriter(new FileWriter(outputFile))) {
+
+            // Write header
+            ResultSetMetaData meta = rs.getMetaData();
+            int columnCount = meta.getColumnCount();
+
+            StringBuilder header = new StringBuilder();
+            for (int i = 1; i <= columnCount; i++) {
+                if (i > 1) header.append(",");
+                header.append(escapeCSV(meta.getColumnName(i)));
+            }
+            writer.println(header);
+
+            // Write data rows
+            int rowCount = 0;
+            while (rs.next()) {
+                StringBuilder row = new StringBuilder();
+                for (int i = 1; i <= columnCount; i++) {
+                    if (i > 1) row.append(",");
+                    row.append(escapeCSV(rs.getString(i)));
+                }
+                writer.println(row);
+                rowCount++;
+            }
+
+            System.out.printf("Exported %d rows to %s%n", rowCount, outputFile);
+
+        } catch (SQLException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static String escapeCSV(String value) {
+        if (value == null) return "";
+        if (value.contains(",") || value.contains("\"") || value.contains("\n")) {
+            return "\"" + value.replace("\"", "\"\"") + "\"";
+        }
+        return value;
+    }
+
+    private static Properties createConnectionProperties() {
+        Properties props = new Properties();
+        props.setProperty("user", System.getenv("SF_USERNAME"));
+        props.setProperty("password", System.getenv("SF_PASSWORD"));
+        props.setProperty("clientId", System.getenv("SF_CLIENT_ID"));
+        props.setProperty("clientSecret", System.getenv("SF_CLIENT_SECRET"));
+        return props;
+    }
+}
+```
+
+## Connection Pool Example
+
+Using HikariCP for connection pooling:
+
+```java ConnectionPoolExample.java icon=java lines expandable {13-17,30-34,36-40,42,46-51}
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import java.sql.*;
+
+public class ConnectionPoolExample {
+    private static HikariDataSource dataSource;
+
+    public static void main(String[] args) {
+        initializeDataSource();
+
+        // Simulate multiple concurrent queries
+        for (int i = 0; i < 5; i++) {
+            final int threadNum = i;
+            new Thread(() -> executeQuery(threadNum)).start();
+        }
+
+        // Wait and cleanup
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        dataSource.close();
+    }
+
+    private static void initializeDataSource() {
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl("jdbc:salesforce-datacloud://login.salesforce.com");
+        config.setUsername(System.getenv("SF_USERNAME"));
+
+        // Connection properties
+        config.addDataSourceProperty("password", System.getenv("SF_PASSWORD"));
+        config.addDataSourceProperty("clientId", System.getenv("SF_CLIENT_ID"));
+        config.addDataSourceProperty("clientSecret", System.getenv("SF_CLIENT_SECRET"));
+
+        // Pool configuration
+        config.setMaximumPoolSize(10);
+        config.setMinimumIdle(2);
+        config.setConnectionTimeout(30000);
+        config.setIdleTimeout(600000);
+
+        dataSource = new HikariDataSource(config);
+    }
+
+    private static void executeQuery(int threadNum) {
+        try (Connection conn = dataSource.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(
+                 "SELECT COUNT(*) FROM UnifiedIndividual__dlm"
+             )) {
+
+            if (rs.next()) {
+                System.out.printf("Thread %d: Count = %d%n",
+                    threadNum, rs.getInt(1));
+            }
+
+        } catch (SQLException e) {
+            System.err.printf("Thread %d error: %s%n",
+                threadNum, e.getMessage());
+        }
+    }
+}
+```
+
+## Error Handling Example
+
+Comprehensive error handling for production applications:
+
+```java ErrorHandlingExample.java icon=java lines expandable {23-36,54-56,59-63,66-71,74-78}
+import java.sql.*;
+import java.util.Properties;
+
+public class ErrorHandlingExample {
+    public static void main(String[] args) {
+        Properties props = createConnectionProperties();
+        String url = "jdbc:salesforce-datacloud://login.salesforce.com";
+
+        try {
+            executeWithRetry(url, props, 3);
+        } catch (Exception e) {
+            System.err.println("Failed after retries: " + e.getMessage());
+        }
+    }
+
+    private static void executeWithRetry(String url, Properties props, int maxRetries)
+            throws Exception {
+        Exception lastException = null;
+
+        for (int attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                executeQuery(url, props);
+                return; // Success
+            } catch (SQLException e) {
+                lastException = e;
+                System.err.printf("Attempt %d failed: %s%n", attempt, e.getMessage());
+
+                if (isRetryable(e) && attempt < maxRetries) {
+                    int waitTime = (int) Math.pow(2, attempt) * 1000;
+                    System.out.printf("Waiting %d ms before retry...%n", waitTime);
+                    Thread.sleep(waitTime);
+                } else if (!isRetryable(e)) {
+                    throw e; // Don't retry non-retryable errors
+                }
+            }
+        }
+
+        throw lastException;
+    }
+
+    private static void executeQuery(String url, Properties props) throws SQLException {
+        try (Connection conn = DriverManager.getConnection(url, props);
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(
+                 "SELECT COUNT(*) FROM UnifiedIndividual__dlm"
+             )) {
+
+            if (rs.next()) {
+                System.out.println("Query successful. Count: " + rs.getInt(1));
+            }
+        }
+    }
+
+    private static boolean isRetryable(SQLException e) {
+        String message = e.getMessage().toLowerCase();
+
+        // Network/timeout errors are retryable
+        if (message.contains("timeout") ||
+            message.contains("connection") ||
+            message.contains("network")) {
+            return true;
+        }
+
+        // Rate limit errors are retryable
+        if (message.contains("rate limit") ||
+            message.contains("too many requests")) {
+            return true;
+        }
+
+        // Authentication errors are not retryable
+        if (message.contains("authentication") ||
+            message.contains("invalid_client") ||
+            message.contains("invalid_grant")) {
+            return false;
+        }
+
+        // Syntax errors are not retryable
+        if (message.contains("syntax") ||
+            message.contains("invalid_table") ||
+            message.contains("invalid_field")) {
+            return false;
+        }
+
+        return false;
+    }
+
+    private static Properties createConnectionProperties() {
+        Properties props = new Properties();
+        props.setProperty("user", System.getenv("SF_USERNAME"));
+        props.setProperty("password", System.getenv("SF_PASSWORD"));
+        props.setProperty("clientId", System.getenv("SF_CLIENT_ID"));
+        props.setProperty("clientSecret", System.getenv("SF_CLIENT_SECRET"));
+        return props;
+    }
+}
+```
+
+## Related Resources
+
+- [JDBC Overview](/sdks/jdbc/index) - Getting started
+- [Authentication](/sdks/jdbc/authentication) - OAuth configuration
+- [Configuration](/sdks/jdbc/configuration) - Connection properties
+- [Query API](/apis/query-api/query-services) - Query service reference

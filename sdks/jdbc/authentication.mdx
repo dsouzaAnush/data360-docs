@@ -1,0 +1,290 @@
+---
+title: "Authentication"
+description: "Configure OAuth authentication flows for the JDBC connector"
+---
+
+# Authentication
+
+The JDBC connector supports four OAuth 2.0 authentication flows for connecting to Data 360. Choose the flow that best matches your use case and security requirements.
+
+## Authentication Flows Overview
+
+| Flow | Use Case | Requires |
+|------|----------|----------|
+| **JWT Bearer** | Server-to-server, automated processes | Private key, certificate |
+| **Username-Password** | Simple integrations, development | User credentials |
+| **Refresh Token** | Long-running applications | Pre-obtained refresh token |
+| **Direct Token** | When you have existing tokens | Valid access token |
+
+## Required OAuth Scopes
+
+All authentication flows require these OAuth scopes on your connected app:
+
+| Scope | API Name | Description |
+|-------|----------|-------------|
+| General API Access | `api` | Access Salesforce REST APIs |
+| Query Data Cloud | `cdp_query_api` | Execute SQL queries on Data Cloud data |
+
+## JWT Bearer Flow
+
+The JWT Bearer flow is recommended for server-to-server integrations. It uses a signed JWT token for authentication without requiring user credentials at runtime.
+
+### Prerequisites
+
+1. Create an X.509 certificate and private key
+2. Upload the certificate to your Connected App
+3. Pre-authorize the Connected App for the user
+
+### Generate Certificate and Key
+
+```bash generate_keys.sh icon=terminal lines {2,5,8,11}
+# Generate private key
+openssl genrsa -out server.key 2048
+
+# Generate certificate signing request
+openssl req -new -key server.key -out server.csr
+
+# Generate self-signed certificate (valid for 1 year)
+openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
+
+# Convert to PKCS8 format (required by Java)
+openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in server.key -out server.pem
+```
+
+### Configure Connected App
+
+1. In Salesforce Setup, go to App Manager
+2. Create or edit your Connected App
+3. Enable "Use digital signatures"
+4. Upload the `server.crt` file
+5. Pre-authorize the app for your user under "Manage" → "Edit Policies"
+
+### Connection Code
+
+```java JwtConnection.java icon=java lines {6-8,11}
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.util.Properties;
+
+Properties props = new Properties();
+props.setProperty("clientId", "YOUR_CONSUMER_KEY");
+props.setProperty("privateKey", "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----");
+props.setProperty("user", "your.email@example.com");
+
+String url = "jdbc:salesforce-datacloud://login.salesforce.com";
+Connection conn = DriverManager.getConnection(url, props);
+```
+
+### Loading Private Key from File
+
+```java LoadKeyFromFile.java icon=java lines {5,8-10}
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+// Read private key from file
+String privateKey = new String(Files.readAllBytes(Paths.get("/path/to/server.pem")));
+
+Properties props = new Properties();
+props.setProperty("clientId", "YOUR_CONSUMER_KEY");
+props.setProperty("privateKey", privateKey);
+props.setProperty("user", "your.email@example.com");
+
+Connection conn = DriverManager.getConnection(url, props);
+```
+
+## Username-Password Flow
+
+The Username-Password flow is the simplest authentication method, suitable for development and simple integrations.
+
+### Connection Properties
+
+| Property | Required | Description |
+|----------|----------|-------------|
+| `user` | Yes | Salesforce username |
+| `password` | Yes | Salesforce password (with security token if required) |
+| `clientId` | Yes | Connected App Consumer Key |
+| `clientSecret` | Yes | Connected App Consumer Secret |
+
+### Connection Code
+
+```java UsernamePasswordAuth.java icon=java lines {6-9,12}
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.util.Properties;
+
+Properties props = new Properties();
+props.setProperty("user", "your.email@example.com");
+props.setProperty("password", "YourPassword123!SecurityToken");
+props.setProperty("clientId", "YOUR_CONSUMER_KEY");
+props.setProperty("clientSecret", "YOUR_CONSUMER_SECRET");
+
+String url = "jdbc:salesforce-datacloud://login.salesforce.com";
+Connection conn = DriverManager.getConnection(url, props);
+```
+
+<Warning>
+If your Salesforce org requires a security token, append it to your password: `password + security_token`
+
+To get your security token: Setup → My Personal Information → Reset My Security Token
+</Warning>
+
+### Sandbox Connection
+
+```java SandboxConnection.java icon=java lines {2,5}
+// Use test.salesforce.com for sandbox orgs
+String url = "jdbc:salesforce-datacloud://test.salesforce.com";
+
+Properties props = new Properties();
+props.setProperty("user", "your.email@example.com.sandboxname");
+props.setProperty("password", "YourPassword123!SecurityToken");
+props.setProperty("clientId", "YOUR_CONSUMER_KEY");
+props.setProperty("clientSecret", "YOUR_CONSUMER_SECRET");
+
+Connection conn = DriverManager.getConnection(url, props);
+```
+
+## Refresh Token Flow
+
+The Refresh Token flow is useful for long-running applications that need to maintain access without storing user credentials.
+
+### Prerequisites
+
+1. Obtain a refresh token through the standard OAuth web flow
+2. Store the refresh token securely
+
+### Obtaining a Refresh Token
+
+```java ObtainRefreshToken.java icon=java lines {2-6}
+// First, direct user to authorization URL
+String authUrl = "https://login.salesforce.com/services/oauth2/authorize" +
+    "?response_type=code" +
+    "&client_id=" + clientId +
+    "&redirect_uri=" + redirectUri +
+    "&scope=api%20cdp_query_api%20refresh_token";
+
+// After user authorizes, exchange code for tokens
+// POST to https://login.salesforce.com/services/oauth2/token
+// with grant_type=authorization_code, code, client_id, client_secret, redirect_uri
+```
+
+### Connection Code
+
+```java RefreshTokenAuth.java icon=java lines {6-8}
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.util.Properties;
+
+Properties props = new Properties();
+props.setProperty("clientId", "YOUR_CONSUMER_KEY");
+props.setProperty("clientSecret", "YOUR_CONSUMER_SECRET");
+props.setProperty("refreshToken", "YOUR_REFRESH_TOKEN");
+
+String url = "jdbc:salesforce-datacloud://login.salesforce.com";
+Connection conn = DriverManager.getConnection(url, props);
+```
+
+<Note>
+The driver will automatically use the refresh token to obtain a new access token when needed.
+</Note>
+
+## Direct Token Flow
+
+The Direct Token flow is useful when you already have a valid Data Cloud access token from another authentication process.
+
+### Connection Properties
+
+| Property | Required | Description |
+|----------|----------|-------------|
+| `coreToken` | Yes | Valid Data Cloud access token |
+| `instanceUrl` | Yes | Data Cloud instance URL |
+
+### Connection Code
+
+```java DirectTokenAuth.java icon=java lines {6-7}
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.util.Properties;
+
+Properties props = new Properties();
+props.setProperty("coreToken", "YOUR_DATA_CLOUD_ACCESS_TOKEN");
+props.setProperty("instanceUrl", "https://your-tenant.c360a.salesforce.com");
+
+String url = "jdbc:salesforce-datacloud://login.salesforce.com";
+Connection conn = DriverManager.getConnection(url, props);
+```
+
+<Warning>
+The Direct Token flow does not support automatic token refresh. You must handle token expiration and renewal in your application.
+</Warning>
+
+## Environment Variables
+
+For security, store sensitive credentials in environment variables:
+
+```java EnvVarsAuth.java icon=java lines {6-9,11-12}
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.util.Properties;
+
+Properties props = new Properties();
+props.setProperty("user", System.getenv("SF_USERNAME"));
+props.setProperty("password", System.getenv("SF_PASSWORD"));
+props.setProperty("clientId", System.getenv("SF_CLIENT_ID"));
+props.setProperty("clientSecret", System.getenv("SF_CLIENT_SECRET"));
+
+String url = "jdbc:salesforce-datacloud://" +
+    System.getenv().getOrDefault("SF_LOGIN_URL", "login.salesforce.com");
+
+Connection conn = DriverManager.getConnection(url, props);
+```
+
+Set environment variables:
+
+```bash icon=terminal
+export SF_USERNAME="your.email@example.com"
+export SF_PASSWORD="YourPassword123!Token"
+export SF_CLIENT_ID="your_consumer_key"
+export SF_CLIENT_SECRET="your_consumer_secret"
+export SF_LOGIN_URL="login.salesforce.com"
+```
+
+## Error Handling
+
+Handle authentication errors appropriately:
+
+```java ErrorHandling.java icon=java lines {4-5,7-15}
+import java.sql.*;
+
+try {
+    Connection conn = DriverManager.getConnection(url, props);
+    // Use connection
+} catch (SQLException e) {
+    if (e.getMessage().contains("INVALID_CLIENT")) {
+        System.err.println("Invalid client ID or secret");
+    } else if (e.getMessage().contains("INVALID_GRANT")) {
+        System.err.println("Invalid credentials or refresh token expired");
+    } else if (e.getMessage().contains("INVALID_SESSION_ID")) {
+        System.err.println("Token expired - re-authenticate");
+    } else {
+        System.err.println("Connection failed: " + e.getMessage());
+    }
+}
+```
+
+## Choosing an Authentication Flow
+
+| Scenario | Recommended Flow |
+|----------|------------------|
+| Automated server process | JWT Bearer |
+| Development/testing | Username-Password |
+| Web application with user login | Refresh Token |
+| Integration with existing OAuth | Direct Token |
+| CI/CD pipelines | JWT Bearer |
+| Scheduled batch jobs | JWT Bearer or Refresh Token |
+
+## Related Resources
+
+- [JDBC Overview](/sdks/jdbc/index) - Getting started guide
+- [Configuration](/sdks/jdbc/configuration) - Connection properties
+- [Examples](/sdks/jdbc/examples) - Complete code examples
+- [Salesforce OAuth Flows](https://help.salesforce.com/s/articleView?id=xcloud.remoteaccess_oauth_flows.htm) - OAuth documentation

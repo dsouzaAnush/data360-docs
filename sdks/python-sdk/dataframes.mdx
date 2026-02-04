@@ -1,0 +1,427 @@
+---
+title: "DataFrames"
+description: "Work with Data 360 query results as Pandas DataFrames"
+---
+
+# DataFrames
+
+The Python SDK integrates seamlessly with Pandas, allowing you to fetch query results directly as DataFrames for data analysis, visualization, and machine learning workflows.
+
+## Fetching DataFrames
+
+### Basic DataFrame Fetch
+
+```python basic_dataframe.py icon=python lines {5-11,17-22,24}
+from salesforce_cdp_connector import SalesforceCDPConnection
+import pandas as pd
+
+# Establish connection
+connection = SalesforceCDPConnection(
+    login_url='https://login.salesforce.com',
+    client_id=client_id,
+    client_secret=client_secret,
+    username=username,
+    password=password
+)
+
+cursor = connection.cursor()
+
+# Execute query and fetch as DataFrame
+cursor.execute("""
+    SELECT Id__c, FirstName__c, LastName__c, Email__c, LifetimeValue__c
+    FROM UnifiedIndividual__dlm
+    WHERE IsActive__c = true
+    LIMIT 1000
+""")
+
+df = cursor.fetch_dataframe()
+
+print(df.head())
+print(f"Shape: {df.shape}")
+print(f"Columns: {df.columns.tolist()}")
+```
+
+### Output
+
+```text Output
+       Id__c FirstName__c LastName__c              Email__c  LifetimeValue__c
+0  UI_001234         John       Smith   john.smith@email.com           1250.00
+1  UI_001235         Jane         Doe     jane.doe@email.com           2340.50
+2  UI_001236          Bob     Johnson  bob.johnson@email.com            890.25
+3  UI_001237        Alice      Wilson  alice.wilson@email.com          3100.00
+4  UI_001238      Charlie       Brown  charlie.b@email.com             450.75
+Shape: (1000, 5)
+Columns: ['Id__c', 'FirstName__c', 'LastName__c', 'Email__c', 'LifetimeValue__c']
+```
+
+## Data Analysis Examples
+
+### Descriptive Statistics
+
+```python statistics.py icon=python lines {11-12,14-15}
+cursor.execute("""
+    SELECT LifetimeValue__c, PurchaseCount__c, DaysSinceLastPurchase__c
+    FROM UnifiedIndividual__dlm
+    WHERE LifetimeValue__c > 0
+""")
+
+df = cursor.fetch_dataframe()
+
+# Summary statistics
+print(df.describe())
+
+# Correlation matrix
+print(df.corr())
+```
+
+### Grouping and Aggregation
+
+```python grouping.py icon=python lines {13-17,20-26}
+cursor.execute("""
+    SELECT
+        Region__c,
+        Segment__c,
+        LifetimeValue__c,
+        PurchaseCount__c
+    FROM UnifiedIndividual__dlm
+""")
+
+df = cursor.fetch_dataframe()
+
+# Group by region
+region_stats = df.groupby('Region__c').agg({
+    'LifetimeValue__c': ['mean', 'sum', 'count'],
+    'PurchaseCount__c': 'mean'
+})
+print(region_stats)
+
+# Pivot table
+pivot = pd.pivot_table(
+    df,
+    values='LifetimeValue__c',
+    index='Region__c',
+    columns='Segment__c',
+    aggfunc='mean'
+)
+print(pivot)
+```
+
+### Filtering and Transformation
+
+```python transformation.py icon=python lines {10-11,14-18,21}
+cursor.execute("""
+    SELECT *
+    FROM UnifiedIndividual__dlm
+    LIMIT 10000
+""")
+
+df = cursor.fetch_dataframe()
+
+# Filter high-value customers
+high_value = df[df['LifetimeValue__c'] > 1000]
+print(f"High-value customers: {len(high_value)}")
+
+# Create derived columns
+df['ValueTier'] = pd.cut(
+    df['LifetimeValue__c'],
+    bins=[0, 100, 500, 1000, float('inf')],
+    labels=['Bronze', 'Silver', 'Gold', 'Platinum']
+)
+
+# Value tier distribution
+print(df['ValueTier'].value_counts())
+```
+
+## Data Visualization
+
+### With Matplotlib
+
+```python matplotlib_chart.py icon=python lines {12-19}
+import matplotlib.pyplot as plt
+
+cursor.execute("""
+    SELECT Region__c, COUNT(*) as CustomerCount
+    FROM UnifiedIndividual__dlm
+    GROUP BY Region__c
+""")
+
+df = cursor.fetch_dataframe()
+
+# Bar chart
+plt.figure(figsize=(10, 6))
+plt.bar(df['Region__c'], df['CustomerCount'])
+plt.title('Customer Distribution by Region')
+plt.xlabel('Region')
+plt.ylabel('Customer Count')
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.savefig('region_distribution.png')
+plt.show()
+```
+
+### With Seaborn
+
+```python seaborn_chart.py icon=python lines {12-17}
+import seaborn as sns
+
+cursor.execute("""
+    SELECT Segment__c, LifetimeValue__c
+    FROM UnifiedIndividual__dlm
+    WHERE LifetimeValue__c > 0
+""")
+
+df = cursor.fetch_dataframe()
+
+# Box plot
+plt.figure(figsize=(12, 6))
+sns.boxplot(x='Segment__c', y='LifetimeValue__c', data=df)
+plt.title('Lifetime Value Distribution by Segment')
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+```
+
+## Machine Learning Workflows
+
+### Feature Engineering
+
+```python feature_engineering.py icon=python lines expandable {17-21,24-31}
+cursor.execute("""
+    SELECT
+        Id__c,
+        Age__c,
+        LifetimeValue__c,
+        PurchaseCount__c,
+        DaysSinceLastPurchase__c,
+        EmailEngagementScore__c,
+        WebEngagementScore__c,
+        ChurnedFlag__c
+    FROM CustomerFeatures__dlm
+""")
+
+df = cursor.fetch_dataframe()
+
+# Handle missing values
+df = df.fillna({
+    'Age__c': df['Age__c'].median(),
+    'EmailEngagementScore__c': 0,
+    'WebEngagementScore__c': 0
+})
+
+# Feature engineering
+df['EngagementScore'] = (
+    df['EmailEngagementScore__c'] * 0.4 +
+    df['WebEngagementScore__c'] * 0.6
+)
+
+df['RecencyScore'] = 1 / (1 + df['DaysSinceLastPurchase__c'] / 30)
+
+df['MonetaryScore'] = df['LifetimeValue__c'] / df['LifetimeValue__c'].max()
+```
+
+### Training a Model
+
+```python train_model.py icon=python lines expandable {8-10,17-19,22-24,27-28,31-32,35-38}
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report
+
+# Prepare features
+feature_cols = [
+    'Age__c', 'LifetimeValue__c', 'PurchaseCount__c',
+    'DaysSinceLastPurchase__c', 'EngagementScore'
+]
+
+X = df[feature_cols]
+y = df['ChurnedFlag__c']
+
+# Split data
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# Scale features
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# Train model
+model = RandomForestClassifier(n_estimators=100, random_state=42)
+model.fit(X_train_scaled, y_train)
+
+# Evaluate
+y_pred = model.predict(X_test_scaled)
+print(classification_report(y_test, y_pred))
+
+# Feature importance
+importance = pd.DataFrame({
+    'feature': feature_cols,
+    'importance': model.feature_importances_
+}).sort_values('importance', ascending=False)
+print(importance)
+```
+
+## Working with Large Datasets
+
+### Chunked Processing
+
+```python chunked_processing.py icon=python lines expandable {6-10,12-13,15-18,22-24,28-30}
+def process_in_chunks(query, chunk_size=10000):
+    """Process large datasets in chunks to manage memory."""
+    offset = 0
+    all_results = []
+
+    while True:
+        cursor.execute(f"{query} LIMIT {chunk_size} OFFSET {offset}")
+        chunk = cursor.fetch_dataframe()
+
+        if chunk.empty:
+            break
+
+        # Process chunk
+        processed = process_chunk(chunk)
+        all_results.append(processed)
+
+        offset += chunk_size
+        print(f"Processed {offset} records...")
+
+    return pd.concat(all_results, ignore_index=True)
+
+def process_chunk(df):
+    """Apply transformations to a chunk."""
+    df['ProcessedDate'] = pd.Timestamp.now()
+    return df[['Id__c', 'Email__c', 'ProcessedDate']]
+
+result = process_in_chunks(
+    "SELECT Id__c, Email__c FROM UnifiedContactPointEmail__dlm"
+)
+```
+
+### Memory-Efficient Data Types
+
+```python optimize_dtypes.py icon=python lines expandable {6-23,27-28}
+cursor.execute("SELECT * FROM UnifiedIndividual__dlm LIMIT 100000")
+df = cursor.fetch_dataframe()
+
+# Optimize memory usage
+def optimize_dtypes(df):
+    """Convert columns to more memory-efficient types."""
+    for col in df.columns:
+        col_type = df[col].dtype
+
+        if col_type == 'object':
+            # Try to convert to category if low cardinality
+            if df[col].nunique() / len(df) < 0.5:
+                df[col] = df[col].astype('category')
+
+        elif col_type == 'float64':
+            # Downcast floats
+            df[col] = pd.to_numeric(df[col], downcast='float')
+
+        elif col_type == 'int64':
+            # Downcast integers
+            df[col] = pd.to_numeric(df[col], downcast='integer')
+
+    return df
+
+df_optimized = optimize_dtypes(df)
+
+print(f"Original memory: {df.memory_usage(deep=True).sum() / 1024**2:.2f} MB")
+print(f"Optimized memory: {df_optimized.memory_usage(deep=True).sum() / 1024**2:.2f} MB")
+```
+
+## Exporting Data
+
+### To CSV
+
+```python icon=python lines {4}
+cursor.execute("SELECT * FROM UnifiedIndividual__dlm LIMIT 10000")
+df = cursor.fetch_dataframe()
+
+df.to_csv('customers_export.csv', index=False)
+```
+
+### To Excel
+
+```python icon=python
+df.to_excel('customers_export.xlsx', index=False, sheet_name='Customers')
+```
+
+### To Parquet
+
+```python icon=python
+df.to_parquet('customers_export.parquet', index=False)
+```
+
+### To JSON
+
+```python icon=python
+df.to_json('customers_export.json', orient='records', lines=True)
+```
+
+## Data Type Handling
+
+### Date/Time Columns
+
+```python datetime_handling.py icon=python lines {10-12,15-17}
+cursor.execute("""
+    SELECT Id__c, CreatedDate__c, LastModifiedDate__c
+    FROM UnifiedIndividual__dlm
+    LIMIT 1000
+""")
+
+df = cursor.fetch_dataframe()
+
+# Convert to datetime
+df['CreatedDate__c'] = pd.to_datetime(df['CreatedDate__c'])
+df['LastModifiedDate__c'] = pd.to_datetime(df['LastModifiedDate__c'])
+
+# Extract components
+df['CreatedYear'] = df['CreatedDate__c'].dt.year
+df['CreatedMonth'] = df['CreatedDate__c'].dt.month
+df['DaysSinceCreated'] = (pd.Timestamp.now() - df['CreatedDate__c']).dt.days
+```
+
+### Numeric Columns
+
+```python numeric_handling.py icon=python lines {10-11}
+cursor.execute("""
+    SELECT Id__c, Revenue__c, Quantity__c
+    FROM SalesData__dlm
+""")
+
+df = cursor.fetch_dataframe()
+
+# Ensure numeric types
+df['Revenue__c'] = pd.to_numeric(df['Revenue__c'], errors='coerce')
+df['Quantity__c'] = pd.to_numeric(df['Quantity__c'], errors='coerce')
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Query Efficiency">
+    - Select only needed columns to reduce data transfer
+    - Apply filters in SQL, not in Pandas
+    - Use LIMIT during development
+  </Accordion>
+
+  <Accordion title="Memory Management">
+    - Process large datasets in chunks
+    - Use appropriate data types
+    - Clear DataFrames when no longer needed with `del df`
+  </Accordion>
+
+  <Accordion title="Data Validation">
+    - Check for null values after fetching
+    - Validate data types match expectations
+    - Handle edge cases (empty results, missing columns)
+  </Accordion>
+</AccordionGroup>
+
+## Related Resources
+
+- [Queries](/sdks/python-sdk/queries) - SQL query execution
+- [Authentication](/sdks/python-sdk/authentication) - Connection setup
+- [Pandas Documentation](https://pandas.pydata.org/docs/) - Pandas reference

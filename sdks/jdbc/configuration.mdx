@@ -1,0 +1,302 @@
+---
+title: "Configuration"
+description: "JDBC connection properties and configuration options"
+---
+
+# Configuration
+
+This page documents all connection properties and configuration options for the Data 360 JDBC connector.
+
+## Connection URL
+
+The JDBC connection URL format:
+
+```text
+jdbc:salesforce-datacloud://<Salesforce_Login_Domain>
+```
+
+### URL Examples
+
+| Environment | URL |
+|-------------|-----|
+| Production | `jdbc:salesforce-datacloud://login.salesforce.com` |
+| Sandbox | `jdbc:salesforce-datacloud://test.salesforce.com` |
+| My Domain | `jdbc:salesforce-datacloud://mycompany.my.salesforce.com` |
+
+## Connection Properties
+
+### Authentication Properties
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `user` | String | Conditional | - | Salesforce username (required for Username-Password and JWT flows) |
+| `password` | String | Conditional | - | Salesforce password with security token (required for Username-Password flow) |
+| `clientId` | String | Yes | - | Consumer Key from your Connected App |
+| `clientSecret` | String | Conditional | - | Consumer Secret (required for Username-Password and Refresh Token flows) |
+| `privateKey` | String | Conditional | - | PEM-encoded private key (required for JWT Bearer flow) |
+| `refreshToken` | String | Conditional | - | OAuth refresh token (for Refresh Token flow) |
+| `coreToken` | String | Conditional | - | Data Cloud access token (for Direct Token flow) |
+
+### Connection Properties
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `dataspace` | String | No | `default` | Data space name to connect to |
+| `instanceUrl` | String | Conditional | - | Data Cloud instance URL (required for Direct Token flow) |
+
+### Performance Properties
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `maxRetries` | Integer | No | `3` | Maximum number of retry attempts for failed requests |
+| `connectionTimeout` | Integer | No | `30000` | Connection timeout in milliseconds |
+| `queryTimeout` | Integer | No | `120000` | Query execution timeout in milliseconds |
+| `fetchSize` | Integer | No | `1000` | Number of rows to fetch per batch |
+
+### SSL Properties
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `sslEnabled` | Boolean | No | `true` | Enable SSL/TLS for connections |
+| `trustStore` | String | No | - | Path to custom trust store file |
+| `trustStorePassword` | String | No | - | Trust store password |
+
+## Configuration Examples
+
+### Basic Configuration
+
+```java BasicConfig.java icon=java lines {2-5,7-10}
+Properties props = new Properties();
+props.setProperty("user", "your.email@example.com");
+props.setProperty("password", "YourPassword123!");
+props.setProperty("clientId", "YOUR_CONSUMER_KEY");
+props.setProperty("clientSecret", "YOUR_CONSUMER_SECRET");
+
+Connection conn = DriverManager.getConnection(
+    "jdbc:salesforce-datacloud://login.salesforce.com",
+    props
+);
+```
+
+### With Custom Dataspace
+
+```java DataspaceConfig.java icon=java lines {6}
+Properties props = new Properties();
+props.setProperty("user", "your.email@example.com");
+props.setProperty("password", "YourPassword123!");
+props.setProperty("clientId", "YOUR_CONSUMER_KEY");
+props.setProperty("clientSecret", "YOUR_CONSUMER_SECRET");
+props.setProperty("dataspace", "marketing_dataspace");
+
+Connection conn = DriverManager.getConnection(url, props);
+```
+
+### With Performance Tuning
+
+```java PerformanceConfig.java icon=java lines {9-12}
+Properties props = new Properties();
+// Authentication
+props.setProperty("user", "your.email@example.com");
+props.setProperty("password", "YourPassword123!");
+props.setProperty("clientId", "YOUR_CONSUMER_KEY");
+props.setProperty("clientSecret", "YOUR_CONSUMER_SECRET");
+
+// Performance
+props.setProperty("maxRetries", "5");
+props.setProperty("connectionTimeout", "60000");
+props.setProperty("queryTimeout", "300000");
+props.setProperty("fetchSize", "5000");
+
+Connection conn = DriverManager.getConnection(url, props);
+```
+
+### With Custom Trust Store
+
+```java SSLConfig.java icon=java lines {9-10}
+Properties props = new Properties();
+// Authentication
+props.setProperty("user", "your.email@example.com");
+props.setProperty("password", "YourPassword123!");
+props.setProperty("clientId", "YOUR_CONSUMER_KEY");
+props.setProperty("clientSecret", "YOUR_CONSUMER_SECRET");
+
+// SSL
+props.setProperty("trustStore", "/path/to/custom-truststore.jks");
+props.setProperty("trustStorePassword", "truststore_password");
+
+Connection conn = DriverManager.getConnection(url, props);
+```
+
+## Private Key Configuration
+
+### Key Format Requirements
+
+The private key for JWT Bearer authentication must be:
+- PEM encoded (PKCS#8 format)
+- Begin with `-----BEGIN PRIVATE KEY-----`
+- End with `-----END PRIVATE KEY-----`
+
+### Converting Key Formats
+
+```bash convert_keys.sh icon=terminal lines {2-4,7}
+# Convert from RSA private key to PKCS#8
+openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt \
+    -in rsa_private.key \
+    -out pkcs8_private.pem
+
+# Convert from PKCS#12 to PEM
+openssl pkcs12 -in certificate.p12 -out private.pem -nocerts -nodes
+```
+
+### Loading Key from File
+
+```java LoadKeyFile.java icon=java lines {4-6,9-11}
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+String privateKey = new String(
+    Files.readAllBytes(Paths.get("/secure/path/private.pem"))
+);
+
+Properties props = new Properties();
+props.setProperty("clientId", "YOUR_CONSUMER_KEY");
+props.setProperty("privateKey", privateKey);
+props.setProperty("user", "service.account@example.com");
+```
+
+### Loading Key from Environment Variable
+
+```java LoadKeyEnv.java icon=java lines {1-2,5-7}
+String privateKey = System.getenv("SF_PRIVATE_KEY")
+    .replace("\\n", "\n"); // Handle escaped newlines
+
+Properties props = new Properties();
+props.setProperty("clientId", System.getenv("SF_CLIENT_ID"));
+props.setProperty("privateKey", privateKey);
+props.setProperty("user", System.getenv("SF_USERNAME"));
+```
+
+## Connection Pooling
+
+### HikariCP Configuration
+
+```java HikariConfig.java icon=java lines expandable {6-8,11-13,16-20,22}
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
+HikariConfig config = new HikariConfig();
+config.setJdbcUrl("jdbc:salesforce-datacloud://login.salesforce.com");
+config.setUsername("your.email@example.com");
+
+// Add additional properties
+config.addDataSourceProperty("clientId", "YOUR_CONSUMER_KEY");
+config.addDataSourceProperty("clientSecret", "YOUR_CONSUMER_SECRET");
+config.addDataSourceProperty("password", "YourPassword123!");
+
+// Pool settings
+config.setMaximumPoolSize(10);
+config.setMinimumIdle(2);
+config.setConnectionTimeout(30000);
+config.setIdleTimeout(600000);
+config.setMaxLifetime(1800000);
+
+HikariDataSource dataSource = new HikariDataSource(config);
+
+// Use the data source
+try (Connection conn = dataSource.getConnection()) {
+    // Execute queries
+}
+```
+
+### Apache DBCP2 Configuration
+
+```java DBCP2Config.java icon=java lines expandable {4-7,10-12,15-17}
+import org.apache.commons.dbcp2.BasicDataSource;
+
+BasicDataSource dataSource = new BasicDataSource();
+dataSource.setDriverClassName("com.salesforce.datacloud.jdbc.DataCloudJDBCDriver");
+dataSource.setUrl("jdbc:salesforce-datacloud://login.salesforce.com");
+dataSource.setUsername("your.email@example.com");
+
+// Add connection properties
+dataSource.addConnectionProperty("clientId", "YOUR_CONSUMER_KEY");
+dataSource.addConnectionProperty("clientSecret", "YOUR_CONSUMER_SECRET");
+dataSource.addConnectionProperty("password", "YourPassword123!");
+
+// Pool settings
+dataSource.setMaxTotal(10);
+dataSource.setMinIdle(2);
+dataSource.setMaxIdle(5);
+
+// Use the data source
+try (Connection conn = dataSource.getConnection()) {
+    // Execute queries
+}
+```
+
+## Spring Boot Configuration
+
+### application.properties
+
+```properties application.properties icon=code lines {1-3,6-8,11-13}
+spring.datasource.url=jdbc:salesforce-datacloud://login.salesforce.com
+spring.datasource.username=${SF_USERNAME}
+spring.datasource.driver-class-name=com.salesforce.datacloud.jdbc.DataCloudJDBCDriver
+
+# Custom properties
+spring.datasource.hikari.data-source-properties.clientId=${SF_CLIENT_ID}
+spring.datasource.hikari.data-source-properties.clientSecret=${SF_CLIENT_SECRET}
+spring.datasource.hikari.data-source-properties.password=${SF_PASSWORD}
+
+# Pool configuration
+spring.datasource.hikari.maximum-pool-size=10
+spring.datasource.hikari.minimum-idle=2
+spring.datasource.hikari.connection-timeout=30000
+```
+
+### application.yml
+
+```yaml application.yml icon=code lines {3-5,7-13}
+spring:
+  datasource:
+    url: jdbc:salesforce-datacloud://login.salesforce.com
+    username: ${SF_USERNAME}
+    driver-class-name: com.salesforce.datacloud.jdbc.DataCloudJDBCDriver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+      data-source-properties:
+        clientId: ${SF_CLIENT_ID}
+        clientSecret: ${SF_CLIENT_SECRET}
+        password: ${SF_PASSWORD}
+```
+
+## Troubleshooting Configuration Issues
+
+### Common Configuration Errors
+
+| Error | Cause | Solution |
+|-------|-------|----------|
+| `Missing required property: clientId` | Consumer Key not provided | Add `clientId` property |
+| `Invalid private key format` | Key not in PKCS#8 format | Convert key using openssl |
+| `Connection timeout` | Timeout too short | Increase `connectionTimeout` value |
+| `Dataspace not found` | Invalid dataspace name | Verify dataspace exists and name is correct |
+
+### Debugging Connection Issues
+
+Enable debug logging to troubleshoot:
+
+```java DebugConfig.java icon=java lines {5}
+// Add to your logging configuration (logback.xml example)
+// <logger name="com.salesforce.datacloud.jdbc" level="DEBUG"/>
+
+// Or programmatically
+System.setProperty("datacloud.jdbc.debug", "true");
+```
+
+## Related Resources
+
+- [Authentication](/sdks/jdbc/authentication) - OAuth flow configuration
+- [Examples](/sdks/jdbc/examples) - Complete code examples
+- [JDBC Overview](/sdks/jdbc/index) - Getting started guide

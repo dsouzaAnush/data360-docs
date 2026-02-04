@@ -1,83 +1,410 @@
 ---
 title: "Quick Start"
-description: "Use this section to understand the prerequisites and steps for integrating with Data 360 APIs."
+description: "Use this section to understand the prerequisites and steps for integrating with Salesforce Data 360 APIs."
 ---
 
 # Quick Start
 
-Use this section to understand the prerequisites and steps for integrating with Data 360 APIs.
+Use this section to understand the prerequisites and steps for integrating with Salesforce Data 360 APIs.
 
+<Note>
 To quickly make calls to the Data 360 API, use the [Postman collection](https://www.postman.com/salesforce-developers/salesforce-developers/collection/vkln4gx/salesforce-data-cloud-apis). For more information and a video tutorial, see [Make Data 360 REST API Calls with Postman](https://developer.salesforce.com/docs/data/data-cloud-dev/guide/dc-apis-postman.html?q=postman).
+</Note>
+
+## Prerequisites Checklist
+
+Before you begin, ensure you have:
+
+<Steps>
+  <Step title="Data 360 License">
+    Your org must be provisioned with a Data 360 license
+  </Step>
+  <Step title="User Permissions">
+    Users must have the **Minimum Access - API Only Integrations** profile assigned and appropriate permissions. See [Data Cloud Standard Permission Sets](https://help.salesforce.com/s/articleView?id=data.c360_a_userpermissions.htm&type=5)
+  </Step>
+  <Step title="Data Sources Configured">
+    Set up your data sources by [creating an app connector](https://help.salesforce.com/articleView?id=data.c360_a_web_mobile_app_connector.htm) in the Data 360 app
+  </Step>
+  <Step title="External Client App">
+    Create an External Client App for API authentication (instructions below)
+  </Step>
+</Steps>
 
 Explore the [Data Cloud Online Help](https://help.salesforce.com/articleView?id=customer360_a.htm) if you're unfamiliar with the application.
 
-Before you can use Data 360 APIs, you must configure the application. To set up the application, see [Data Cloud Implementation Overview Guide](https://resources.docs.salesforce.com/rel1/doc/en-us/static/pdf/DataCloud_Overview.pdf).
+## OAuth Scopes
 
-Your org must be provisioned with a Data 360 license, and users must have the **Minimum Access - API Only Integrations** profile assigned and appropriate permissions to access required objects in Data 360. See [Data Cloud Standard Permission Sets](https://help.salesforce.com/s/articleView?id=data.c360_a_userpermissions.htm&type=5).
+When creating your External Client App, enable the OAuth scopes required for your use case:
 
-If you’re using an existing Data 360 instance, confirm with your admin that your user profile has permissions to use Data 360 APIs.
+| Scope | API Name | Description |
+|-------|----------|-------------|
+| Query Data Cloud | `cdp_query_api` | Execute ANSI SQL queries against Data Cloud data |
+| Manage Profile Data | `cdp_profile_api` | Access and manage Data Cloud profile records |
+| Manage Ingestion API | `cdp_ingest_api` | Ingest data via the Ingestion API |
+| Offline Access | `refresh_token` | Obtain refresh tokens for persistent access |
+| General API Access | `api` | Access Salesforce REST APIs |
 
-After you create your Data 360 instance, you can control the scope of data ingestion and activation from within the instance.
+<Tip>
+For most integrations, you'll need at minimum: `api`, `cdp_query_api`, and `refresh_token`
+</Tip>
 
-Set up your data sources by [creating an app connector](https://help.salesforce.com/articleView?id=data.c360_a_web_mobile_app_connector.htm) in the Data 360 app. Configure data streams to ingest data for data mapping and segments.
+## Create an External Client App
 
-Set up an external client app to authenticate and request access to Data 360 APIs. The external client app enables standard OAuth protocols for authentication and authorization and is a newer version of a connected app. Follow the instructions in [Create an External Client App](https://help.salesforce.com/s/articleView?id=xcloud.create_a_local_external_client_app.htm&type=5) and configure the app depending on the type of OAuth 2.0 flow you intend to use to authenticate to the Salesforce platform and how you want to implement it. For information on configuring an external client app for different OAuth 2.0 flows, see [Configure the External Client App OAuth Settings](https://help.salesforce.com/s/articleView?id=xcloud.configure_external_client_app_oauth_settings.htm&type=5).
+1. In Salesforce Setup, search for "App Manager"
+2. Click **New Connected App** or create an **External Client App**
+3. Enable **OAuth Settings**
+4. Add a **Callback URL** (e.g., `https://localhost:3000/callback` for testing)
+5. Select the required **OAuth Scopes** from the table above
+6. Save and copy the **Consumer Key** and **Consumer Secret**
 
-In general, you must select **Enable OAuth** under **OAuth Settings** and then select the necessary OAuth scopes. These scopes define the permissions for the external client app and are granted as tokens after the app is authorized.
+For detailed instructions, see [Create an External Client App](https://help.salesforce.com/s/articleView?id=xcloud.create_a_local_external_client_app.htm&type=5).
 
--   Perform ANSI SQL queries on Data Cloud data (**cdp\_query\_api**): The `cdp_query_api` scope allows ANSI SQL queries of Data Cloud data on behalf of the user.
--   Manage Data Cloud profile data (**cdp\_profile\_api**): The `cdp_profile_api` scope allows you to manage Data Cloud profile records.
--   Manage Data Cloud Ingestion API data (**cdp\_ingest\_api**): The `cdp_ingest_api` scope allows access to manage Data Cloud Ingestion API data.
--   Perform requests at any time (**refresh\_token**): The `refresh_token` scope allows a refresh token to be returned when the requesting client is eligible to receive one. With a refresh token, the app can interact with the user’s data while the user is offline.
--   Manage user data via APIs (**api**): The `api` scope allows access to the current logged-in user’s account using APIs, such as REST API and Bulk API 2.0.
+## Authentication Flow
 
-After creating the external client app, navigate to the **Settings** tab of the app, click **Consumer Key and Secret** under **OAuth Settings**, and copy the _Consumer Key_ and _Consumer Secret_. You need to use these details to authenticate to Data 360 APIs.
+Authentication to Data 360 is a **two-step process**:
 
-For example, you can configure the external client app to use the web server OAuth 2.0 flow to authenticate to the Salesforce platform. For more information, see [Configure a Web Server Flow](https://help.salesforce.com/s/articleView?id=xcloud.configure_web_server_flow_for_external_client_apps.htm).
+1. **Step 1:** Authenticate to Salesforce to get a Salesforce access token
+2. **Step 2:** Exchange the Salesforce token for a Data 360 access token
 
-Authentication to the Data 360 API is a two-step process. First, you must authenticate to the Salesforce platform to obtain a Salesforce access token. Then, you use that Salesforce access token to authenticate to the Data 360 tenant for a Data 360 access token. You can then use the Data 360 access token to make API calls to the Data 360 API.
+```mermaid
+sequenceDiagram
+    participant App as Your App
+    participant SF as Salesforce
+    participant DC as Data 360
 
-To use the OAuth 2.0 web server flow to authenticate to the Salesforce platform, perform these settings in the external client app:
+    App->>SF: 1. Request Authorization Code
+    SF->>App: Authorization Code
+    App->>SF: 2. Exchange Code for Token
+    SF->>App: Salesforce Access Token
+    App->>DC: 3. Exchange for Data 360 Token
+    DC->>App: Data 360 Access Token + Instance URL
+    App->>DC: 4. Make API Calls
+```
 
--   For simplicity, disable **Require Proof Key for Code Exchange (PKCE) Extension for Supported Authorization Flows** in the external client app. Depending on the OAuth 2.0 flow type you intend to use, you must configure the required settings in the external client app. For more information, see [Configure the External Client App OAuth Settings](https://help.salesforce.com/s/articleView?id=xcloud.configure_external_client_app_oauth_settings.htm&type=5).
+## Step 1: Get Salesforce Access Token
 
--   To authenticate to the Salesforce platform, you need a callback URL where Salesforce sends the authorization code after successful authentication. You can either set up a local server (like `localhost:3000`) for testing or use your actual client URL. You must use the same URL as the callback URL in your external client app.
+### 1.1 Initiate Authorization
 
-To authenticate to the Salesforce platform:
+Navigate to this URL in your browser (replace placeholders):
 
-1.  Initiate authorization and retrieve the Salesforce authorization code.
+```text Authorization URL
+https://login.salesforce.com/services/oauth2/authorize
+  ?response_type=code
+  &client_id=YOUR_CONSUMER_KEY
+  &redirect_uri=YOUR_CALLBACK_URL
+  &scope=api cdp_query_api cdp_profile_api refresh_token
+```
 
-    a. Navigate to this URL in your web browser.
+After logging in and granting consent, you'll be redirected to your callback URL with an authorization code:
 
-    In this section, the commands use placeholder variables written in uppercase letters with underscores separating the words.
+```text Callback Response
+https://your-callback-url.com/callback?code=AUTHORIZATION_CODE
+```
 
-    b. In the Salesforce login page, log in using your credentials. After successful login, a consent screen appears.
+### 1.2 Exchange Code for Salesforce Token
 
-    c. Click **Allow** to authorize access to Data Cloud APIs. You are redirected to the web page of the redirect URL specified in your request.
+<CodeGroup>
+```bash cURL icon=terminal
+curl -X POST "https://login.salesforce.com/services/oauth2/token" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "grant_type=authorization_code" \
+  -d "client_id=YOUR_CONSUMER_KEY" \
+  -d "client_secret=YOUR_CONSUMER_SECRET" \
+  -d "redirect_uri=YOUR_CALLBACK_URL" \
+  -d "code=AUTHORIZATION_CODE"
+```
 
-    d. Copy the `Salesforce OAuth code` displayed on the web page to use it in the next step.
+```python get_salesforce_token.py icon=python lines
+import requests
 
-2.  Exchange the OAuth code obtained in the previous step for the Salesforce access token.
+response = requests.post(
+    'https://login.salesforce.com/services/oauth2/token',
+    data={
+        'grant_type': 'authorization_code',
+        'client_id': 'YOUR_CONSUMER_KEY',
+        'client_secret': 'YOUR_CONSUMER_SECRET',
+        'redirect_uri': 'YOUR_CALLBACK_URL',
+        'code': 'AUTHORIZATION_CODE'
+    }
+)
 
-    **Request**
+tokens = response.json()
+salesforce_token = tokens['access_token']
+instance_url = tokens['instance_url']
+```
 
-    **Response**
+```javascript getSalesforceToken.js icon=js lines
+const response = await fetch('https://login.salesforce.com/services/oauth2/token', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+  body: new URLSearchParams({
+    grant_type: 'authorization_code',
+    client_id: 'YOUR_CONSUMER_KEY',
+    client_secret: 'YOUR_CONSUMER_SECRET',
+    redirect_uri: 'YOUR_CALLBACK_URL',
+    code: 'AUTHORIZATION_CODE'
+  })
+});
 
-3.  Copy the `SALESFORCE_ACCESS_TOKEN` to use it in the next step.
+const { access_token, instance_url } = await response.json();
+```
+</CodeGroup>
 
-1.  Exchange the `SALESFORCE_ACCESS_TOKEN` for the Data Cloud access token.
+**Response:**
 
-    **Request**
+```json Response {2-3}
+{
+  "access_token": "00D5f000000KzXy!ARcAQE...",
+  "instance_url": "https://your-org.my.salesforce.com",
+  "refresh_token": "5Aep861KIwKdekr90I4xH...",
+  "token_type": "Bearer",
+  "scope": "api cdp_query_api cdp_profile_api refresh_token"
+}
+```
 
-    **Response**
+## Step 2: Get Data 360 Access Token
 
-2.  Copy these values from the response to use in the Data 360 API requests.
+Exchange your Salesforce access token for a Data 360 access token:
 
--   `DATA_CLOUD_ACCESS_TOKEN`: The token used to access Data Cloud resources.
--   `DATA_CLOUD_INSTANCE_URL`: The tenant-specific endpoint where Data 360 API requests are sent.
+<CodeGroup>
+```bash cURL icon=terminal
+curl -X POST "https://your-org.my.salesforce.com/services/a360/token" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -H "Authorization: Bearer SALESFORCE_ACCESS_TOKEN" \
+  -d "grant_type=urn:salesforce:grant-type:external:cdp" \
+  -d "subject_token=SALESFORCE_ACCESS_TOKEN" \
+  -d "subject_token_type=urn:ietf:params:oauth:token-type:access_token"
+```
 
-After you've acquired your org-specific Data 360 endpoint (`DATA_CLOUD_INSTANCE_URL`), use it for your organization's Data 360 API calls.
+```python get_data360_token.py icon=python lines
+import requests
 
-Let's make a sample API call to get the metadata of your Data 360 tenant.
+response = requests.post(
+    f'{instance_url}/services/a360/token',
+    headers={
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': f'Bearer {salesforce_token}'
+    },
+    data={
+        'grant_type': 'urn:salesforce:grant-type:external:cdp',
+        'subject_token': salesforce_token,
+        'subject_token_type': 'urn:ietf:params:oauth:token-type:access_token'
+    }
+)
 
-**Request**
+data360_response = response.json()
+data360_token = data360_response['access_token']
+data360_instance_url = data360_response['instance_url']
+```
+
+```javascript getData360Token.js icon=js lines
+const data360Response = await fetch(`${instance_url}/services/a360/token`, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/x-www-form-urlencoded',
+    'Authorization': `Bearer ${access_token}`
+  },
+  body: new URLSearchParams({
+    grant_type: 'urn:salesforce:grant-type:external:cdp',
+    subject_token: access_token,
+    subject_token_type: 'urn:ietf:params:oauth:token-type:access_token'
+  })
+});
+
+const { access_token: data360Token, instance_url: data360Url } = await data360Response.json();
+```
+</CodeGroup>
+
+**Response:**
+
+```json Response {2-3}
+{
+  "access_token": "eyJhbGciOiJSUzI1NiIs...",
+  "instance_url": "https://your-tenant.c360a.salesforce.com",
+  "token_type": "Bearer",
+  "expires_in": 7200
+}
+```
+
+<Info>
+Save both the `access_token` and `instance_url` from this response. Use the `instance_url` as the base URL for all Data 360 API calls.
+</Info>
+
+## Make Your First API Call
+
+With your Data 360 access token and instance URL, you can now make API calls.
+
+### Get Tenant Metadata
+
+<CodeGroup>
+```bash cURL icon=terminal
+curl -X GET "https://your-tenant.c360a.salesforce.com/api/v1/metadata/" \
+  -H "Authorization: Bearer DATA_360_ACCESS_TOKEN" \
+  -H "Content-Type: application/json"
+```
+
+```python get_metadata.py icon=python lines
+import requests
+
+response = requests.get(
+    f'{data360_instance_url}/api/v1/metadata/',
+    headers={
+        'Authorization': f'Bearer {data360_token}',
+        'Content-Type': 'application/json'
+    }
+)
+
+metadata = response.json()
+print(f"Found {len(metadata['metadata'])} entities")
+```
+
+```javascript getMetadata.js icon=js lines
+const metadataResponse = await fetch(`${data360Url}/api/v1/metadata/`, {
+  headers: {
+    'Authorization': `Bearer ${data360Token}`,
+    'Content-Type': 'application/json'
+  }
+});
+
+const metadata = await metadataResponse.json();
+console.log(`Found ${metadata.metadata.length} entities`);
+```
+</CodeGroup>
+
+**Response:**
+
+```json Response
+{
+  "metadata": [
+    {
+      "name": "UnifiedIndividual__dlm",
+      "displayName": "Unified Individual",
+      "category": "Profile",
+      "fields": [...]
+    },
+    {
+      "name": "UnifiedContactPointEmail__dlm",
+      "displayName": "Unified Contact Point Email",
+      "category": "Profile",
+      "fields": [...]
+    }
+  ]
+}
+```
+
+### Execute a SQL Query
+
+<CodeGroup>
+```bash cURL icon=terminal
+curl -X POST "https://your-tenant.c360a.salesforce.com/services/data/v64.0/ssot/query-sql" \
+  -H "Authorization: Bearer DATA_360_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "sql": "SELECT Id__c, FirstName__c, LastName__c FROM UnifiedIndividual__dlm LIMIT 10"
+  }'
+```
+
+```python execute_query.py icon=python lines
+import requests
+
+response = requests.post(
+    f'{data360_instance_url}/services/data/v64.0/ssot/query-sql',
+    headers={
+        'Authorization': f'Bearer {data360_token}',
+        'Content-Type': 'application/json'
+    },
+    json={
+        'sql': 'SELECT Id__c, FirstName__c, LastName__c FROM UnifiedIndividual__dlm LIMIT 10'
+    }
+)
+
+result = response.json()
+print(f"Query returned {result['rowCount']} rows")
+for row in result['data']:
+    print(row)
+```
+
+```javascript executeQuery.js icon=js lines
+const queryResponse = await fetch(`${data360Url}/services/data/v64.0/ssot/query-sql`, {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${data360Token}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    sql: 'SELECT Id__c, FirstName__c, LastName__c FROM UnifiedIndividual__dlm LIMIT 10'
+  })
+});
+
+const result = await queryResponse.json();
+console.log(`Query returned ${result.rowCount} rows`);
+```
+</CodeGroup>
+
+**Response:**
+
+```json Response {4-6}
+{
+  "queryId": "0Xx000000000001AAA",
+  "done": true,
+  "rowCount": 10,
+  "data": [
+    ["UI_001234", "John", "Smith"],
+    ["UI_001235", "Jane", "Doe"]
+  ],
+  "metadata": {
+    "columns": [
+      { "name": "Id__c", "type": "STRING" },
+      { "name": "FirstName__c", "type": "STRING" },
+      { "name": "LastName__c", "type": "STRING" }
+    ]
+  }
+}
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Query API" icon="database" href="/apis/query-api/index">
+    Learn how to query Data 360 using SQL
+  </Card>
+  <Card title="Data Ingestion" icon="upload" href="/apis/connect-api/data-ingestion">
+    Ingest data into Data 360
+  </Card>
+  <Card title="Python SDK" icon="python" href="/sdks/python-sdk/index">
+    Connect using the Python connector
+  </Card>
+  <Card title="JDBC Connector" icon="java" href="/sdks/jdbc/index">
+    Connect from Java applications
+  </Card>
+</CardGroup>
+
+## Troubleshooting
+
+### Common Issues
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| `INVALID_CLIENT_ID` | Wrong Consumer Key | Verify Consumer Key from Connected App |
+| `INVALID_GRANT` | Expired or invalid code | Request a new authorization code |
+| `INVALID_SESSION_ID` | Token expired | Refresh using refresh_token |
+| `FORBIDDEN` | Insufficient permissions | Check user permissions and OAuth scopes |
+
+### Token Refresh
+
+When the Data 360 token expires, use the refresh token to get a new Salesforce token, then repeat Step 2:
+
+```bash Refresh Token icon=terminal
+curl -X POST "https://login.salesforce.com/services/oauth2/token" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "grant_type=refresh_token" \
+  -d "client_id=YOUR_CONSUMER_KEY" \
+  -d "client_secret=YOUR_CONSUMER_SECRET" \
+  -d "refresh_token=YOUR_REFRESH_TOKEN"
+```
+
+## Related Resources
+
+- [Data Cloud Implementation Overview](https://resources.docs.salesforce.com/rel1/doc/en-us/static/pdf/DataCloud_Overview.pdf) - Setup guide
+- [Configure OAuth Settings](https://help.salesforce.com/s/articleView?id=xcloud.configure_external_client_app_oauth_settings.htm&type=5) - OAuth configuration
+- [Architecture Overview](/getting-started/architecture) - Data 360 architecture

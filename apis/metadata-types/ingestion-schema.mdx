@@ -1,0 +1,669 @@
+---
+title: "DataCloudIngestionApiSchema Metadata Type"
+description: "Define ingestion API schemas for streaming data into Data 360"
+---
+
+# DataCloudIngestionApiSchema Metadata Type
+
+The `DataCloudIngestionApiSchema` metadata type defines the schema for data ingested via the Data 360 Ingestion API. This allows you to configure and deploy ingestion endpoints programmatically.
+
+## Overview
+
+Ingestion API schemas define:
+
+- Field structure for incoming data
+- Data validation rules
+- Primary key configuration
+- Category classification
+
+## Metadata Structure
+
+### Basic Structure
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<DataCloudIngestionApiSchema xmlns="http://soap.sforce.com/2006/04/metadata">
+    <masterLabel>Web Engagement Events</masterLabel>
+    <developerName>Web_Engagement_Events_Schema</developerName>
+    <description>Schema for ingesting web engagement events</description>
+    <isEnabled>true</isEnabled>
+    <category>Engagement</category>
+
+    <fields>
+        <field>
+            <name>EventId</name>
+            <label>Event ID</label>
+            <type>Text</type>
+            <length>100</length>
+            <isRequired>true</isRequired>
+            <isPrimaryKey>true</isPrimaryKey>
+            <description>Unique identifier for the event</description>
+        </field>
+        <field>
+            <name>UserId</name>
+            <label>User ID</label>
+            <type>Text</type>
+            <length>50</length>
+            <isRequired>false</isRequired>
+            <description>External user identifier</description>
+        </field>
+        <field>
+            <name>EventType</name>
+            <label>Event Type</label>
+            <type>Text</type>
+            <length>50</length>
+            <isRequired>true</isRequired>
+            <description>Type of engagement event</description>
+        </field>
+        <field>
+            <name>EventTimestamp</name>
+            <label>Event Timestamp</label>
+            <type>DateTime</type>
+            <isRequired>true</isRequired>
+            <dateFormat>ISO8601</dateFormat>
+            <description>When the event occurred</description>
+        </field>
+        <field>
+            <name>PageUrl</name>
+            <label>Page URL</label>
+            <type>Text</type>
+            <length>500</length>
+            <isRequired>false</isRequired>
+            <description>URL of the page where event occurred</description>
+        </field>
+        <field>
+            <name>Revenue</name>
+            <label>Revenue</label>
+            <type>Number</type>
+            <precision>18</precision>
+            <scale>2</scale>
+            <isRequired>false</isRequired>
+            <description>Revenue associated with the event</description>
+        </field>
+    </fields>
+
+    <apiSettings>
+        <maxBatchSize>10000</maxBatchSize>
+        <rateLimitPerMinute>100</rateLimitPerMinute>
+    </apiSettings>
+</DataCloudIngestionApiSchema>
+```
+
+## Field Reference
+
+### Top-Level Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `masterLabel` | string | Yes | Display name |
+| `developerName` | string | Yes | API name (unique) |
+| `description` | string | No | Schema description |
+| `isEnabled` | boolean | Yes | Whether schema is active |
+| `category` | enum | Yes | `Profile`, `Engagement`, `Other` |
+| `fields` | array | Yes | Field definitions |
+| `apiSettings` | object | No | API configuration |
+
+### Field Definition
+
+| Attribute | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `name` | string | Yes | Field API name |
+| `label` | string | Yes | Display label |
+| `type` | enum | Yes | Data type |
+| `length` | integer | Conditional | For Text fields |
+| `precision` | integer | Conditional | For Number fields |
+| `scale` | integer | Conditional | For Number fields |
+| `isRequired` | boolean | No | Whether field is required |
+| `isPrimaryKey` | boolean | No | Part of primary key |
+| `description` | string | No | Field description |
+| `defaultValue` | varies | No | Default value |
+| `dateFormat` | string | No | Date/time format |
+| `validation` | object | No | Validation rules |
+
+### Data Types
+
+| Type | Description | Config Options |
+|------|-------------|----------------|
+| `Text` | String data | `length` (max 32000) |
+| `LongText` | Large text | `length` |
+| `Number` | Numeric data | `precision`, `scale` |
+| `Boolean` | True/false | None |
+| `Date` | Date only | `dateFormat` |
+| `DateTime` | Date and time | `dateFormat` |
+| `Email` | Email address | None |
+| `Phone` | Phone number | None |
+| `Url` | Web URL | `length` |
+
+### API Settings
+
+| Setting | Type | Description |
+|---------|------|-------------|
+| `maxBatchSize` | integer | Maximum records per request |
+| `rateLimitPerMinute` | integer | Requests per minute limit |
+| `timeoutSeconds` | integer | Request timeout |
+| `retryPolicy` | object | Retry configuration |
+
+## Validation Rules
+
+### Field Validation
+
+```xml
+<field>
+    <name>Email</name>
+    <label>Email Address</label>
+    <type>Email</type>
+    <isRequired>true</isRequired>
+    <validation>
+        <pattern>^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$</pattern>
+        <errorMessage>Invalid email format</errorMessage>
+    </validation>
+</field>
+```
+
+### Picklist Validation
+
+```xml
+<field>
+    <name>EventType</name>
+    <label>Event Type</label>
+    <type>Text</type>
+    <length>50</length>
+    <isRequired>true</isRequired>
+    <validation>
+        <allowedValues>page_view,click,form_submit,purchase,video_play</allowedValues>
+        <errorMessage>Invalid event type</errorMessage>
+    </validation>
+</field>
+```
+
+### Range Validation
+
+```xml
+<field>
+    <name>Quantity</name>
+    <label>Quantity</label>
+    <type>Number</type>
+    <precision>10</precision>
+    <scale>0</scale>
+    <validation>
+        <minValue>1</minValue>
+        <maxValue>10000</maxValue>
+        <errorMessage>Quantity must be between 1 and 10000</errorMessage>
+    </validation>
+</field>
+```
+
+## Deployment Examples
+
+### Retrieve Schemas
+
+```bash
+# Retrieve all ingestion schemas
+sf project retrieve start -m DataCloudIngestionApiSchema
+
+# Retrieve specific schema
+sf project retrieve start -m DataCloudIngestionApiSchema:Web_Engagement_Events_Schema
+```
+
+### Deploy Schemas
+
+```bash
+# Deploy single schema
+sf project deploy start -m DataCloudIngestionApiSchema:Web_Engagement_Events_Schema
+
+# Validate before deployment
+sf project deploy start -m DataCloudIngestionApiSchema:Web_Engagement_Events_Schema --dry-run
+```
+
+### Package.xml Configuration
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>Web_Engagement_Events_Schema</members>
+        <members>Mobile_App_Events_Schema</members>
+        <members>Transaction_Events_Schema</members>
+        <name>DataCloudIngestionApiSchema</name>
+    </types>
+    <version>64.0</version>
+</Package>
+```
+
+## Complete Examples
+
+### Mobile App Events Schema
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<DataCloudIngestionApiSchema xmlns="http://soap.sforce.com/2006/04/metadata">
+    <masterLabel>Mobile App Events</masterLabel>
+    <developerName>Mobile_App_Events_Schema</developerName>
+    <description>Schema for mobile application engagement events</description>
+    <isEnabled>true</isEnabled>
+    <category>Engagement</category>
+
+    <fields>
+        <field>
+            <name>EventId</name>
+            <label>Event ID</label>
+            <type>Text</type>
+            <length>100</length>
+            <isRequired>true</isRequired>
+            <isPrimaryKey>true</isPrimaryKey>
+            <description>Unique event identifier</description>
+        </field>
+        <field>
+            <name>DeviceId</name>
+            <label>Device ID</label>
+            <type>Text</type>
+            <length>100</length>
+            <isRequired>true</isRequired>
+            <description>Unique device identifier (IDFA/GAID)</description>
+        </field>
+        <field>
+            <name>UserId</name>
+            <label>User ID</label>
+            <type>Text</type>
+            <length>50</length>
+            <isRequired>false</isRequired>
+            <description>Authenticated user ID (if logged in)</description>
+        </field>
+        <field>
+            <name>SessionId</name>
+            <label>Session ID</label>
+            <type>Text</type>
+            <length>100</length>
+            <isRequired>true</isRequired>
+            <description>App session identifier</description>
+        </field>
+        <field>
+            <name>EventName</name>
+            <label>Event Name</label>
+            <type>Text</type>
+            <length>100</length>
+            <isRequired>true</isRequired>
+            <description>Name of the event</description>
+        </field>
+        <field>
+            <name>EventTimestamp</name>
+            <label>Event Timestamp</label>
+            <type>DateTime</type>
+            <isRequired>true</isRequired>
+            <dateFormat>ISO8601</dateFormat>
+        </field>
+        <field>
+            <name>ScreenName</name>
+            <label>Screen Name</label>
+            <type>Text</type>
+            <length>100</length>
+            <isRequired>false</isRequired>
+            <description>Name of the app screen</description>
+        </field>
+        <field>
+            <name>AppVersion</name>
+            <label>App Version</label>
+            <type>Text</type>
+            <length>20</length>
+            <isRequired>true</isRequired>
+            <description>Application version number</description>
+        </field>
+        <field>
+            <name>Platform</name>
+            <label>Platform</label>
+            <type>Text</type>
+            <length>20</length>
+            <isRequired>true</isRequired>
+            <validation>
+                <allowedValues>iOS,Android</allowedValues>
+                <errorMessage>Platform must be iOS or Android</errorMessage>
+            </validation>
+        </field>
+        <field>
+            <name>OSVersion</name>
+            <label>OS Version</label>
+            <type>Text</type>
+            <length>20</length>
+            <isRequired>false</isRequired>
+        </field>
+        <field>
+            <name>DeviceModel</name>
+            <label>Device Model</label>
+            <type>Text</type>
+            <length>50</length>
+            <isRequired>false</isRequired>
+        </field>
+        <field>
+            <name>EventProperties</name>
+            <label>Event Properties</label>
+            <type>LongText</type>
+            <length>32000</length>
+            <isRequired>false</isRequired>
+            <description>JSON object with additional event properties</description>
+        </field>
+    </fields>
+
+    <apiSettings>
+        <maxBatchSize>50000</maxBatchSize>
+        <rateLimitPerMinute>200</rateLimitPerMinute>
+        <timeoutSeconds>30</timeoutSeconds>
+    </apiSettings>
+</DataCloudIngestionApiSchema>
+```
+
+### E-Commerce Transaction Schema
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<DataCloudIngestionApiSchema xmlns="http://soap.sforce.com/2006/04/metadata">
+    <masterLabel>E-Commerce Transactions</masterLabel>
+    <developerName>ECommerce_Transaction_Schema</developerName>
+    <description>Schema for e-commerce transaction events</description>
+    <isEnabled>true</isEnabled>
+    <category>Engagement</category>
+
+    <fields>
+        <field>
+            <name>TransactionId</name>
+            <label>Transaction ID</label>
+            <type>Text</type>
+            <length>50</length>
+            <isRequired>true</isRequired>
+            <isPrimaryKey>true</isPrimaryKey>
+        </field>
+        <field>
+            <name>CustomerId</name>
+            <label>Customer ID</label>
+            <type>Text</type>
+            <length>50</length>
+            <isRequired>true</isRequired>
+        </field>
+        <field>
+            <name>Email</name>
+            <label>Email</label>
+            <type>Email</type>
+            <isRequired>false</isRequired>
+        </field>
+        <field>
+            <name>TransactionDate</name>
+            <label>Transaction Date</label>
+            <type>DateTime</type>
+            <isRequired>true</isRequired>
+            <dateFormat>ISO8601</dateFormat>
+        </field>
+        <field>
+            <name>TransactionType</name>
+            <label>Transaction Type</label>
+            <type>Text</type>
+            <length>20</length>
+            <isRequired>true</isRequired>
+            <validation>
+                <allowedValues>purchase,refund,exchange</allowedValues>
+            </validation>
+        </field>
+        <field>
+            <name>TotalAmount</name>
+            <label>Total Amount</label>
+            <type>Number</type>
+            <precision>18</precision>
+            <scale>2</scale>
+            <isRequired>true</isRequired>
+            <validation>
+                <minValue>0</minValue>
+            </validation>
+        </field>
+        <field>
+            <name>Currency</name>
+            <label>Currency</label>
+            <type>Text</type>
+            <length>3</length>
+            <isRequired>true</isRequired>
+            <defaultValue>USD</defaultValue>
+        </field>
+        <field>
+            <name>ItemCount</name>
+            <label>Item Count</label>
+            <type>Number</type>
+            <precision>10</precision>
+            <scale>0</scale>
+            <isRequired>false</isRequired>
+        </field>
+        <field>
+            <name>DiscountAmount</name>
+            <label>Discount Amount</label>
+            <type>Number</type>
+            <precision>18</precision>
+            <scale>2</scale>
+            <isRequired>false</isRequired>
+            <defaultValue>0</defaultValue>
+        </field>
+        <field>
+            <name>PromoCode</name>
+            <label>Promo Code</label>
+            <type>Text</type>
+            <length>50</length>
+            <isRequired>false</isRequired>
+        </field>
+        <field>
+            <name>Channel</name>
+            <label>Sales Channel</label>
+            <type>Text</type>
+            <length>20</length>
+            <isRequired>true</isRequired>
+            <validation>
+                <allowedValues>web,mobile_app,in_store,phone,marketplace</allowedValues>
+            </validation>
+        </field>
+        <field>
+            <name>PaymentMethod</name>
+            <label>Payment Method</label>
+            <type>Text</type>
+            <length>30</length>
+            <isRequired>false</isRequired>
+        </field>
+        <field>
+            <name>ShippingMethod</name>
+            <label>Shipping Method</label>
+            <type>Text</type>
+            <length>50</length>
+            <isRequired>false</isRequired>
+        </field>
+        <field>
+            <name>StoreId</name>
+            <label>Store ID</label>
+            <type>Text</type>
+            <length>20</length>
+            <isRequired>false</isRequired>
+            <description>Physical store ID (for in-store purchases)</description>
+        </field>
+        <field>
+            <name>LineItems</name>
+            <label>Line Items</label>
+            <type>LongText</type>
+            <length>32000</length>
+            <isRequired>false</isRequired>
+            <description>JSON array of transaction line items</description>
+        </field>
+    </fields>
+
+    <apiSettings>
+        <maxBatchSize>10000</maxBatchSize>
+        <rateLimitPerMinute>100</rateLimitPerMinute>
+        <timeoutSeconds>60</timeoutSeconds>
+    </apiSettings>
+</DataCloudIngestionApiSchema>
+```
+
+### Customer Profile Schema
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<DataCloudIngestionApiSchema xmlns="http://soap.sforce.com/2006/04/metadata">
+    <masterLabel>Customer Profile</masterLabel>
+    <developerName>Customer_Profile_Schema</developerName>
+    <description>Schema for customer profile data ingestion</description>
+    <isEnabled>true</isEnabled>
+    <category>Profile</category>
+
+    <fields>
+        <field>
+            <name>CustomerId</name>
+            <label>Customer ID</label>
+            <type>Text</type>
+            <length>50</length>
+            <isRequired>true</isRequired>
+            <isPrimaryKey>true</isPrimaryKey>
+        </field>
+        <field>
+            <name>FirstName</name>
+            <label>First Name</label>
+            <type>Text</type>
+            <length>100</length>
+            <isRequired>false</isRequired>
+        </field>
+        <field>
+            <name>LastName</name>
+            <label>Last Name</label>
+            <type>Text</type>
+            <length>100</length>
+            <isRequired>true</isRequired>
+        </field>
+        <field>
+            <name>Email</name>
+            <label>Email</label>
+            <type>Email</type>
+            <isRequired>false</isRequired>
+        </field>
+        <field>
+            <name>Phone</name>
+            <label>Phone</label>
+            <type>Phone</type>
+            <isRequired>false</isRequired>
+        </field>
+        <field>
+            <name>BirthDate</name>
+            <label>Birth Date</label>
+            <type>Date</type>
+            <isRequired>false</isRequired>
+        </field>
+        <field>
+            <name>Gender</name>
+            <label>Gender</label>
+            <type>Text</type>
+            <length>20</length>
+            <isRequired>false</isRequired>
+        </field>
+        <field>
+            <name>Street</name>
+            <label>Street Address</label>
+            <type>Text</type>
+            <length>255</length>
+            <isRequired>false</isRequired>
+        </field>
+        <field>
+            <name>City</name>
+            <label>City</label>
+            <type>Text</type>
+            <length>100</length>
+            <isRequired>false</isRequired>
+        </field>
+        <field>
+            <name>State</name>
+            <label>State/Province</label>
+            <type>Text</type>
+            <length>100</length>
+            <isRequired>false</isRequired>
+        </field>
+        <field>
+            <name>PostalCode</name>
+            <label>Postal Code</label>
+            <type>Text</type>
+            <length>20</length>
+            <isRequired>false</isRequired>
+        </field>
+        <field>
+            <name>Country</name>
+            <label>Country</label>
+            <type>Text</type>
+            <length>100</length>
+            <isRequired>false</isRequired>
+        </field>
+        <field>
+            <name>CreatedDate</name>
+            <label>Created Date</label>
+            <type>DateTime</type>
+            <isRequired>true</isRequired>
+        </field>
+        <field>
+            <name>LastModifiedDate</name>
+            <label>Last Modified Date</label>
+            <type>DateTime</type>
+            <isRequired>true</isRequired>
+        </field>
+        <field>
+            <name>MarketingOptIn</name>
+            <label>Marketing Opt-In</label>
+            <type>Boolean</type>
+            <isRequired>false</isRequired>
+            <defaultValue>false</defaultValue>
+        </field>
+        <field>
+            <name>Source</name>
+            <label>Data Source</label>
+            <type>Text</type>
+            <length>50</length>
+            <isRequired>true</isRequired>
+            <description>Origin system of this record</description>
+        </field>
+    </fields>
+
+    <apiSettings>
+        <maxBatchSize>50000</maxBatchSize>
+        <rateLimitPerMinute>100</rateLimitPerMinute>
+        <timeoutSeconds>120</timeoutSeconds>
+    </apiSettings>
+</DataCloudIngestionApiSchema>
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Schema Design">
+    - Always define a clear primary key
+    - Use appropriate data types for each field
+    - Include timestamp fields for temporal tracking
+    - Document field purposes in descriptions
+    - Plan for schema evolution and versioning
+  </Accordion>
+
+  <Accordion title="Validation">
+    - Validate required fields at schema level
+    - Use pattern validation for formatted data
+    - Set appropriate length limits
+    - Define allowed values for enumerated fields
+    - Handle edge cases in validation rules
+  </Accordion>
+
+  <Accordion title="Performance">
+    - Set appropriate batch size limits
+    - Configure realistic rate limits
+    - Consider payload size in schema design
+    - Minimize required fields for streaming use cases
+    - Use LongText sparingly
+  </Accordion>
+
+  <Accordion title="Integration">
+    - Document schema for API consumers
+    - Provide sample payloads in documentation
+    - Version schemas for breaking changes
+    - Test with realistic data volumes
+    - Monitor ingestion error rates
+  </Accordion>
+</AccordionGroup>
+
+## Related Resources
+
+- [Data Ingestion API](/apis/connect-api/data-ingestion) - Runtime ingestion endpoints
+- [Data Streams Metadata](/apis/metadata-types/data-stream) - Stream configuration
+- [Data Source Metadata](/apis/metadata-types/data-source) - Source configuration
+- [Ingestion API Setup](https://help.salesforce.com/s/articleView?id=data.c360_a_set_up_ingestion_api.htm&type=5) - Setup guide

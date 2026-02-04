@@ -1,0 +1,507 @@
+---
+title: "SegmentDefinition Metadata Type"
+description: "Define customer segments and audience criteria for Data 360"
+---
+
+# SegmentDefinition Metadata Type
+
+The `SegmentDefinition` metadata type allows you to define customer segments - dynamic audiences based on profile attributes, behaviors, and calculated insights that can be activated across marketing channels.
+
+## Overview
+
+Segment definitions enable you to:
+
+- Define audience criteria using profile and behavioral data
+- Create reusable segment configurations
+- Deploy segments across environments
+- Version control audience logic
+
+## Metadata Structure
+
+### Basic Structure
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<SegmentDefinition xmlns="http://soap.sforce.com/2006/04/metadata">
+    <masterLabel>High Value Customers</masterLabel>
+    <developerName>High_Value_Customers</developerName>
+    <description>Customers with lifetime value greater than $1000</description>
+    <isEnabled>true</isEnabled>
+    <sourceDataModelObject>UnifiedIndividual__dlm</sourceDataModelObject>
+
+    <criteria>
+        <criteriaGroup>
+            <operator>AND</operator>
+            <conditions>
+                <condition>
+                    <field>LifetimeValue__c</field>
+                    <operator>GREATER_THAN</operator>
+                    <value>1000</value>
+                </condition>
+                <condition>
+                    <field>LastActivityDate__c</field>
+                    <operator>WITHIN_LAST</operator>
+                    <value>90</value>
+                    <unit>DAYS</unit>
+                </condition>
+            </conditions>
+        </criteriaGroup>
+    </criteria>
+
+    <refreshSchedule>
+        <frequency>Daily</frequency>
+        <time>06:00:00Z</time>
+    </refreshSchedule>
+
+    <publishSettings>
+        <autoPublish>true</autoPublish>
+    </publishSettings>
+</SegmentDefinition>
+```
+
+## Field Reference
+
+### Top-Level Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `masterLabel` | string | Yes | Display name |
+| `developerName` | string | Yes | API name (unique) |
+| `description` | string | No | Segment description |
+| `isEnabled` | boolean | Yes | Whether segment is active |
+| `sourceDataModelObject` | string | Yes | Primary source DMO |
+| `criteria` | object | Yes | Segment criteria definition |
+| `refreshSchedule` | object | No | Refresh configuration |
+| `publishSettings` | object | No | Publishing configuration |
+
+### Criteria Structure
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `criteriaGroup` | object | Yes | Root criteria group |
+| `operator` | enum | Yes | `AND` or `OR` |
+| `conditions` | array | Yes | Array of conditions |
+| `nestedGroups` | array | No | Nested criteria groups |
+
+### Condition Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `field` | string | Yes | Field name to evaluate |
+| `operator` | enum | Yes | Comparison operator |
+| `value` | varies | Conditional | Comparison value |
+| `values` | array | Conditional | For IN/NOT_IN operators |
+| `unit` | enum | Conditional | Time unit for date operators |
+
+### Comparison Operators
+
+| Operator | Description | Value Type |
+|----------|-------------|------------|
+| `EQUALS` | Exact match | Single value |
+| `NOT_EQUALS` | Does not match | Single value |
+| `GREATER_THAN` | Greater than | Number/Date |
+| `GREATER_THAN_OR_EQUAL` | Greater than or equal | Number/Date |
+| `LESS_THAN` | Less than | Number/Date |
+| `LESS_THAN_OR_EQUAL` | Less than or equal | Number/Date |
+| `CONTAINS` | Contains substring | String |
+| `NOT_CONTAINS` | Does not contain | String |
+| `STARTS_WITH` | Starts with string | String |
+| `ENDS_WITH` | Ends with string | String |
+| `IN` | Value in list | Array |
+| `NOT_IN` | Value not in list | Array |
+| `IS_NULL` | Value is null | None |
+| `IS_NOT_NULL` | Value is not null | None |
+| `WITHIN_LAST` | Within last N units | Number + unit |
+| `WITHIN_NEXT` | Within next N units | Number + unit |
+| `BEFORE` | Before date | Date |
+| `AFTER` | After date | Date |
+| `BETWEEN` | Between two values | Two values |
+
+### Time Units
+
+| Unit | Description |
+|------|-------------|
+| `DAYS` | Calendar days |
+| `WEEKS` | Calendar weeks |
+| `MONTHS` | Calendar months |
+| `QUARTERS` | Calendar quarters |
+| `YEARS` | Calendar years |
+
+## Complex Criteria Examples
+
+### Nested Criteria Groups
+
+```xml
+<criteria>
+    <criteriaGroup>
+        <operator>AND</operator>
+        <conditions>
+            <condition>
+                <field>IsActive__c</field>
+                <operator>EQUALS</operator>
+                <value>true</value>
+            </condition>
+        </conditions>
+        <nestedGroups>
+            <criteriaGroup>
+                <operator>OR</operator>
+                <conditions>
+                    <condition>
+                        <field>LoyaltyTier__c</field>
+                        <operator>IN</operator>
+                        <values>Gold,Platinum</values>
+                    </condition>
+                    <condition>
+                        <field>LifetimeValue__c</field>
+                        <operator>GREATER_THAN</operator>
+                        <value>5000</value>
+                    </condition>
+                </conditions>
+            </criteriaGroup>
+        </nestedGroups>
+    </criteriaGroup>
+</criteria>
+```
+
+### Related Object Criteria
+
+```xml
+<criteria>
+    <criteriaGroup>
+        <operator>AND</operator>
+        <conditions>
+            <condition>
+                <relatedObject>ssot__SalesOrder__dlm</relatedObject>
+                <relationshipPath>Orders</relationshipPath>
+                <field>OrderDate__c</field>
+                <operator>WITHIN_LAST</operator>
+                <value>30</value>
+                <unit>DAYS</unit>
+            </condition>
+            <condition>
+                <relatedObject>ssot__SalesOrder__dlm</relatedObject>
+                <relationshipPath>Orders</relationshipPath>
+                <aggregation>SUM</aggregation>
+                <field>TotalAmount__c</field>
+                <operator>GREATER_THAN</operator>
+                <value>500</value>
+            </condition>
+        </conditions>
+    </criteriaGroup>
+</criteria>
+```
+
+### Calculated Insight Criteria
+
+```xml
+<criteria>
+    <criteriaGroup>
+        <operator>AND</operator>
+        <conditions>
+            <condition>
+                <calculatedInsight>Customer_Engagement_Score</calculatedInsight>
+                <measure>EngagementScore</measure>
+                <operator>GREATER_THAN</operator>
+                <value>75</value>
+            </condition>
+            <condition>
+                <calculatedInsight>Purchase_Frequency</calculatedInsight>
+                <measure>MonthlyPurchases</measure>
+                <operator>GREATER_THAN_OR_EQUAL</operator>
+                <value>2</value>
+            </condition>
+        </conditions>
+    </criteriaGroup>
+</criteria>
+```
+
+## Deployment Examples
+
+### Retrieve Segments
+
+```bash
+# Retrieve all segment definitions
+sf project retrieve start -m SegmentDefinition
+
+# Retrieve specific segment
+sf project retrieve start -m SegmentDefinition:High_Value_Customers
+```
+
+### Deploy Segments
+
+```bash
+# Deploy single segment
+sf project deploy start -m SegmentDefinition:High_Value_Customers
+
+# Validate before deployment
+sf project deploy start -m SegmentDefinition:High_Value_Customers --dry-run
+```
+
+### Package.xml Configuration
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>High_Value_Customers</members>
+        <members>Recent_Purchasers</members>
+        <members>At_Risk_Customers</members>
+        <members>Newsletter_Subscribers</members>
+        <name>SegmentDefinition</name>
+    </types>
+    <version>64.0</version>
+</Package>
+```
+
+## Complete Examples
+
+### RFM-Based Segment
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<SegmentDefinition xmlns="http://soap.sforce.com/2006/04/metadata">
+    <masterLabel>Champions</masterLabel>
+    <developerName>RFM_Champions</developerName>
+    <description>High-value customers with recent purchases and high frequency (RFM Champions)</description>
+    <isEnabled>true</isEnabled>
+    <sourceDataModelObject>UnifiedIndividual__dlm</sourceDataModelObject>
+
+    <criteria>
+        <criteriaGroup>
+            <operator>AND</operator>
+            <conditions>
+                <!-- Recency: Purchased within last 30 days -->
+                <condition>
+                    <field>LastPurchaseDate__c</field>
+                    <operator>WITHIN_LAST</operator>
+                    <value>30</value>
+                    <unit>DAYS</unit>
+                </condition>
+                <!-- Frequency: 5+ purchases in last year -->
+                <condition>
+                    <calculatedInsight>Purchase_Frequency</calculatedInsight>
+                    <measure>YearlyPurchaseCount</measure>
+                    <operator>GREATER_THAN_OR_EQUAL</operator>
+                    <value>5</value>
+                </condition>
+                <!-- Monetary: Lifetime value > $2000 -->
+                <condition>
+                    <field>LifetimeValue__c</field>
+                    <operator>GREATER_THAN</operator>
+                    <value>2000</value>
+                </condition>
+            </conditions>
+        </criteriaGroup>
+    </criteria>
+
+    <refreshSchedule>
+        <frequency>Daily</frequency>
+        <time>05:00:00Z</time>
+    </refreshSchedule>
+
+    <publishSettings>
+        <autoPublish>true</autoPublish>
+    </publishSettings>
+</SegmentDefinition>
+```
+
+### Multi-Channel Engagement Segment
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<SegmentDefinition xmlns="http://soap.sforce.com/2006/04/metadata">
+    <masterLabel>Multi-Channel Engaged</masterLabel>
+    <developerName>Multi_Channel_Engaged</developerName>
+    <description>Customers engaged across multiple channels in the last 60 days</description>
+    <isEnabled>true</isEnabled>
+    <sourceDataModelObject>UnifiedIndividual__dlm</sourceDataModelObject>
+
+    <criteria>
+        <criteriaGroup>
+            <operator>AND</operator>
+            <conditions>
+                <!-- Has email engagement -->
+                <condition>
+                    <relatedObject>EmailEngagement__dlm</relatedObject>
+                    <relationshipPath>EmailEvents</relationshipPath>
+                    <aggregation>COUNT</aggregation>
+                    <field>EventId__c</field>
+                    <operator>GREATER_THAN</operator>
+                    <value>0</value>
+                    <dateFilter>
+                        <field>EventDate__c</field>
+                        <operator>WITHIN_LAST</operator>
+                        <value>60</value>
+                        <unit>DAYS</unit>
+                    </dateFilter>
+                </condition>
+            </conditions>
+            <nestedGroups>
+                <!-- Has at least one other channel engagement -->
+                <criteriaGroup>
+                    <operator>OR</operator>
+                    <conditions>
+                        <!-- Web engagement -->
+                        <condition>
+                            <relatedObject>WebEngagement__dlm</relatedObject>
+                            <relationshipPath>WebEvents</relationshipPath>
+                            <aggregation>COUNT</aggregation>
+                            <field>VisitId__c</field>
+                            <operator>GREATER_THAN</operator>
+                            <value>0</value>
+                            <dateFilter>
+                                <field>VisitDate__c</field>
+                                <operator>WITHIN_LAST</operator>
+                                <value>60</value>
+                                <unit>DAYS</unit>
+                            </dateFilter>
+                        </condition>
+                        <!-- Mobile app engagement -->
+                        <condition>
+                            <relatedObject>MobileAppEvent__dlm</relatedObject>
+                            <relationshipPath>AppEvents</relationshipPath>
+                            <aggregation>COUNT</aggregation>
+                            <field>EventId__c</field>
+                            <operator>GREATER_THAN</operator>
+                            <value>0</value>
+                            <dateFilter>
+                                <field>EventDate__c</field>
+                                <operator>WITHIN_LAST</operator>
+                                <value>60</value>
+                                <unit>DAYS</unit>
+                            </dateFilter>
+                        </condition>
+                        <!-- In-store visit -->
+                        <condition>
+                            <relatedObject>StoreVisit__dlm</relatedObject>
+                            <relationshipPath>StoreVisits</relationshipPath>
+                            <aggregation>COUNT</aggregation>
+                            <field>VisitId__c</field>
+                            <operator>GREATER_THAN</operator>
+                            <value>0</value>
+                            <dateFilter>
+                                <field>VisitDate__c</field>
+                                <operator>WITHIN_LAST</operator>
+                                <value>60</value>
+                                <unit>DAYS</unit>
+                            </dateFilter>
+                        </condition>
+                    </conditions>
+                </criteriaGroup>
+            </nestedGroups>
+        </criteriaGroup>
+    </criteria>
+
+    <refreshSchedule>
+        <frequency>Daily</frequency>
+        <time>04:00:00Z</time>
+    </refreshSchedule>
+
+    <publishSettings>
+        <autoPublish>true</autoPublish>
+    </publishSettings>
+</SegmentDefinition>
+```
+
+### Exclusion Segment
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<SegmentDefinition xmlns="http://soap.sforce.com/2006/04/metadata">
+    <masterLabel>Suppression List</masterLabel>
+    <developerName>Suppression_List</developerName>
+    <description>Customers to exclude from marketing communications</description>
+    <isEnabled>true</isEnabled>
+    <sourceDataModelObject>UnifiedIndividual__dlm</sourceDataModelObject>
+
+    <criteria>
+        <criteriaGroup>
+            <operator>OR</operator>
+            <conditions>
+                <!-- Opted out of marketing -->
+                <condition>
+                    <field>MarketingOptOut__c</field>
+                    <operator>EQUALS</operator>
+                    <value>true</value>
+                </condition>
+                <!-- Unsubscribed from email -->
+                <condition>
+                    <field>EmailOptOut__c</field>
+                    <operator>EQUALS</operator>
+                    <value>true</value>
+                </condition>
+                <!-- GDPR erasure request -->
+                <condition>
+                    <field>GDPRErasureRequested__c</field>
+                    <operator>EQUALS</operator>
+                    <value>true</value>
+                </condition>
+                <!-- Bounced email -->
+                <condition>
+                    <field>EmailBounced__c</field>
+                    <operator>EQUALS</operator>
+                    <value>true</value>
+                </condition>
+                <!-- Inactive for over 2 years -->
+                <condition>
+                    <field>LastActivityDate__c</field>
+                    <operator>BEFORE</operator>
+                    <value>-730</value>
+                    <unit>DAYS</unit>
+                </condition>
+            </conditions>
+        </criteriaGroup>
+    </criteria>
+
+    <refreshSchedule>
+        <frequency>Hourly</frequency>
+    </refreshSchedule>
+
+    <publishSettings>
+        <autoPublish>true</autoPublish>
+    </publishSettings>
+</SegmentDefinition>
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Segment Design">
+    - Use meaningful, descriptive names
+    - Document segment purpose and criteria
+    - Start with simple criteria, add complexity as needed
+    - Consider segment overlap and exclusivity
+    - Test criteria with expected member counts
+  </Accordion>
+
+  <Accordion title="Performance">
+    - Limit nested criteria depth
+    - Use indexed fields when possible
+    - Choose appropriate refresh frequencies
+    - Monitor segment refresh duration
+    - Consider partitioning large segments
+  </Accordion>
+
+  <Accordion title="Activation Readiness">
+    - Ensure segments meet platform requirements
+    - Include consent/opt-in filters
+    - Create corresponding suppression segments
+    - Test activation with small segments first
+    - Document activation channel mappings
+  </Accordion>
+
+  <Accordion title="Maintenance">
+    - Review segment criteria periodically
+    - Monitor segment size trends
+    - Archive unused segments
+    - Track segment performance metrics
+    - Version control all definitions
+  </Accordion>
+</AccordionGroup>
+
+## Related Resources
+
+- [Segments API](/apis/connect-api/segments) - Runtime segment management
+- [Activations API](/apis/connect-api/activations) - Activate segments
+- [Calculated Insights](/apis/metadata-types/calculated-insights) - Use insights in criteria
+- [Segmentation Help](https://help.salesforce.com/s/articleView?id=data.c360_a_segments.htm&type=5) - Salesforce documentation

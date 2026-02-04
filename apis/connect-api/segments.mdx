@@ -1,0 +1,448 @@
+---
+title: "Segments API"
+description: "Create and manage customer segments in Data 360"
+openapi: "GET /services/data/v64.0/ssot/segments"
+---
+
+# Segments API
+
+The Segments API enables you to programmatically create, manage, and query customer segments in Data 360. Segments are dynamic groups of customers based on attributes, behaviors, and calculated insights.
+
+## Overview
+
+Segments in Data 360 allow you to:
+
+- **Define audiences** based on profile attributes and behaviors
+- **Create dynamic groups** that update automatically as data changes
+- **Activate audiences** to marketing and advertising platforms
+- **Analyze segment overlap** and customer journeys
+
+## Endpoints
+
+### List Segments
+
+#### GET /services/data/v64.0/ssot/segments
+
+Retrieve all segments in your org.
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `status` | string | Filter by status: `ACTIVE`, `INACTIVE`, `DRAFT`, `PUBLISHING` |
+| `type` | string | Filter by type: `MANUAL`, `CALCULATED`, `IMPORTED` |
+| `limit` | integer | Maximum results (default: 100) |
+| `offset` | integer | Pagination offset |
+
+**Response:**
+
+```json
+{
+  "segments": [
+    {
+      "id": "SEG_001",
+      "name": "High_Value_Customers",
+      "displayName": "High Value Customers",
+      "description": "Customers with lifetime value > $1000",
+      "status": "ACTIVE",
+      "type": "CALCULATED",
+      "memberCount": 45230,
+      "createdDate": "2024-01-01T00:00:00Z",
+      "lastRefreshedDate": "2024-01-15T06:00:00Z",
+      "publishStatus": "PUBLISHED"
+    },
+    {
+      "id": "SEG_002",
+      "name": "Recent_Purchasers",
+      "displayName": "Recent Purchasers",
+      "description": "Customers who purchased in last 30 days",
+      "status": "ACTIVE",
+      "type": "CALCULATED",
+      "memberCount": 12500,
+      "createdDate": "2024-01-05T00:00:00Z",
+      "lastRefreshedDate": "2024-01-15T06:00:00Z",
+      "publishStatus": "PUBLISHED"
+    }
+  ],
+  "totalCount": 25,
+  "offset": 0,
+  "limit": 100
+}
+```
+
+### Get Segment Details
+
+#### GET /services/data/v64.0/ssot/segments/{segmentId}
+
+Retrieve detailed information about a specific segment.
+
+<ParamField path="segmentId" type="string" required>
+  The unique identifier of the segment
+</ParamField>
+
+**Response:**
+
+```json
+{
+  "id": "SEG_001",
+  "name": "High_Value_Customers",
+  "displayName": "High Value Customers",
+  "description": "Customers with lifetime value > $1000 and active in last 90 days",
+  "status": "ACTIVE",
+  "type": "CALCULATED",
+  "criteria": {
+    "container": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "ATTRIBUTE",
+          "field": "LifetimeValue__c",
+          "operator": "GREATER_THAN",
+          "value": 1000
+        },
+        {
+          "type": "ATTRIBUTE",
+          "field": "LastActivityDate__c",
+          "operator": "WITHIN_LAST",
+          "value": 90,
+          "unit": "DAYS"
+        }
+      ]
+    }
+  },
+  "memberCount": 45230,
+  "refreshSchedule": {
+    "frequency": "DAILY",
+    "time": "06:00:00Z"
+  },
+  "activations": [
+    {
+      "targetId": "ACT_001",
+      "targetName": "Google Ads",
+      "status": "ACTIVE",
+      "lastSyncDate": "2024-01-15T08:00:00Z"
+    }
+  ],
+  "createdDate": "2024-01-01T00:00:00Z",
+  "createdBy": "admin@example.com",
+  "lastModifiedDate": "2024-01-10T00:00:00Z",
+  "lastRefreshedDate": "2024-01-15T06:00:00Z"
+}
+```
+
+### Create Segment
+
+#### POST /services/data/v64.0/ssot/segments
+
+Create a new segment with specified criteria.
+
+**Request Body:**
+
+```json Request {2-4,6-22}
+{
+  "name": "Loyal_Mobile_Users",
+  "displayName": "Loyal Mobile App Users",
+  "description": "Users with 10+ app sessions in last 30 days",
+  "criteria": {
+    "container": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "ATTRIBUTE",
+          "field": "AppSessions30Days__c",
+          "operator": "GREATER_THAN_OR_EQUAL",
+          "value": 10
+        },
+        {
+          "type": "ATTRIBUTE",
+          "field": "HasMobileApp__c",
+          "operator": "EQUALS",
+          "value": true
+        }
+      ]
+    }
+  },
+  "refreshSchedule": {
+    "frequency": "DAILY",
+    "time": "06:00:00Z"
+  }
+}
+```
+
+**Response:**
+
+```json Response {2-3}
+{
+  "id": "SEG_003",
+  "name": "Loyal_Mobile_Users",
+  "status": "DRAFT",
+  "message": "Segment created successfully. Run publish to activate."
+}
+```
+
+### Update Segment
+
+#### PATCH /services/data/v64.0/ssot/segments/{segmentId}
+
+Update an existing segment's configuration.
+
+<ParamField path="segmentId" type="string" required>
+  The unique identifier of the segment
+</ParamField>
+
+**Request Body:**
+
+```json
+{
+  "description": "Updated description for the segment",
+  "criteria": {
+    "container": {
+      "operator": "AND",
+      "conditions": [
+        {
+          "type": "ATTRIBUTE",
+          "field": "AppSessions30Days__c",
+          "operator": "GREATER_THAN_OR_EQUAL",
+          "value": 15
+        }
+      ]
+    }
+  }
+}
+```
+
+**Response:**
+
+```json
+{
+  "id": "SEG_003",
+  "status": "DRAFT",
+  "message": "Segment updated. Republish required to apply changes."
+}
+```
+
+### Publish Segment
+
+#### POST /services/data/v64.0/ssot/segments/{segmentId}/publish
+
+Publish a segment to make it active and compute membership.
+
+<ParamField path="segmentId" type="string" required>
+  The unique identifier of the segment
+</ParamField>
+
+**Response:**
+
+```json
+{
+  "id": "SEG_003",
+  "status": "PUBLISHING",
+  "jobId": "PUB_001",
+  "estimatedCompletionTime": "2024-01-15T10:30:00Z",
+  "message": "Segment publishing initiated"
+}
+```
+
+### Get Segment Members
+
+#### GET /services/data/v64.0/ssot/segments/{segmentId}/members
+
+Retrieve the members (unified profile IDs) of a segment.
+
+<ParamField path="segmentId" type="string" required>
+  The unique identifier of the segment
+</ParamField>
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `limit` | integer | Maximum members to return (default: 1000) |
+| `offset` | integer | Pagination offset |
+| `fields` | string | Comma-separated fields to include |
+
+**Response:**
+
+```json
+{
+  "segmentId": "SEG_001",
+  "memberCount": 45230,
+  "members": [
+    {
+      "unifiedId": "UI_001",
+      "firstName": "John",
+      "lastName": "Smith",
+      "email": "john.smith@example.com",
+      "lifetimeValue": 2500.00
+    },
+    {
+      "unifiedId": "UI_002",
+      "firstName": "Jane",
+      "lastName": "Doe",
+      "email": "jane.doe@example.com",
+      "lifetimeValue": 1800.00
+    }
+  ],
+  "offset": 0,
+  "limit": 1000,
+  "hasMore": true
+}
+```
+
+### Get Segment Overlap
+
+#### GET /services/data/v64.0/ssot/segments/{segmentId}/overlap
+
+Analyze overlap with other segments.
+
+<ParamField path="segmentId" type="string" required>
+  The unique identifier of the segment
+</ParamField>
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `compareWith` | string | Comma-separated segment IDs to compare |
+
+**Response:**
+
+```json
+{
+  "segmentId": "SEG_001",
+  "segmentName": "High Value Customers",
+  "memberCount": 45230,
+  "overlaps": [
+    {
+      "segmentId": "SEG_002",
+      "segmentName": "Recent Purchasers",
+      "overlapCount": 8500,
+      "overlapPercentage": 18.8
+    },
+    {
+      "segmentId": "SEG_003",
+      "segmentName": "Loyal Mobile Users",
+      "overlapCount": 12000,
+      "overlapPercentage": 26.5
+    }
+  ]
+}
+```
+
+## Segment Criteria Operators
+
+### Comparison Operators
+
+| Operator | Description | Data Types |
+|----------|-------------|------------|
+| `EQUALS` | Exact match | All types |
+| `NOT_EQUALS` | Does not match | All types |
+| `GREATER_THAN` | Greater than value | Number, Date |
+| `GREATER_THAN_OR_EQUAL` | Greater than or equal | Number, Date |
+| `LESS_THAN` | Less than value | Number, Date |
+| `LESS_THAN_OR_EQUAL` | Less than or equal | Number, Date |
+| `CONTAINS` | Contains substring | String |
+| `STARTS_WITH` | Starts with string | String |
+| `IN` | Value in list | All types |
+| `NOT_IN` | Value not in list | All types |
+| `IS_NULL` | Value is null | All types |
+| `IS_NOT_NULL` | Value is not null | All types |
+
+### Date Operators
+
+| Operator | Description | Example |
+|----------|-------------|---------|
+| `WITHIN_LAST` | Within last N days/months | Last 30 days |
+| `WITHIN_NEXT` | Within next N days/months | Next 7 days |
+| `BEFORE` | Before specific date | Before 2024-01-01 |
+| `AFTER` | After specific date | After 2023-12-31 |
+| `BETWEEN` | Between two dates | 2023-01-01 to 2024-01-01 |
+
+## Code Examples
+
+<CodeGroup>
+```bash cURL icon=terminal
+curl -X POST "https://{instance}.salesforce.com/services/data/v64.0/ssot/segments" \
+  -H "Authorization: Bearer {access_token}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "High_Spenders",
+    "displayName": "High Spenders",
+    "criteria": {
+      "container": {
+        "operator": "AND",
+        "conditions": [
+          {
+            "type": "ATTRIBUTE",
+            "field": "TotalSpend__c",
+            "operator": "GREATER_THAN",
+            "value": 500
+          }
+        ]
+      }
+    }
+  }'
+```
+
+```python get_segment_members.py icon=python lines {4-6,8-9,11-13}
+import requests
+
+segment_id = "SEG_001"
+url = f"https://{instance}.salesforce.com/services/data/v64.0/ssot/segments/{segment_id}/members"
+headers = {"Authorization": f"Bearer {access_token}"}
+params = {"limit": 100, "fields": "unifiedId,email,lifetimeValue"}
+
+response = requests.get(url, headers=headers, params=params)
+data = response.json()
+
+print(f"Segment has {data['memberCount']:,} members")
+for member in data['members']:
+    print(f"  {member['email']}: ${member['lifetimeValue']:.2f}")
+```
+
+```java PublishSegment.java icon=java lines {3-8}
+HttpClient client = HttpClient.newHttpClient();
+
+HttpRequest request = HttpRequest.newBuilder()
+    .uri(URI.create("https://{instance}.salesforce.com/services/data/v64.0/ssot/segments/SEG_001/publish"))
+    .header("Authorization", "Bearer " + accessToken)
+    .header("Content-Type", "application/json")
+    .POST(HttpRequest.BodyPublishers.noBody())
+    .build();
+
+HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+System.out.println("Publish response: " + response.body());
+```
+</CodeGroup>
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Segment Design">
+    - Keep criteria simple and understandable
+    - Use meaningful names that describe the audience
+    - Document the business purpose of each segment
+    - Consider refresh frequency based on data volatility
+  </Accordion>
+
+  <Accordion title="Performance Optimization">
+    - Avoid overly complex nested conditions
+    - Use indexed fields in criteria when possible
+    - Schedule refreshes during off-peak hours
+    - Monitor segment size trends over time
+  </Accordion>
+
+  <Accordion title="Activation Best Practices">
+    - Test segments with small activations first
+    - Monitor activation sync status regularly
+    - Set up alerts for failed activations
+    - Review segment overlap before activating to multiple channels
+  </Accordion>
+</AccordionGroup>
+
+## Related Resources
+
+- [Activations API](/apis/connect-api/activations) - Activate segments to destinations
+- [Segment Definition Metadata](/apis/metadata-types/segments) - Deploy segment configurations
+- [Calculated Insights API](/apis/query-api/calculated-insights-api) - Query segment-related metrics
+- [Segmentation Help](https://help.salesforce.com/s/articleView?id=data.c360_a_segments.htm&type=5) - Salesforce documentation

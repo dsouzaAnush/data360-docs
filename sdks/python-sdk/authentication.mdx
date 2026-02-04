@@ -1,0 +1,255 @@
+---
+title: "Authentication"
+description: "Configure OAuth authentication for the Python SDK"
+---
+
+# Authentication
+
+The Python SDK supports two OAuth 2.0 authentication flows for connecting to Data 360: Client Credentials Flow and Token Flow.
+
+## Prerequisites
+
+Before authenticating, ensure you have:
+
+1. A Salesforce org with Data 360 provisioned
+2. An External Client App (or Connected App) configured with appropriate OAuth scopes
+3. Consumer Key and Consumer Secret from your app
+
+### Required OAuth Scopes
+
+Your connected app must have these scopes enabled:
+
+| Scope | API Name | Description |
+|-------|----------|-------------|
+| Query Data Cloud | `cdp_query_api` | Execute SQL queries on Data Cloud data |
+| Manage Profile Data | `cdp_profile_api` | Access and manage profile records |
+| General API Access | `api` | Access Salesforce REST APIs |
+| Offline Access | `refresh_token` | Obtain refresh tokens for persistent access |
+
+## Client Credentials Flow
+
+The Client Credentials flow is recommended for server-to-server integrations where user interaction is not required.
+
+### Configuration
+
+```python icon=python lines {3-8}
+from salesforce_cdp_connector import SalesforceCDPConnection
+
+connection = SalesforceCDPConnection(
+    login_url='https://login.salesforce.com',
+    client_id='YOUR_CONSUMER_KEY',
+    client_secret='YOUR_CONSUMER_SECRET',
+    username='service.account@example.com',
+    password='your_password'
+)
+```
+
+### Parameters
+
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| `login_url` | Yes | Salesforce login URL (`https://login.salesforce.com` for production, `https://test.salesforce.com` for sandbox) |
+| `client_id` | Yes | Consumer Key from your External Client App |
+| `client_secret` | Yes | Consumer Secret from your External Client App |
+| `username` | Yes | Salesforce username |
+| `password` | Yes | Salesforce password (may need security token appended) |
+
+### Example
+
+```python client_credentials_example.py icon=python lines {4-10,14-16}
+from salesforce_cdp_connector import SalesforceCDPConnection
+
+# Production environment
+connection = SalesforceCDPConnection(
+    login_url='https://login.salesforce.com',
+    client_id='3MVG9YDQS5WtC11paU2Wc...',
+    client_secret='1234567890ABCDEF...',
+    username='api.user@company.com',
+    password='MyPassword123!SecurityToken'
+)
+
+# Execute a query
+cursor = connection.cursor()
+cursor.execute("SELECT COUNT(*) FROM UnifiedIndividual__dlm")
+result = cursor.fetchone()
+print(f"Total profiles: {result[0]}")
+
+# Clean up
+cursor.close()
+connection.close()
+```
+
+<Warning>
+If your Salesforce org requires a security token, append it to your password: `password + security_token`
+</Warning>
+
+## Token Flow
+
+The Token flow is useful when you already have access tokens or when implementing user-authenticated flows.
+
+### Configuration
+
+```python icon=python lines {3-8}
+from salesforce_cdp_connector import SalesforceCDPConnection
+
+connection = SalesforceCDPConnection(
+    login_url='https://login.salesforce.com',
+    client_id='YOUR_CONSUMER_KEY',
+    client_secret='YOUR_CONSUMER_SECRET',
+    core_token='YOUR_SALESFORCE_ACCESS_TOKEN',
+    refresh_token='YOUR_REFRESH_TOKEN'
+)
+```
+
+### Parameters
+
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| `login_url` | Yes | Salesforce login URL |
+| `client_id` | Yes | Consumer Key from your External Client App |
+| `client_secret` | Yes | Consumer Secret from your External Client App |
+| `core_token` | Yes | Salesforce OAuth access token |
+| `refresh_token` | Conditional | Required for automatic token refresh |
+
+### Obtaining Tokens
+
+To use the Token flow, you first need to obtain tokens through the standard OAuth 2.0 web flow:
+
+```python obtain_tokens.py icon=python lines {7-13,16-24,27-28}
+import requests
+
+# Step 1: Direct user to authorization URL
+auth_url = (
+    "https://login.salesforce.com/services/oauth2/authorize"
+    "?response_type=code"
+    f"&client_id={client_id}"
+    f"&redirect_uri={redirect_uri}"
+    "&scope=api cdp_query_api cdp_profile_api refresh_token"
+)
+
+# Step 2: After user authorizes, exchange code for tokens
+token_response = requests.post(
+    'https://login.salesforce.com/services/oauth2/token',
+    data={
+        'grant_type': 'authorization_code',
+        'client_id': client_id,
+        'client_secret': client_secret,
+        'redirect_uri': redirect_uri,
+        'code': authorization_code
+    }
+)
+
+tokens = token_response.json()
+access_token = tokens['access_token']
+refresh_token = tokens['refresh_token']
+```
+
+### Example with Token Flow
+
+```python token_flow_example.py icon=python lines {4-10,14-16}
+from salesforce_cdp_connector import SalesforceCDPConnection
+
+# Using previously obtained tokens
+connection = SalesforceCDPConnection(
+    login_url='https://login.salesforce.com',
+    client_id='3MVG9YDQS5WtC11paU2Wc...',
+    client_secret='1234567890ABCDEF...',
+    core_token='00D5f000000KzXy!ARcAQE...',
+    refresh_token='5Aep861KIwKdekr90I4xH...'
+)
+
+# The SDK will automatically refresh the token when it expires
+cursor = connection.cursor()
+cursor.execute("SELECT Id__c, Email__c FROM UnifiedContactPointEmail__dlm LIMIT 10")
+df = cursor.fetch_dataframe()
+print(df)
+```
+
+## Environment Variables
+
+For security, store credentials in environment variables:
+
+```python env_config.py icon=python lines {4-9}
+import os
+from salesforce_cdp_connector import SalesforceCDPConnection
+
+connection = SalesforceCDPConnection(
+    login_url=os.environ.get('SF_LOGIN_URL', 'https://login.salesforce.com'),
+    client_id=os.environ['SF_CLIENT_ID'],
+    client_secret=os.environ['SF_CLIENT_SECRET'],
+    username=os.environ['SF_USERNAME'],
+    password=os.environ['SF_PASSWORD']
+)
+```
+
+Set environment variables in your shell:
+
+```bash icon=terminal
+export SF_CLIENT_ID='your_consumer_key'
+export SF_CLIENT_SECRET='your_consumer_secret'
+export SF_USERNAME='your_username'
+export SF_PASSWORD='your_password_and_token'
+```
+
+## Connection Context Manager
+
+Use a context manager to ensure connections are properly closed:
+
+```python context_manager.py icon=python lines {4-11,12-14}
+from salesforce_cdp_connector import SalesforceCDPConnection
+
+# Connection is automatically closed when exiting the block
+with SalesforceCDPConnection(
+    login_url='https://login.salesforce.com',
+    client_id=client_id,
+    client_secret=client_secret,
+    username=username,
+    password=password
+) as connection:
+    cursor = connection.cursor()
+    cursor.execute("SELECT COUNT(*) FROM UnifiedIndividual__dlm")
+    print(cursor.fetchone())
+```
+
+## Error Handling
+
+Handle authentication errors gracefully:
+
+```python error_handling.py icon=python lines {4-11,12-15}
+from salesforce_cdp_connector import SalesforceCDPConnection
+from salesforce_cdp_connector.exceptions import AuthenticationError
+
+try:
+    connection = SalesforceCDPConnection(
+        login_url='https://login.salesforce.com',
+        client_id=client_id,
+        client_secret=client_secret,
+        username=username,
+        password=password
+    )
+except AuthenticationError as e:
+    print(f"Authentication failed: {e}")
+    # Handle error - check credentials, scopes, etc.
+except Exception as e:
+    print(f"Connection error: {e}")
+```
+
+## Sandbox Environments
+
+For sandbox orgs, use the test login URL:
+
+```python sandbox_config.py icon=python lines {2,5}
+connection = SalesforceCDPConnection(
+    login_url='https://test.salesforce.com',  # Sandbox URL
+    client_id=client_id,
+    client_secret=client_secret,
+    username='user@company.com.sandbox',  # Sandbox username format
+    password=password
+)
+```
+
+## Related Resources
+
+- [Python SDK Overview](/sdks/python-sdk/index) - Getting started guide
+- [Queries](/sdks/python-sdk/queries) - Execute SQL queries
+- [OAuth 2.0 Flows](https://help.salesforce.com/s/articleView?id=xcloud.remoteaccess_oauth_flows.htm) - Salesforce OAuth documentation

@@ -1,0 +1,210 @@
+---
+title: "JDBC Connector"
+description: "Connect to Data 360 from Java applications using the JDBC driver"
+---
+
+# JDBC Connector
+
+The Salesforce Data Cloud JDBC Connector enables Java applications to connect to Data 360 and execute SQL queries using standard JDBC interfaces.
+
+## Overview
+
+The JDBC connector provides:
+
+- **Standard JDBC Interface** - Use familiar JDBC APIs and tools
+- **Multiple Authentication Flows** - JWT Bearer, Username-Password, Refresh Token, Direct Token
+- **SQL Query Support** - Execute ANSI SQL queries against Data 360
+- **Connection Pooling** - Compatible with standard connection pool implementations
+- **BI Tool Integration** - Works with Tableau, Power BI, DBeaver, and other JDBC-compatible tools
+
+## Connection URL Format
+
+```text
+jdbc:salesforce-datacloud://<Salesforce_Login_Domain>
+```
+
+### Examples
+
+```text URL Examples
+# Production
+jdbc:salesforce-datacloud://login.salesforce.com
+
+# Sandbox
+jdbc:salesforce-datacloud://test.salesforce.com
+
+# My Domain
+jdbc:salesforce-datacloud://mycompany.my.salesforce.com
+```
+
+## Quick Start
+
+### 1. Add the Driver Dependency
+
+<CodeGroup>
+```xml pom.xml icon=code lines {2-4}
+<dependency>
+    <groupId>com.salesforce.datacloud</groupId>
+    <artifactId>salesforce-datacloud-jdbc</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
+
+```groovy build.gradle icon=code
+implementation 'com.salesforce.datacloud:salesforce-datacloud-jdbc:1.0.0'
+```
+</CodeGroup>
+
+### 2. Establish a Connection
+
+```java Connect.java icon=java lines {6-10,13-14}
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.util.Properties;
+
+// Connection properties
+Properties props = new Properties();
+props.setProperty("user", "your.email@example.com");
+props.setProperty("password", "your_password");
+props.setProperty("clientId", "YOUR_CONSUMER_KEY");
+props.setProperty("clientSecret", "YOUR_CONSUMER_SECRET");
+
+// Connect
+String url = "jdbc:salesforce-datacloud://login.salesforce.com";
+Connection conn = DriverManager.getConnection(url, props);
+```
+
+### 3. Execute a Query
+
+```java Query.java icon=java lines {3-7,9-14}
+import java.sql.*;
+
+try (Statement stmt = conn.createStatement()) {
+    ResultSet rs = stmt.executeQuery(
+        "SELECT Id__c, FirstName__c, LastName__c " +
+        "FROM UnifiedIndividual__dlm " +
+        "LIMIT 100"
+    );
+
+    while (rs.next()) {
+        String id = rs.getString("Id__c");
+        String firstName = rs.getString("FirstName__c");
+        String lastName = rs.getString("LastName__c");
+        System.out.println(id + ": " + firstName + " " + lastName);
+    }
+}
+```
+
+### 4. Close the Connection
+
+```java icon=java
+conn.close();
+```
+
+## Features
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="key" href="/sdks/jdbc/authentication">
+    Configure OAuth flows: JWT Bearer, Username-Password, Refresh Token, Direct Token
+  </Card>
+  <Card title="Configuration" icon="gear" href="/sdks/jdbc/configuration">
+    Connection properties, key generation, and advanced settings
+  </Card>
+  <Card title="Examples" icon="code" href="/sdks/jdbc/examples">
+    Complete Java code examples for common use cases
+  </Card>
+</CardGroup>
+
+## Required OAuth Scopes
+
+Your connected app must have these OAuth scopes enabled:
+
+| Scope | API Name | Description |
+|-------|----------|-------------|
+| General API Access | `api` | Access Salesforce REST APIs |
+| Query Data Cloud | `cdp_query_api` | Execute SQL queries on Data Cloud data |
+
+## Supported Operations
+
+| Operation | Support |
+|-----------|---------|
+| SELECT queries | Full support |
+| JOIN queries | Supported |
+| Aggregations (COUNT, SUM, AVG, etc.) | Supported |
+| Subqueries | Supported |
+| INSERT/UPDATE/DELETE | Not supported (read-only) |
+| DDL (CREATE, ALTER, DROP) | Not supported |
+
+## BI Tool Integration
+
+The JDBC connector works with popular BI and analytics tools:
+
+| Tool | Status | Notes |
+|------|--------|-------|
+| Tableau | Supported | Use "Other Databases (JDBC)" connector |
+| Power BI | Supported | Requires JDBC-ODBC bridge or custom connector |
+| DBeaver | Supported | Add driver manually |
+| IntelliJ DataGrip | Supported | Add as generic JDBC driver |
+| Apache Superset | Supported | Configure as SQLAlchemy connection |
+
+### Tableau Configuration
+
+1. Download the JDBC driver JAR file
+2. Place it in Tableau's drivers directory:
+   - Windows: `C:\Program Files\Tableau\Drivers`
+   - Mac: `~/Library/Tableau/Drivers`
+3. Restart Tableau
+4. Connect using "Other Databases (JDBC)"
+5. Enter the JDBC URL and credentials
+
+### DBeaver Configuration
+
+1. Go to Database → Driver Manager
+2. Click "New" to add a custom driver
+3. Configure:
+   - Driver Name: `Salesforce Data Cloud`
+   - Class Name: `com.salesforce.datacloud.jdbc.DataCloudJDBCDriver`
+   - URL Template: `jdbc:salesforce-datacloud://{host}`
+4. Add the JDBC JAR file to the Libraries tab
+5. Create a new connection using this driver
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Connection Management">
+    - Use connection pooling in production applications
+    - Close connections, statements, and result sets properly
+    - Use try-with-resources for automatic resource cleanup
+  </Accordion>
+
+  <Accordion title="Query Performance">
+    - Add WHERE clauses to filter data early
+    - Select only needed columns
+    - Use LIMIT for interactive queries
+    - Consider query timeout settings for long-running queries
+  </Accordion>
+
+  <Accordion title="Security">
+    - Store credentials securely (environment variables, secrets manager)
+    - Use JWT Bearer flow for server-to-server integrations
+    - Rotate credentials regularly
+    - Use the minimum required OAuth scopes
+  </Accordion>
+</AccordionGroup>
+
+## Troubleshooting
+
+### Common Issues
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| `Authentication failed` | Invalid credentials | Verify Consumer Key, Secret, and user credentials |
+| `Connection refused` | Network/firewall issue | Check network connectivity and firewall rules |
+| `Invalid table name` | Table doesn't exist | Use `_dlm` suffix for Data Model Objects |
+| `Query timeout` | Query too complex/large | Add filters, reduce result set, increase timeout |
+
+## Related Resources
+
+- [Authentication](/sdks/jdbc/authentication) - OAuth configuration details
+- [Configuration](/sdks/jdbc/configuration) - Connection properties reference
+- [Examples](/sdks/jdbc/examples) - Complete code examples
+- [Query API](/apis/query-api/index) - Data 360 Query API reference

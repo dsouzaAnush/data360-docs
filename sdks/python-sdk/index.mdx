@@ -1,0 +1,265 @@
+---
+title: "Python SDK"
+description: "Connect to Salesforce Data 360 using the official Python connector for data analysis and ML workflows"
+---
+
+# Python SDK
+
+The Salesforce Data Cloud Python Connector enables you to connect to Data 360 from Python applications for querying data, building machine learning models, and performing data analysis with Pandas DataFrames.
+
+## Overview
+
+The Python SDK provides:
+
+- **OAuth Authentication** - Support for Client Credentials and Token flows
+- **SQL Query Execution** - Execute ANSI SQL queries against Data 360
+- **Pandas Integration** - Fetch results directly into DataFrames
+- **Cursor-based API** - Familiar database cursor interface
+- **Connection Pooling** - Efficient resource management
+
+## Installation
+
+Install the connector using pip:
+
+```bash Installation icon=terminal
+pip install salesforce-cdp-connector
+```
+
+<Note>
+Requires Python 3.8 or later. The connector depends on `pandas`, `requests`, and other packages that will be installed automatically.
+</Note>
+
+## Quick Start
+
+### 1. Import the Connector
+
+```python icon=python
+from salesforce_cdp_connector import SalesforceCDPConnection
+```
+
+### 2. Establish a Connection
+
+<CodeGroup>
+```python Client Credentials Flow icon=python lines {1-7}
+connection = SalesforceCDPConnection(
+    login_url='https://login.salesforce.com',
+    client_id='YOUR_CONSUMER_KEY',
+    client_secret='YOUR_CONSUMER_SECRET',
+    username='your.email@example.com',
+    password='your_password'
+)
+```
+
+```python Token Flow icon=python lines {1-7}
+connection = SalesforceCDPConnection(
+    login_url='https://login.salesforce.com',
+    client_id='YOUR_CONSUMER_KEY',
+    client_secret='YOUR_CONSUMER_SECRET',
+    core_token='YOUR_SALESFORCE_ACCESS_TOKEN',
+    refresh_token='YOUR_REFRESH_TOKEN'
+)
+```
+</CodeGroup>
+
+### 3. Execute a Query
+
+```python query_example.py icon=python lines {4-9,12}
+# Create a cursor
+cursor = connection.cursor()
+
+# Execute a SQL query
+cursor.execute("""
+    SELECT Id__c, FirstName__c, LastName__c, Email__c
+    FROM UnifiedIndividual__dlm
+    WHERE IsActive__c = true
+    LIMIT 100
+""")
+
+# Fetch results as a Pandas DataFrame
+df = cursor.fetch_dataframe()
+
+print(f"Retrieved {len(df)} records")
+print(df.head())
+```
+
+### 4. Close the Connection
+
+```python icon=python
+cursor.close()
+connection.close()
+```
+
+## Features
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="key" href="/sdks/python-sdk/authentication">
+    Configure OAuth authentication with Client Credentials or Token flows
+  </Card>
+  <Card title="Queries" icon="database" href="/sdks/python-sdk/queries">
+    Execute SQL queries with cursor-based result handling
+  </Card>
+  <Card title="DataFrames" icon="table" href="/sdks/python-sdk/dataframes">
+    Work with query results as Pandas DataFrames
+  </Card>
+</CardGroup>
+
+## Use Cases
+
+### Data Analysis
+
+```python data_analysis.py icon=python lines
+import pandas as pd
+
+# Query customer data
+cursor.execute("""
+    SELECT Region__c, SUM(Revenue__c) as TotalRevenue
+    FROM SalesData__dlm
+    GROUP BY Region__c
+    ORDER BY TotalRevenue DESC
+""")
+
+df = cursor.fetch_dataframe()
+
+# Analyze with Pandas
+print(df.describe())
+```
+
+### Machine Learning
+
+```python ml_example.py icon=python lines expandable
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+
+# Fetch training data
+cursor.execute("""
+    SELECT Age__c, Income__c, PurchaseHistory__c, ChurnRisk__c
+    FROM CustomerFeatures__dlm
+    WHERE ChurnRisk__c IS NOT NULL
+""")
+
+df = cursor.fetch_dataframe()
+
+# Prepare features and labels
+X = df[['Age__c', 'Income__c', 'PurchaseHistory__c']]
+y = df['ChurnRisk__c']
+
+# Train model
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+model = RandomForestClassifier()
+model.fit(X_train, y_train)
+
+print(f"Model accuracy: {model.score(X_test, y_test):.2%}")
+```
+
+### ETL Pipelines
+
+```python etl_pipeline.py icon=python lines
+# Extract data from Data 360
+cursor.execute("SELECT * FROM ProductCatalog__dlm")
+products = cursor.fetch_dataframe()
+
+# Transform
+products['Price_USD'] = products['Price__c'] * exchange_rate
+products['Category_Clean'] = products['Category__c'].str.strip().str.lower()
+
+# Load to another system
+products.to_csv('products_export.csv', index=False)
+```
+
+## Required OAuth Scopes
+
+To use the Python SDK, your connected app must have these OAuth scopes enabled:
+
+| Scope | Description |
+|-------|-------------|
+| `api` | General API access |
+| `cdp_query_api` | Query Data Cloud data |
+| `cdp_profile_api` | Manage profile records |
+| `refresh_token` | Offline access (for Token flow) |
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Connection Management">
+    - Use context managers or try/finally blocks to ensure connections are closed
+    - Reuse connections when making multiple queries
+    - Consider connection pooling for high-throughput applications
+  </Accordion>
+
+  <Accordion title="Query Optimization">
+    - Use WHERE clauses to filter data early
+    - Avoid SELECT * - specify only needed columns
+    - Use LIMIT for development and testing
+    - Leverage calculated insights for aggregations
+  </Accordion>
+
+  <Accordion title="Memory Management">
+    - For large result sets, use pagination with offset/limit
+    - Process data in chunks when memory is constrained
+    - Use appropriate data types to minimize memory usage
+  </Accordion>
+
+  <Accordion title="Error Handling">
+    - Wrap queries in try/except blocks
+    - Handle authentication errors separately
+    - Implement retry logic for transient failures
+  </Accordion>
+</AccordionGroup>
+
+## Complete Example
+
+Here's a complete working example that connects to Data 360 and fetches customer data:
+
+```python complete_example.py icon=python lines expandable
+from salesforce_cdp_connector import SalesforceCDPConnection
+import pandas as pd
+import os
+
+def main():
+    # Load credentials from environment variables
+    connection = SalesforceCDPConnection(
+        login_url='https://login.salesforce.com',
+        client_id=os.environ['SF_CLIENT_ID'],
+        client_secret=os.environ['SF_CLIENT_SECRET'],
+        username=os.environ['SF_USERNAME'],
+        password=os.environ['SF_PASSWORD']
+    )
+
+    try:
+        cursor = connection.cursor()
+
+        # Get customer count by region
+        cursor.execute("""
+            SELECT
+                Region__c,
+                COUNT(*) as CustomerCount,
+                AVG(LifetimeValue__c) as AvgLTV
+            FROM UnifiedIndividual__dlm
+            WHERE IsActive__c = true
+            GROUP BY Region__c
+            ORDER BY CustomerCount DESC
+        """)
+
+        df = cursor.fetch_dataframe()
+
+        print("Customer Distribution by Region:")
+        print(df.to_string(index=False))
+
+        # Export to CSV
+        df.to_csv('customer_by_region.csv', index=False)
+        print("\nExported to customer_by_region.csv")
+
+    finally:
+        cursor.close()
+        connection.close()
+
+if __name__ == '__main__':
+    main()
+```
+
+## Related Resources
+
+- [Authentication](/sdks/python-sdk/authentication) - Detailed authentication configuration
+- [Queries](/sdks/python-sdk/queries) - Query execution and result handling
+- [DataFrames](/sdks/python-sdk/dataframes) - Pandas DataFrame integration
+- [Query API](/apis/query-api/index) - Data 360 Query API reference

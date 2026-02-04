@@ -1,0 +1,340 @@
+---
+title: "DataSource Metadata Type"
+description: "Configure external data sources and connections for Data 360"
+---
+
+# DataSource Metadata Type
+
+The `DataSource` metadata type defines external data source configurations that bring data into Data 360. This includes connection settings, authentication credentials, and source object mappings.
+
+## Overview
+
+Data sources in Data 360 can connect to:
+
+- **Salesforce clouds** (Sales Cloud, Service Cloud, Marketing Cloud)
+- **External databases** (via connectors)
+- **Cloud storage** (S3, GCS, Azure Blob)
+- **SaaS applications** (via pre-built connectors)
+- **Custom APIs** (via Ingestion API)
+
+## Metadata Structure
+
+### DataSource
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<DataSource xmlns="http://soap.sforce.com/2006/04/metadata">
+    <masterLabel>Retail Sales System</masterLabel>
+    <developerName>Retail_Sales_System</developerName>
+    <description>Connection to retail POS system</description>
+    <connectionType>External_API</connectionType>
+    <status>Active</status>
+    <namedCredential>Retail_API_Credential</namedCredential>
+</DataSource>
+```
+
+### DataSourceBundleDefinition
+
+Bundle multiple related data source configurations:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<DataSourceBundleDefinition xmlns="http://soap.sforce.com/2006/04/metadata">
+    <masterLabel>E-Commerce Bundle</masterLabel>
+    <developerName>ECommerce_Bundle</developerName>
+    <description>Bundle containing all e-commerce data sources</description>
+    <dataSources>
+        <dataSource>ECommerce_Orders</dataSource>
+        <dataSource>ECommerce_Products</dataSource>
+        <dataSource>ECommerce_Customers</dataSource>
+    </dataSources>
+</DataSourceBundleDefinition>
+```
+
+### DataSourceObject
+
+Define objects within a data source:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<DataSourceObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <masterLabel>Order</masterLabel>
+    <developerName>Order</developerName>
+    <dataSource>ECommerce_Orders</dataSource>
+    <description>E-commerce order records</description>
+    <fields>
+        <field>
+            <name>OrderId</name>
+            <label>Order ID</label>
+            <type>Text</type>
+            <length>50</length>
+            <primaryKey>true</primaryKey>
+            <required>true</required>
+        </field>
+        <field>
+            <name>CustomerId</name>
+            <label>Customer ID</label>
+            <type>Text</type>
+            <length>50</length>
+            <required>true</required>
+        </field>
+        <field>
+            <name>OrderDate</name>
+            <label>Order Date</label>
+            <type>DateTime</type>
+            <required>true</required>
+        </field>
+        <field>
+            <name>TotalAmount</name>
+            <label>Total Amount</label>
+            <type>Currency</type>
+            <precision>18</precision>
+            <scale>2</scale>
+        </field>
+        <field>
+            <name>Status</name>
+            <label>Order Status</label>
+            <type>Picklist</type>
+            <values>Pending,Processing,Shipped,Delivered,Cancelled</values>
+        </field>
+    </fields>
+</DataSourceObject>
+```
+
+## Field Reference
+
+### DataSource Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `masterLabel` | string | Yes | Display name for the data source |
+| `developerName` | string | Yes | API name (unique identifier) |
+| `description` | string | No | Description of the data source |
+| `connectionType` | enum | Yes | Type of connection (see Connection Types) |
+| `status` | enum | Yes | `Active`, `Inactive`, `Draft` |
+| `namedCredential` | string | Conditional | Named Credential for authentication |
+| `externalDataSource` | string | Conditional | Reference to External Data Source |
+| `refreshSchedule` | object | No | Automatic refresh configuration |
+
+### Connection Types
+
+| Type | Description | Required Fields |
+|------|-------------|-----------------|
+| `Salesforce_Core` | Salesforce CRM org | org connection |
+| `Marketing_Cloud` | Marketing Cloud | MC credentials |
+| `External_API` | Custom REST API | namedCredential |
+| `S3` | Amazon S3 | bucket, credentials |
+| `GCS` | Google Cloud Storage | bucket, credentials |
+| `Azure_Blob` | Azure Blob Storage | container, credentials |
+| `SFTP` | Secure FTP | host, credentials |
+| `Snowflake` | Snowflake database | account, warehouse |
+| `BigQuery` | Google BigQuery | project, dataset |
+
+### DataSourceObject Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `masterLabel` | string | Yes | Display name for the object |
+| `developerName` | string | Yes | API name (unique identifier) |
+| `dataSource` | string | Yes | Reference to parent DataSource |
+| `description` | string | No | Description of the object |
+| `fields` | array | Yes | Field definitions |
+| `primaryKeyFields` | array | Yes | Fields that form the primary key |
+| `category` | enum | No | `Profile`, `Engagement`, `Other` |
+
+### Field Definition Structure
+
+| Attribute | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `name` | string | Yes | Field API name |
+| `label` | string | Yes | Display label |
+| `type` | enum | Yes | Data type (see Field Types) |
+| `length` | integer | Conditional | For Text fields |
+| `precision` | integer | Conditional | For Number/Currency fields |
+| `scale` | integer | Conditional | For Number/Currency fields |
+| `required` | boolean | No | Whether field is required |
+| `primaryKey` | boolean | No | Whether field is a primary key |
+| `keyQualifier` | string | No | Key qualifier field reference |
+
+### Field Types
+
+| Type | Description | Additional Attributes |
+|------|-------------|----------------------|
+| `Text` | String data | `length` (max 32000) |
+| `Number` | Numeric data | `precision`, `scale` |
+| `Currency` | Monetary values | `precision`, `scale` |
+| `Boolean` | True/false | None |
+| `Date` | Date only | None |
+| `DateTime` | Date and time | None |
+| `Picklist` | Enumerated values | `values` |
+| `Email` | Email address | None |
+| `Phone` | Phone number | None |
+| `Url` | Web URL | None |
+
+## Deployment Examples
+
+### Retrieve Data Sources
+
+```bash
+# Retrieve all data sources
+sf project retrieve start -m DataSource
+
+# Retrieve specific data source
+sf project retrieve start -m DataSource:Retail_Sales_System
+
+# Retrieve with related objects
+sf project retrieve start -m DataSource,DataSourceObject
+```
+
+### Deploy Data Sources
+
+```bash
+# Deploy single data source
+sf project deploy start -m DataSource:Retail_Sales_System
+
+# Deploy with validation
+sf project deploy start -m DataSource:Retail_Sales_System --dry-run
+
+# Deploy bundle
+sf project deploy start -m DataSourceBundleDefinition:ECommerce_Bundle
+```
+
+### Package.xml Configuration
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>Retail_Sales_System</members>
+        <members>ECommerce_Orders</members>
+        <name>DataSource</name>
+    </types>
+    <types>
+        <members>*</members>
+        <name>DataSourceObject</name>
+    </types>
+    <types>
+        <members>ECommerce_Bundle</members>
+        <name>DataSourceBundleDefinition</name>
+    </types>
+    <version>64.0</version>
+</Package>
+```
+
+## Complete Example
+
+### S3 Data Source Configuration
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<DataSource xmlns="http://soap.sforce.com/2006/04/metadata">
+    <masterLabel>Customer Events S3</masterLabel>
+    <developerName>Customer_Events_S3</developerName>
+    <description>Customer behavior events stored in S3</description>
+    <connectionType>S3</connectionType>
+    <status>Active</status>
+    <namedCredential>AWS_S3_Events</namedCredential>
+    <s3Configuration>
+        <bucketName>customer-events-data</bucketName>
+        <region>us-west-2</region>
+        <pathPrefix>events/</pathPrefix>
+        <fileFormat>JSON</fileFormat>
+    </s3Configuration>
+    <refreshSchedule>
+        <frequency>Hourly</frequency>
+        <startTime>00:00</startTime>
+    </refreshSchedule>
+</DataSource>
+```
+
+### Associated Object Definition
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<DataSourceObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <masterLabel>Page View Event</masterLabel>
+    <developerName>Page_View_Event</developerName>
+    <dataSource>Customer_Events_S3</dataSource>
+    <description>Web page view events</description>
+    <category>Engagement</category>
+    <fields>
+        <field>
+            <name>EventId</name>
+            <label>Event ID</label>
+            <type>Text</type>
+            <length>100</length>
+            <primaryKey>true</primaryKey>
+            <required>true</required>
+        </field>
+        <field>
+            <name>UserId</name>
+            <label>User ID</label>
+            <type>Text</type>
+            <length>50</length>
+            <keyQualifier>DataSourceId</keyQualifier>
+        </field>
+        <field>
+            <name>PageUrl</name>
+            <label>Page URL</label>
+            <type>Url</type>
+            <required>true</required>
+        </field>
+        <field>
+            <name>EventTimestamp</name>
+            <label>Event Timestamp</label>
+            <type>DateTime</type>
+            <required>true</required>
+        </field>
+        <field>
+            <name>SessionId</name>
+            <label>Session ID</label>
+            <type>Text</type>
+            <length>50</length>
+        </field>
+        <field>
+            <name>DeviceType</name>
+            <label>Device Type</label>
+            <type>Picklist</type>
+            <values>Desktop,Mobile,Tablet</values>
+        </field>
+    </fields>
+</DataSourceObject>
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Naming Conventions">
+    - Use descriptive `masterLabel` names
+    - Follow consistent `developerName` patterns (e.g., `System_ObjectType`)
+    - Include source system in names for clarity
+    - Document purpose in descriptions
+  </Accordion>
+
+  <Accordion title="Security">
+    - Use Named Credentials for authentication
+    - Never hard-code credentials in metadata
+    - Rotate credentials regularly
+    - Limit data source access with profiles/permission sets
+  </Accordion>
+
+  <Accordion title="Schema Design">
+    - Define primary keys for all objects
+    - Use appropriate field types for data
+    - Include key qualifier fields for joins
+    - Plan for schema evolution
+  </Accordion>
+
+  <Accordion title="Performance">
+    - Choose appropriate refresh schedules
+    - Consider data volume when configuring
+    - Use incremental loads when possible
+    - Monitor refresh job performance
+  </Accordion>
+</AccordionGroup>
+
+## Related Resources
+
+- [Data Streams Metadata](/apis/metadata-types/data-stream) - Configure data streams
+- [Data Ingestion API](/apis/connect-api/data-ingestion) - Ingest data via API
+- [External Data Sources](https://help.salesforce.com/s/articleView?id=data.c360_a_external_data_sources.htm&type=5) - Setup guide

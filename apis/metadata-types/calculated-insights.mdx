@@ -1,0 +1,516 @@
+---
+title: "CalculatedInsightDefinition Metadata Type"
+description: "Define calculated insights and metrics for Data 360"
+---
+
+# CalculatedInsightDefinition Metadata Type
+
+The `CalculatedInsightDefinition` metadata type allows you to define calculated insights - metrics and KPIs computed from your Data 360 data that can be queried and used across the platform.
+
+## Overview
+
+Calculated insights enable you to:
+
+- Create reusable metrics and KPIs
+- Aggregate data across multiple data model objects
+- Define time-based calculations
+- Build complex analytics that persist for querying
+
+## Metadata Structure
+
+### Basic Structure
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<CalculatedInsightDefinition xmlns="http://soap.sforce.com/2006/04/metadata">
+    <masterLabel>Customer Lifetime Value</masterLabel>
+    <developerName>Customer_Lifetime_Value</developerName>
+    <description>Calculates total customer lifetime value based on purchase history</description>
+    <isEnabled>true</isEnabled>
+    <sourceDataModelObject>UnifiedIndividual__dlm</sourceDataModelObject>
+
+    <dimensions>
+        <dimension>
+            <name>CustomerId</name>
+            <sourceField>Id__c</sourceField>
+            <label>Customer ID</label>
+        </dimension>
+        <dimension>
+            <name>Region</name>
+            <sourceField>Region__c</sourceField>
+            <label>Customer Region</label>
+        </dimension>
+        <dimension>
+            <name>LoyaltyTier</name>
+            <sourceField>LoyaltyTier__c</sourceField>
+            <label>Loyalty Tier</label>
+        </dimension>
+    </dimensions>
+
+    <measures>
+        <measure>
+            <name>TotalRevenue</name>
+            <label>Total Revenue</label>
+            <aggregation>SUM</aggregation>
+            <expression>Purchase_Amount__c</expression>
+            <dataType>Currency</dataType>
+        </measure>
+        <measure>
+            <name>OrderCount</name>
+            <label>Order Count</label>
+            <aggregation>COUNT</aggregation>
+            <expression>Order_Id__c</expression>
+            <dataType>Number</dataType>
+        </measure>
+        <measure>
+            <name>AverageOrderValue</name>
+            <label>Average Order Value</label>
+            <aggregation>AVERAGE</aggregation>
+            <expression>Purchase_Amount__c</expression>
+            <dataType>Currency</dataType>
+        </measure>
+    </measures>
+
+    <refreshSchedule>
+        <frequency>Daily</frequency>
+        <time>04:00:00Z</time>
+    </refreshSchedule>
+</CalculatedInsightDefinition>
+```
+
+## Field Reference
+
+### Top-Level Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `masterLabel` | string | Yes | Display name |
+| `developerName` | string | Yes | API name (unique) |
+| `description` | string | No | Description of the insight |
+| `isEnabled` | boolean | Yes | Whether insight is active |
+| `sourceDataModelObject` | string | Yes | Primary source DMO |
+| `dimensions` | array | No | Grouping dimensions |
+| `measures` | array | Yes | Calculated measures |
+| `filters` | array | No | Data filters |
+| `joins` | array | No | Object joins |
+| `refreshSchedule` | object | No | Refresh configuration |
+
+### Dimension Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | Yes | Dimension API name |
+| `label` | string | Yes | Display label |
+| `sourceField` | string | Yes | Source field reference |
+| `dataType` | enum | No | Data type override |
+| `description` | string | No | Description |
+
+### Measure Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | Yes | Measure API name |
+| `label` | string | Yes | Display label |
+| `aggregation` | enum | Yes | Aggregation function |
+| `expression` | string | Yes | Field or expression |
+| `dataType` | enum | Yes | Result data type |
+| `filters` | array | No | Measure-specific filters |
+| `description` | string | No | Description |
+
+### Aggregation Functions
+
+| Function | Description | Use Case |
+|----------|-------------|----------|
+| `SUM` | Sum of values | Total revenue, quantities |
+| `COUNT` | Count of records | Order count, visit count |
+| `COUNT_DISTINCT` | Count of unique values | Unique customers |
+| `AVERAGE` | Average value | Average order value |
+| `MIN` | Minimum value | First purchase date |
+| `MAX` | Maximum value | Last activity date |
+| `PERCENTILE` | Percentile calculation | Median values |
+
+### Data Types
+
+| Type | Description |
+|------|-------------|
+| `Number` | Integer or decimal |
+| `Currency` | Monetary value |
+| `Date` | Date value |
+| `DateTime` | Date and time |
+| `Text` | String value |
+| `Boolean` | True/false |
+
+## Complex Expressions
+
+### Calculated Expressions
+
+```xml
+<measure>
+    <name>ConversionRate</name>
+    <label>Conversion Rate</label>
+    <aggregation>CUSTOM</aggregation>
+    <expression>
+        CASE WHEN COUNT(Visit_Id__c) > 0
+        THEN CAST(COUNT(DISTINCT Purchase_Id__c) AS DECIMAL) / COUNT(DISTINCT Visit_Id__c)
+        ELSE 0
+        END
+    </expression>
+    <dataType>Number</dataType>
+</measure>
+```
+
+### Time-Based Measures
+
+```xml
+<measure>
+    <name>Last30DaysRevenue</name>
+    <label>Last 30 Days Revenue</label>
+    <aggregation>SUM</aggregation>
+    <expression>Purchase_Amount__c</expression>
+    <dataType>Currency</dataType>
+    <filters>
+        <filter>
+            <field>Purchase_Date__c</field>
+            <operator>WITHIN_LAST</operator>
+            <value>30</value>
+            <unit>DAYS</unit>
+        </filter>
+    </filters>
+</measure>
+```
+
+### Joins
+
+```xml
+<joins>
+    <join>
+        <name>Purchases</name>
+        <targetObject>ssot__SalesOrder__dlm</targetObject>
+        <joinType>LEFT</joinType>
+        <conditions>
+            <condition>
+                <sourceField>Id__c</sourceField>
+                <targetField>Customer_Id__c</targetField>
+            </condition>
+        </conditions>
+    </join>
+</joins>
+```
+
+## Deployment Examples
+
+### Retrieve Calculated Insights
+
+```bash
+# Retrieve all calculated insights
+sf project retrieve start -m CalculatedInsightDefinition
+
+# Retrieve specific insight
+sf project retrieve start -m CalculatedInsightDefinition:Customer_Lifetime_Value
+```
+
+### Deploy Calculated Insights
+
+```bash
+# Deploy single insight
+sf project deploy start -m CalculatedInsightDefinition:Customer_Lifetime_Value
+
+# Validate before deployment
+sf project deploy start -m CalculatedInsightDefinition:Customer_Lifetime_Value --dry-run
+```
+
+### Package.xml Configuration
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>Customer_Lifetime_Value</members>
+        <members>Purchase_Frequency</members>
+        <members>Engagement_Score</members>
+        <name>CalculatedInsightDefinition</name>
+    </types>
+    <version>64.0</version>
+</Package>
+```
+
+## Complete Examples
+
+### Customer Engagement Score
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<CalculatedInsightDefinition xmlns="http://soap.sforce.com/2006/04/metadata">
+    <masterLabel>Customer Engagement Score</masterLabel>
+    <developerName>Customer_Engagement_Score</developerName>
+    <description>Composite engagement score based on multiple activities</description>
+    <isEnabled>true</isEnabled>
+    <sourceDataModelObject>UnifiedIndividual__dlm</sourceDataModelObject>
+
+    <dimensions>
+        <dimension>
+            <name>CustomerId</name>
+            <sourceField>Id__c</sourceField>
+            <label>Customer ID</label>
+        </dimension>
+        <dimension>
+            <name>Segment</name>
+            <sourceField>CustomerSegment__c</sourceField>
+            <label>Customer Segment</label>
+        </dimension>
+    </dimensions>
+
+    <joins>
+        <join>
+            <name>WebEvents</name>
+            <targetObject>WebEngagement__dlm</targetObject>
+            <joinType>LEFT</joinType>
+            <conditions>
+                <condition>
+                    <sourceField>Id__c</sourceField>
+                    <targetField>CustomerId__c</targetField>
+                </condition>
+            </conditions>
+        </join>
+        <join>
+            <name>EmailEvents</name>
+            <targetObject>EmailEngagement__dlm</targetObject>
+            <joinType>LEFT</joinType>
+            <conditions>
+                <condition>
+                    <sourceField>Id__c</sourceField>
+                    <targetField>CustomerId__c</targetField>
+                </condition>
+            </conditions>
+        </join>
+        <join>
+            <name>Purchases</name>
+            <targetObject>ssot__SalesOrder__dlm</targetObject>
+            <joinType>LEFT</joinType>
+            <conditions>
+                <condition>
+                    <sourceField>Id__c</sourceField>
+                    <targetField>CustomerId__c</targetField>
+                </condition>
+            </conditions>
+        </join>
+    </joins>
+
+    <measures>
+        <measure>
+            <name>WebVisits30Days</name>
+            <label>Web Visits (30 Days)</label>
+            <aggregation>COUNT</aggregation>
+            <expression>WebEvents.VisitId__c</expression>
+            <dataType>Number</dataType>
+            <filters>
+                <filter>
+                    <field>WebEvents.VisitDate__c</field>
+                    <operator>WITHIN_LAST</operator>
+                    <value>30</value>
+                    <unit>DAYS</unit>
+                </filter>
+            </filters>
+        </measure>
+        <measure>
+            <name>EmailOpens30Days</name>
+            <label>Email Opens (30 Days)</label>
+            <aggregation>COUNT</aggregation>
+            <expression>EmailEvents.EventId__c</expression>
+            <dataType>Number</dataType>
+            <filters>
+                <filter>
+                    <field>EmailEvents.EventDate__c</field>
+                    <operator>WITHIN_LAST</operator>
+                    <value>30</value>
+                    <unit>DAYS</unit>
+                </filter>
+                <filter>
+                    <field>EmailEvents.EventType__c</field>
+                    <operator>EQUALS</operator>
+                    <value>Open</value>
+                </filter>
+            </filters>
+        </measure>
+        <measure>
+            <name>Purchases90Days</name>
+            <label>Purchases (90 Days)</label>
+            <aggregation>COUNT</aggregation>
+            <expression>Purchases.OrderId__c</expression>
+            <dataType>Number</dataType>
+            <filters>
+                <filter>
+                    <field>Purchases.OrderDate__c</field>
+                    <operator>WITHIN_LAST</operator>
+                    <value>90</value>
+                    <unit>DAYS</unit>
+                </filter>
+            </filters>
+        </measure>
+        <measure>
+            <name>EngagementScore</name>
+            <label>Engagement Score</label>
+            <aggregation>CUSTOM</aggregation>
+            <expression>
+                (COALESCE(COUNT(DISTINCT WebEvents.VisitId__c), 0) * 1) +
+                (COALESCE(COUNT(DISTINCT EmailEvents.EventId__c), 0) * 2) +
+                (COALESCE(COUNT(DISTINCT Purchases.OrderId__c), 0) * 10)
+            </expression>
+            <dataType>Number</dataType>
+            <description>Weighted engagement score: Web=1, Email=2, Purchase=10</description>
+        </measure>
+    </measures>
+
+    <refreshSchedule>
+        <frequency>Daily</frequency>
+        <time>05:00:00Z</time>
+    </refreshSchedule>
+</CalculatedInsightDefinition>
+```
+
+### Product Performance Insight
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<CalculatedInsightDefinition xmlns="http://soap.sforce.com/2006/04/metadata">
+    <masterLabel>Product Performance</masterLabel>
+    <developerName>Product_Performance</developerName>
+    <description>Product sales performance metrics</description>
+    <isEnabled>true</isEnabled>
+    <sourceDataModelObject>Product__dlm</sourceDataModelObject>
+
+    <dimensions>
+        <dimension>
+            <name>ProductId</name>
+            <sourceField>Id__c</sourceField>
+            <label>Product ID</label>
+        </dimension>
+        <dimension>
+            <name>ProductName</name>
+            <sourceField>Name__c</sourceField>
+            <label>Product Name</label>
+        </dimension>
+        <dimension>
+            <name>Category</name>
+            <sourceField>Category__c</sourceField>
+            <label>Product Category</label>
+        </dimension>
+        <dimension>
+            <name>OrderMonth</name>
+            <sourceField>DATE_TRUNC('MONTH', OrderItems.OrderDate__c)</sourceField>
+            <label>Order Month</label>
+            <dataType>Date</dataType>
+        </dimension>
+    </dimensions>
+
+    <joins>
+        <join>
+            <name>OrderItems</name>
+            <targetObject>ssot__SalesOrderProduct__dlm</targetObject>
+            <joinType>LEFT</joinType>
+            <conditions>
+                <condition>
+                    <sourceField>Id__c</sourceField>
+                    <targetField>ProductId__c</targetField>
+                </condition>
+            </conditions>
+        </join>
+    </joins>
+
+    <measures>
+        <measure>
+            <name>TotalUnitsSold</name>
+            <label>Total Units Sold</label>
+            <aggregation>SUM</aggregation>
+            <expression>OrderItems.Quantity__c</expression>
+            <dataType>Number</dataType>
+        </measure>
+        <measure>
+            <name>TotalRevenue</name>
+            <label>Total Revenue</label>
+            <aggregation>SUM</aggregation>
+            <expression>OrderItems.TotalPrice__c</expression>
+            <dataType>Currency</dataType>
+        </measure>
+        <measure>
+            <name>UniqueCustomers</name>
+            <label>Unique Customers</label>
+            <aggregation>COUNT_DISTINCT</aggregation>
+            <expression>OrderItems.CustomerId__c</expression>
+            <dataType>Number</dataType>
+        </measure>
+        <measure>
+            <name>AverageUnitPrice</name>
+            <label>Average Unit Price</label>
+            <aggregation>AVERAGE</aggregation>
+            <expression>OrderItems.UnitPrice__c</expression>
+            <dataType>Currency</dataType>
+        </measure>
+        <measure>
+            <name>RepeatPurchaseRate</name>
+            <label>Repeat Purchase Rate</label>
+            <aggregation>CUSTOM</aggregation>
+            <expression>
+                CAST(COUNT(DISTINCT CASE WHEN OrderItems.IsRepeatPurchase__c = true THEN OrderItems.CustomerId__c END) AS DECIMAL) /
+                NULLIF(COUNT(DISTINCT OrderItems.CustomerId__c), 0)
+            </expression>
+            <dataType>Number</dataType>
+        </measure>
+    </measures>
+
+    <filters>
+        <filter>
+            <field>OrderItems.OrderStatus__c</field>
+            <operator>IN</operator>
+            <values>Completed,Shipped</values>
+        </filter>
+    </filters>
+
+    <refreshSchedule>
+        <frequency>Daily</frequency>
+        <time>06:00:00Z</time>
+    </refreshSchedule>
+</CalculatedInsightDefinition>
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Design Principles">
+    - Create insights for reusable KPIs
+    - Use meaningful dimension groupings
+    - Document measure calculations
+    - Keep expressions readable and maintainable
+    - Test with sample data before production
+  </Accordion>
+
+  <Accordion title="Performance">
+    - Limit number of joins per insight
+    - Use filters to reduce data scanned
+    - Choose appropriate refresh schedules
+    - Monitor refresh job duration
+    - Consider pre-aggregating complex calculations
+  </Accordion>
+
+  <Accordion title="Calculations">
+    - Handle NULL values in expressions
+    - Use CASE statements for conditional logic
+    - Apply time-based filters for recency metrics
+    - Use COUNT_DISTINCT for unique counts
+    - Test edge cases (zero values, nulls)
+  </Accordion>
+
+  <Accordion title="Maintenance">
+    - Version control all insight definitions
+    - Document business logic in descriptions
+    - Review and update insights periodically
+    - Archive unused insights
+    - Track insight usage and performance
+  </Accordion>
+</AccordionGroup>
+
+## Related Resources
+
+- [Calculated Insights API](/apis/query-api/calculated-insights-api) - Query calculated insights
+- [Profile API with Insights](/apis/query-api/profile-api) - Profile-level insights
+- [Calculated Insights Help](https://help.salesforce.com/s/articleView?id=data.c360_a_insights.htm&type=5) - Salesforce documentation

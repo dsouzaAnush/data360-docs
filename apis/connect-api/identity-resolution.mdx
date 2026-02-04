@@ -1,0 +1,425 @@
+---
+title: "Identity Resolution API"
+description: "Configure and manage identity resolution rules and jobs in Data 360"
+openapi: "GET /services/data/v64.0/ssot/identity-resolution/rules"
+---
+
+# Identity Resolution API
+
+The Identity Resolution API enables you to programmatically manage identity resolution configurations, run reconciliation jobs, and query unified customer profiles.
+
+## Overview
+
+Identity resolution in Data 360 creates unified customer profiles by:
+
+1. **Matching** - Identifying records that belong to the same individual
+2. **Merging** - Combining matched records into a single unified profile
+3. **Reconciling** - Maintaining consistency as new data arrives
+
+## Endpoints
+
+### List Identity Resolution Rules
+
+#### GET /services/data/v64.0/ssot/identity-resolution/rules
+
+Retrieve all configured identity resolution rulesets.
+
+**Response:**
+
+```json
+{
+  "rules": [
+    {
+      "id": "IR001",
+      "name": "Email_Phone_Match",
+      "displayName": "Email and Phone Matching",
+      "status": "ACTIVE",
+      "priority": 1,
+      "matchCriteria": [
+        {
+          "field": "Email__c",
+          "matchType": "EXACT",
+          "fuzzyThreshold": null
+        },
+        {
+          "field": "Phone__c",
+          "matchType": "NORMALIZED",
+          "fuzzyThreshold": null
+        }
+      ],
+      "createdDate": "2024-01-01T00:00:00Z",
+      "lastModifiedDate": "2024-01-10T00:00:00Z"
+    },
+    {
+      "id": "IR002",
+      "name": "Name_Address_Fuzzy",
+      "displayName": "Fuzzy Name and Address",
+      "status": "ACTIVE",
+      "priority": 2,
+      "matchCriteria": [
+        {
+          "field": "FirstName__c",
+          "matchType": "FUZZY",
+          "fuzzyThreshold": 0.85
+        },
+        {
+          "field": "LastName__c",
+          "matchType": "FUZZY",
+          "fuzzyThreshold": 0.90
+        },
+        {
+          "field": "PostalCode__c",
+          "matchType": "EXACT",
+          "fuzzyThreshold": null
+        }
+      ],
+      "createdDate": "2024-01-01T00:00:00Z",
+      "lastModifiedDate": "2024-01-10T00:00:00Z"
+    }
+  ]
+}
+```
+
+### Get Rule Details
+
+#### GET /services/data/v64.0/ssot/identity-resolution/rules/{ruleId}
+
+Retrieve detailed configuration for a specific identity resolution rule.
+
+<ParamField path="ruleId" type="string" required>
+  The unique identifier of the rule
+</ParamField>
+
+**Response:**
+
+```json
+{
+  "id": "IR001",
+  "name": "Email_Phone_Match",
+  "displayName": "Email and Phone Matching",
+  "description": "Matches records based on normalized email and phone number",
+  "status": "ACTIVE",
+  "priority": 1,
+  "matchCriteria": [
+    {
+      "field": "Email__c",
+      "displayName": "Email Address",
+      "matchType": "EXACT",
+      "normalization": "LOWERCASE_TRIM",
+      "required": true
+    },
+    {
+      "field": "Phone__c",
+      "displayName": "Phone Number",
+      "matchType": "NORMALIZED",
+      "normalization": "PHONE_E164",
+      "required": false
+    }
+  ],
+  "reconciliationRules": {
+    "survivorship": {
+      "defaultRule": "MOST_RECENT",
+      "fieldOverrides": [
+        {
+          "field": "Email__c",
+          "rule": "MOST_COMPLETE"
+        }
+      ]
+    }
+  },
+  "statistics": {
+    "totalMatches": 125000,
+    "lastRunDate": "2024-01-15T00:00:00Z",
+    "averageClusterSize": 2.3
+  }
+}
+```
+
+### List Identity Resolution Jobs
+
+#### GET /services/data/v64.0/ssot/identity-resolution/jobs
+
+Retrieve the history of identity resolution job runs.
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `status` | string | Filter by status: `RUNNING`, `COMPLETED`, `FAILED` |
+| `startDate` | datetime | Jobs started after this date |
+| `endDate` | datetime | Jobs started before this date |
+| `limit` | integer | Maximum results to return |
+
+**Response:**
+
+```json
+{
+  "jobs": [
+    {
+      "jobId": "JOB_001",
+      "type": "FULL_RECONCILIATION",
+      "status": "COMPLETED",
+      "startTime": "2024-01-15T00:00:00Z",
+      "endTime": "2024-01-15T02:30:00Z",
+      "statistics": {
+        "recordsProcessed": 500000,
+        "newMatches": 15000,
+        "updatedProfiles": 8500,
+        "mergedProfiles": 6500,
+        "errorCount": 12
+      }
+    },
+    {
+      "jobId": "JOB_002",
+      "type": "INCREMENTAL",
+      "status": "RUNNING",
+      "startTime": "2024-01-15T10:00:00Z",
+      "endTime": null,
+      "statistics": {
+        "recordsProcessed": 50000,
+        "newMatches": 1200,
+        "updatedProfiles": null,
+        "mergedProfiles": null,
+        "errorCount": 0
+      }
+    }
+  ],
+  "totalCount": 45
+}
+```
+
+### Get Job Details
+
+#### GET /services/data/v64.0/ssot/identity-resolution/jobs/{jobId}
+
+Get detailed information about a specific identity resolution job.
+
+<ParamField path="jobId" type="string" required>
+  The unique identifier of the job
+</ParamField>
+
+**Response:**
+
+```json
+{
+  "jobId": "JOB_001",
+  "type": "FULL_RECONCILIATION",
+  "status": "COMPLETED",
+  "triggeredBy": "SCHEDULED",
+  "startTime": "2024-01-15T00:00:00Z",
+  "endTime": "2024-01-15T02:30:00Z",
+  "duration": "2h 30m",
+  "configuration": {
+    "rulesApplied": ["IR001", "IR002"],
+    "dataSourcesIncluded": ["SalesCloud", "MarketingCloud", "WebEngagement"]
+  },
+  "statistics": {
+    "inputRecords": 500000,
+    "recordsProcessed": 500000,
+    "newMatches": 15000,
+    "updatedProfiles": 8500,
+    "mergedProfiles": 6500,
+    "splitProfiles": 150,
+    "errorCount": 12,
+    "processingRate": 3333
+  },
+  "errors": [
+    {
+      "errorCode": "CONFLICTING_VALUES",
+      "count": 8,
+      "sampleRecordIds": ["REC001", "REC002"]
+    },
+    {
+      "errorCode": "INVALID_DATA",
+      "count": 4,
+      "sampleRecordIds": ["REC003"]
+    }
+  ]
+}
+```
+
+### Trigger Identity Resolution Job
+
+#### POST /services/data/v64.0/ssot/identity-resolution/jobs
+
+Manually trigger an identity resolution job.
+
+**Request Body:**
+
+```json Request {2-4}
+{
+  "type": "INCREMENTAL",
+  "rules": ["IR001", "IR002"],
+  "dataSources": ["SalesCloud", "WebEngagement"],
+  "priority": "HIGH"
+}
+```
+
+**Response:**
+
+```json Response {2-3}
+{
+  "jobId": "JOB_003",
+  "status": "QUEUED",
+  "estimatedStartTime": "2024-01-15T11:00:00Z",
+  "message": "Job queued successfully"
+}
+```
+
+### Get Unified Profile Match History
+
+#### GET /services/data/v64.0/ssot/identity-resolution/profiles/{unifiedId}/matches
+
+Retrieve the match history for a unified profile showing all contributing source records.
+
+<ParamField path="unifiedId" type="string" required>
+  The unified profile identifier
+</ParamField>
+
+**Response:**
+
+```json
+{
+  "unifiedId": "UI_001ABC",
+  "profile": {
+    "firstName": "John",
+    "lastName": "Smith",
+    "email": "john.smith@example.com",
+    "phone": "+1-555-123-4567"
+  },
+  "sourceRecords": [
+    {
+      "dataSource": "SalesCloud",
+      "sourceRecordId": "003ABC123",
+      "matchedBy": "IR001",
+      "matchDate": "2024-01-10T00:00:00Z",
+      "confidence": 0.99,
+      "fieldContributions": {
+        "firstName": true,
+        "lastName": true,
+        "email": true,
+        "phone": false
+      }
+    },
+    {
+      "dataSource": "WebEngagement",
+      "sourceRecordId": "WEB_456",
+      "matchedBy": "IR001",
+      "matchDate": "2024-01-12T00:00:00Z",
+      "confidence": 0.95,
+      "fieldContributions": {
+        "firstName": false,
+        "lastName": false,
+        "email": true,
+        "phone": true
+      }
+    }
+  ],
+  "matchHistory": [
+    {
+      "date": "2024-01-10T00:00:00Z",
+      "action": "CREATED",
+      "sourceRecord": "003ABC123"
+    },
+    {
+      "date": "2024-01-12T00:00:00Z",
+      "action": "MERGED",
+      "sourceRecord": "WEB_456",
+      "matchRule": "IR001"
+    }
+  ]
+}
+```
+
+## Match Types
+
+| Match Type | Description | Example |
+|------------|-------------|---------|
+| `EXACT` | Exact string match (case-sensitive optional) | `john@email.com` = `john@email.com` |
+| `NORMALIZED` | Match after normalization rules | `+1 (555) 123-4567` = `15551234567` |
+| `FUZZY` | Similarity-based matching with threshold | `Jon Smith` ~ `John Smyth` (0.85) |
+| `PHONETIC` | Sound-based matching | `Smith` ~ `Smyth` |
+
+## Survivorship Rules
+
+When merging records, survivorship rules determine which values persist:
+
+| Rule | Description |
+|------|-------------|
+| `MOST_RECENT` | Value from the most recently updated record |
+| `MOST_COMPLETE` | Value with the most data (longest, most fields) |
+| `SOURCE_PRIORITY` | Value from highest priority data source |
+| `AGGREGATE` | Combine values (e.g., union of all emails) |
+
+## Code Examples
+
+<CodeGroup>
+```bash cURL icon=terminal
+curl -X GET "https://{instance}.salesforce.com/services/data/v64.0/ssot/identity-resolution/rules" \
+  -H "Authorization: Bearer {access_token}"
+```
+
+```python trigger_job.py icon=python lines {4-7,8-12,14-16}
+import requests
+
+url = f"https://{instance}.salesforce.com/services/data/v64.0/ssot/identity-resolution/jobs"
+headers = {
+    "Authorization": f"Bearer {access_token}",
+    "Content-Type": "application/json"
+}
+payload = {
+    "type": "INCREMENTAL",
+    "rules": ["IR001", "IR002"],
+    "priority": "HIGH"
+}
+
+response = requests.post(url, headers=headers, json=payload)
+job = response.json()
+print(f"Job {job['jobId']} queued with status: {job['status']}")
+```
+
+```java GetJobStatus.java icon=java lines {3-7}
+HttpClient client = HttpClient.newHttpClient();
+
+HttpRequest request = HttpRequest.newBuilder()
+    .uri(URI.create("https://{instance}.salesforce.com/services/data/v64.0/ssot/identity-resolution/jobs/JOB_001"))
+    .header("Authorization", "Bearer " + accessToken)
+    .GET()
+    .build();
+
+HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+System.out.println(response.body());
+```
+</CodeGroup>
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Rule Configuration">
+    - Start with high-confidence exact matches (email, phone)
+    - Add fuzzy matching for name fields with appropriate thresholds
+    - Order rules by priority for consistent results
+    - Test rules with sample data before production deployment
+  </Accordion>
+
+  <Accordion title="Job Management">
+    - Schedule full reconciliation during low-activity periods
+    - Use incremental jobs for real-time identity resolution
+    - Monitor job statistics for data quality insights
+    - Set up alerts for job failures or unusual error rates
+  </Accordion>
+
+  <Accordion title="Data Quality">
+    - Normalize data at ingestion before identity resolution
+    - Define clear survivorship rules to avoid data loss
+    - Review split profiles to identify false positives
+    - Document matching logic for auditability
+  </Accordion>
+</AccordionGroup>
+
+## Related Resources
+
+- [Identity Resolution Settings Metadata](/apis/metadata-types/identity-resolution) - Deploy ID resolution configurations
+- [Profile API](/apis/query-api/profile-api) - Query unified profiles
+- [Universal ID Lookup](/apis/query-api/universal-id-lookup) - Look up unified IDs
+- [Identity Resolution Help](https://help.salesforce.com/s/articleView?id=data.c360_a_identity_resolution.htm&type=5) - Salesforce documentation

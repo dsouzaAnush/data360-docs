@@ -1,0 +1,320 @@
+---
+title: "Queries"
+description: "Execute SQL queries and handle results with the Python SDK"
+---
+
+# Queries
+
+The Python SDK provides a cursor-based interface for executing SQL queries against Data 360, similar to Python's DB-API 2.0 specification.
+
+## Creating a Cursor
+
+After establishing a connection, create a cursor to execute queries:
+
+```python create_cursor.py icon=python lines {4-9,12}
+from salesforce_cdp_connector import SalesforceCDPConnection
+
+# Establish connection
+connection = SalesforceCDPConnection(
+    login_url='https://login.salesforce.com',
+    client_id=client_id,
+    client_secret=client_secret,
+    username=username,
+    password=password
+)
+
+# Create a cursor
+cursor = connection.cursor()
+```
+
+## Executing Queries
+
+### Basic Query Execution
+
+```python basic_query.py icon=python lines {2-6,9-11}
+# Execute a simple query
+cursor.execute("""
+    SELECT Id__c, FirstName__c, LastName__c
+    FROM UnifiedIndividual__dlm
+    LIMIT 100
+""")
+
+# Fetch all results
+results = cursor.fetchall()
+for row in results:
+    print(f"{row[0]}: {row[1]} {row[2]}")
+```
+
+### Query with WHERE Clause
+
+```python filtered_query.py icon=python lines {4-5}
+cursor.execute("""
+    SELECT Id__c, Email__c, CreatedDate__c
+    FROM UnifiedContactPointEmail__dlm
+    WHERE IsActive__c = true
+    AND CreatedDate__c > '2024-01-01'
+    ORDER BY CreatedDate__c DESC
+    LIMIT 1000
+""")
+```
+
+### Aggregation Queries
+
+```python aggregation_query.py icon=python lines {4-7,10}
+cursor.execute("""
+    SELECT
+        Region__c,
+        COUNT(*) as CustomerCount,
+        SUM(LifetimeValue__c) as TotalLTV,
+        AVG(LifetimeValue__c) as AvgLTV
+    FROM UnifiedIndividual__dlm
+    GROUP BY Region__c
+    ORDER BY TotalLTV DESC
+""")
+
+for row in cursor.fetchall():
+    print(f"{row[0]}: {row[1]} customers, ${row[2]:,.2f} total LTV")
+```
+
+### JOIN Queries
+
+```python join_query.py icon=python lines {8-10}
+cursor.execute("""
+    SELECT
+        ui.Id__c,
+        ui.FirstName__c,
+        ui.LastName__c,
+        cpe.Email__c
+    FROM UnifiedIndividual__dlm ui
+    JOIN UnifiedContactPointEmail__dlm cpe
+        ON ui.Id__c = cpe.PartyId__c
+    WHERE cpe.IsPrimary__c = true
+    LIMIT 500
+""")
+```
+
+## Fetching Results
+
+### Fetch All Results
+
+```python icon=python lines {4}
+cursor.execute("SELECT * FROM UnifiedIndividual__dlm LIMIT 100")
+
+# Fetch all rows as a list of tuples
+all_rows = cursor.fetchall()
+print(f"Retrieved {len(all_rows)} rows")
+```
+
+### Fetch One Row
+
+```python icon=python lines {4-5}
+cursor.execute("SELECT COUNT(*) FROM UnifiedIndividual__dlm")
+
+# Fetch a single row
+row = cursor.fetchone()
+total_count = row[0]
+print(f"Total records: {total_count}")
+```
+
+### Fetch Many Rows
+
+```python icon=python lines {4-7}
+cursor.execute("SELECT * FROM UnifiedIndividual__dlm LIMIT 1000")
+
+# Fetch a specific number of rows
+batch = cursor.fetchmany(100)
+while batch:
+    process_batch(batch)
+    batch = cursor.fetchmany(100)
+```
+
+### Iterate Over Results
+
+```python icon=python lines {4-5}
+cursor.execute("SELECT Id__c, Email__c FROM UnifiedContactPointEmail__dlm LIMIT 500")
+
+# Iterate directly over cursor
+for row in cursor:
+    process_row(row)
+```
+
+## Result Metadata
+
+Access information about query results:
+
+```python result_metadata.py icon=python lines {4,8}
+cursor.execute("SELECT Id__c, FirstName__c, Email__c FROM UnifiedIndividual__dlm LIMIT 10")
+
+# Get column names
+columns = [desc[0] for desc in cursor.description]
+print(f"Columns: {columns}")
+
+# Get row count (if available)
+print(f"Row count: {cursor.rowcount}")
+```
+
+## Parameterized Queries
+
+<Note>
+The current version of the SDK uses string formatting. Always sanitize inputs to prevent SQL injection when building queries dynamically.
+</Note>
+
+```python safe_query.py icon=python lines {3-5,7-13}
+# Safe approach: validate and escape inputs
+def safe_query(email_domain):
+    # Validate input
+    if not email_domain.replace('.', '').isalnum():
+        raise ValueError("Invalid domain")
+
+    cursor.execute(f"""
+        SELECT Id__c, Email__c
+        FROM UnifiedContactPointEmail__dlm
+        WHERE Email__c LIKE '%@{email_domain}'
+        LIMIT 100
+    """)
+    return cursor.fetchall()
+
+results = safe_query('example.com')
+```
+
+## Pagination
+
+For large result sets, use pagination:
+
+```python pagination.py icon=python lines expandable {7-14,16-18,20-22}
+def fetch_all_profiles(page_size=1000):
+    """Fetch all profiles using pagination."""
+    offset = 0
+    all_results = []
+
+    while True:
+        cursor.execute(f"""
+            SELECT Id__c, FirstName__c, LastName__c
+            FROM UnifiedIndividual__dlm
+            ORDER BY Id__c
+            LIMIT {page_size}
+            OFFSET {offset}
+        """)
+
+        batch = cursor.fetchall()
+        if not batch:
+            break
+
+        all_results.extend(batch)
+        offset += page_size
+        print(f"Fetched {len(all_results)} records...")
+
+    return all_results
+
+profiles = fetch_all_profiles()
+```
+
+## Error Handling
+
+Handle query errors appropriately:
+
+```python query_error_handling.py icon=python lines {4-8}
+from salesforce_cdp_connector.exceptions import QueryError
+
+try:
+    cursor.execute("SELECT * FROM NonExistentTable__dlm")
+except QueryError as e:
+    print(f"Query failed: {e}")
+    # Handle error - table doesn't exist, syntax error, etc.
+except Exception as e:
+    print(f"Unexpected error: {e}")
+```
+
+### Common Error Types
+
+| Error | Cause | Solution |
+|-------|-------|----------|
+| `INVALID_TABLE` | Table doesn't exist | Check table name (use `_dlm` suffix for Data Model Objects) |
+| `INVALID_FIELD` | Field doesn't exist | Verify field names and use `__c` suffix for custom fields |
+| `SYNTAX_ERROR` | Invalid SQL syntax | Check SQL syntax, especially for JOINs and subqueries |
+| `TIMEOUT` | Query took too long | Add filters, limit results, or optimize query |
+
+## Query Optimization Tips
+
+<AccordionGroup>
+  <Accordion title="Use Filters Early">
+    Add WHERE clauses to reduce data scanned:
+
+    ```python icon=python lines {4-5}
+    # Good - filter early
+    cursor.execute("""
+        SELECT * FROM UnifiedIndividual__dlm
+        WHERE Region__c = 'West'
+        AND IsActive__c = true
+    """)
+
+    # Bad - fetching all data then filtering in Python
+    cursor.execute("SELECT * FROM UnifiedIndividual__dlm")
+    west_active = [r for r in cursor.fetchall() if r[5] == 'West']
+    ```
+  </Accordion>
+
+  <Accordion title="Select Only Needed Columns">
+    Specify columns instead of using SELECT *:
+
+    ```python icon=python lines {3}
+    # Good - specific columns
+    cursor.execute("""
+        SELECT Id__c, Email__c, CreatedDate__c
+        FROM UnifiedContactPointEmail__dlm
+    """)
+
+    # Bad - selecting all columns
+    cursor.execute("SELECT * FROM UnifiedContactPointEmail__dlm")
+    ```
+  </Accordion>
+
+  <Accordion title="Use LIMIT for Development">
+    Always use LIMIT during development:
+
+    ```python icon=python lines {4}
+    # Development query
+    cursor.execute("""
+        SELECT * FROM LargeTable__dlm
+        LIMIT 100
+    """)
+    ```
+  </Accordion>
+
+  <Accordion title="Leverage Indexes">
+    Filter on indexed fields (like Id__c, key qualifiers):
+
+    ```python icon=python lines {4}
+    # Good - using indexed field
+    cursor.execute("""
+        SELECT * FROM UnifiedIndividual__dlm
+        WHERE Id__c = 'UI_123456'
+    """)
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Closing Cursors
+
+Always close cursors when done:
+
+```python close_cursor.py icon=python lines {3-7,11-13}
+# Manual close
+cursor = connection.cursor()
+try:
+    cursor.execute("SELECT * FROM UnifiedIndividual__dlm LIMIT 10")
+    results = cursor.fetchall()
+finally:
+    cursor.close()
+
+# Or use context manager (if supported)
+with connection.cursor() as cursor:
+    cursor.execute("SELECT * FROM UnifiedIndividual__dlm LIMIT 10")
+    results = cursor.fetchall()
+```
+
+## Related Resources
+
+- [DataFrames](/sdks/python-sdk/dataframes) - Work with results as Pandas DataFrames
+- [SQL Reference](/apis/query-api/sql-reference) - Data 360 SQL syntax
+- [Query API](/apis/query-api/query-services) - Query API reference
