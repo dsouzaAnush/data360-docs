@@ -1,0 +1,53 @@
+---
+title: "Web SDK Setup"
+description: "To set up the Salesforce Interaction SDK in Data Cloud, an architect and developer work together. The Data Cloud architect completes certain tasks fir"
+---
+
+# Set Up the Salesforce Interactions SDK
+
+To set up the Salesforce Interaction SDK in Data Cloud, an architect and developer work together. The Data Cloud architect completes certain tasks first. The website developer then sets up the Salesforce Interactions SDK. Finally, the architect finishes the setup.
+
+|  |  |
+| --- | --- |
+| To configure connections | System Admin profile or Data Cloud Architect permission set |
+
+1.  Register the website by creating an app of type website in Data Cloud.
+
+    1.  In a Salesforce org with Data Cloud provisioned, select **Data Cloud Setup**.
+
+    2.  Select **Configurations**, and then click **Websites & Mobile Apps**.
+
+    3.  To create a connector, click **New**.
+
+    4.  Enter the app name, and select the connector type.
+
+        To rename your app at a later date, click **Edit**.
+
+2.  Upload your schema to Data Cloud.
+
+    1.  To select a JSON Event Type schema file from your computer, click **Upload Schema** in the Schema block.
+
+    2.  Confirm that all events and fields are populated, and save your work.
+
+    3.  After your schema is uploaded, examine it for accuracy.
+
+        1.  To change your schema at any point, click **Update Schema**. You can only add new events and fields, the schema must retain all previous events and fields.
+        2.  To update your schema, click **Yes, Update**.
+        3.  To view the full schema you uploaded, click **View Full Schema**.
+3.  Share the Content Delivery Network (CDN) URL for the Unified Web SDK and sitemap with the website developer.
+
+    1.  Navigate to the Integration Guide section.
+
+    2.  Copy the Content Delivery Network Script.
+
+    3.  Share the CDN link with your website developer.
+
+4.  After the website developer shares the sitemap with you and the data aware specialist completes their tasks, complete the setup.
+
+    1.  On the Website app details page, click **Upload Sitemap** in the Sitemap section.
+
+    2.  Select the saved sitemap.js file that you received from the website developer, and click **Open**.
+
+    3.  Review the sitemap in the Upload Sitemap section, and click **Save**.
+
+Events from a configured website now flow into Data 360 data streams and are available for segmentation.

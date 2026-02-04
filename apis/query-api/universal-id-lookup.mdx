@@ -1,0 +1,55 @@
+---
+title: "Universal ID Lookup"
+description: "Data 360 REST API Reference"
+---
+
+# Query Unified Record ID
+
+The Universal ID Lookup API provides a powerful way to retrieve all individual records associated with a unified record across different data sources. This API allows you to find all the individual IDs for a person across various systems, such as retail sales, loyalty programs, and mobile identity platforms.
+
+-   **Cross-System ID Lookup**: Retrieve all individual records linked to a unified record
+-   **Data Source Integration**: Query across different data sources using a single ID
+-   **Identity Resolution**: Link customer records from multiple systems
+-   **Unified Profile Access**: Access complete customer profiles across platforms
+
+-   Data Cloud licenses must be provisioned for your org
+-   Users must have appropriate roles and permissions assigned
+-   Authentication requires a valid access token
+-   External Client App must be properly configured
+
+-   Maximum of 50 fields can be retrieved per request
+-   Default return limit is 49,999 rows
+-   Only AND logical operator and equality comparator are supported
+-   No limit on the number of filters in a query
+-   Date/time fields must use the format: `YYYY-MM-DD HH:MM:SS`
+
+-   [**GET /api/v1/universalIdLookup/{entity\_name}/{DataSourceId**c}/{DataSourceObjectId**c}/{SourceRecordId\_\_c}**](/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-universalidlookup-entity-name-datasourceid.html)
+
+    Retrieve all individual records associated with a unified record across all data sources.
+
+1.  **Customer Profile Consolidation**
+
+    -   Find all customer records across different systems
+    -   Link customer data from multiple sources
+    -   Create a unified view of customer information
+2.  **Data Integration**
+
+    -   Connect customer data from various platforms
+    -   Maintain consistent customer identification
+    -   Enable cross-system data analysis
+3.  **Identity Resolution**
+
+    -   Resolve customer identities across systems
+    -   Link anonymous and known customer profiles
+    -   Create a single source of truth for customer data
+
+-   The API follows REST standards for consistency and ease of use
+-   All responses are in JSON format
+-   Error responses include detailed error messages
+-   The API supports both primary and secondary key lookups
+-   You must explicitly specify fields to retrieve more than 10 fields
+
+-   [User Roles and Permission Sets in Data 360](https://help.salesforce.com/s/articleView?id=data.c360_a_userpermissions.htm&type=5)
+-   [Set Up an External Client App](https://help.salesforce.com/s/articleView?id=xcloud.external_client_apps.htm&type=5)
+-   [Getting Started with Data Cloud API](https://developer.salesforce.com/docs/data/data-cloud-ref/guide/c360a-getting-started-with-cdp.html)
+-   [API Limits for Profile, Query, and Calculated Insights](https://help.salesforce.com/s/articleView?id=data.c360_a_limits_and_guidelines_cdp.htm&type=5)

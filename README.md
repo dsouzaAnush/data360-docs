@@ -1,43 +1,54 @@
-# Mintlify Starter Kit
+# Data 360 Developer Docs
 
-Use the starter kit to get your docs deployed and ready to customize.
+Developer documentation for Salesforce Data 360 (formerly Data Cloud).
 
-Click the green **Use this template** button at the top of this repo to copy the Mintlify starter kit. The starter kit contains examples with
+## Overview
 
-- Guide pages
-- Navigation
-- Customizations
-- API reference pages
-- Use of popular components
+This documentation site provides comprehensive guides for:
 
-**[Follow the full quickstart guide](https://starter.mintlify.com/quickstart)**
+- **Connect REST API** - The primary REST API for Data 360 operations
+- **Query API** - SQL queries, profile APIs, and metadata
+- **Web SDK** - Capture web interactions and events
+- **Data Model Objects (DMOs)** - Understanding data models
+- **Integrations** - Connectors and integration options
 
 ## Development
 
-Install the [Mintlify CLI](https://www.npmjs.com/package/mint) to preview your documentation changes locally. To install, use the following command:
+### Prerequisites
 
+- Node.js 18+
+- npm or yarn
+
+### Local Development
+
+```bash
+# Install Mintlify CLI
+npm install -g mintlify
+
+# Run local development server
+mintlify dev
 ```
-npm i -g mint
+
+### Crawling Documentation
+
+To update documentation from Salesforce:
+
+```bash
+# Install dependencies
+npm install
+
+# Run crawler
+node scripts/crawl-docs.js
 ```
 
-Run the following command at the root of your documentation, where your `docs.json` is located:
+## Deployment
 
-```
-mint dev
-```
+This site is deployed on Mintlify. Push changes to the main branch to trigger deployment.
 
-View your local preview at `http://localhost:3000`.
+## License
 
-## Publishing changes
+MIT License - See [LICENSE](LICENSE) for details.
 
-Install our GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app) to propagate changes from your repo to your deployment. Changes are deployed to production automatically after pushing to the default branch.
+## Credits
 
-## Need help?
-
-### Troubleshooting
-
-- If your dev environment isn't running: Run `mint update` to ensure you have the most recent version of the CLI.
-- If a page loads as a 404: Make sure you are running in a folder with a valid `docs.json`.
-
-### Resources
-- [Mintlify documentation](https://mintlify.com/docs)
+Documentation sourced from [Salesforce Developer Documentation](https://developer.salesforce.com/docs/data/data-cloud-dev/guide/dc-get-started.html).

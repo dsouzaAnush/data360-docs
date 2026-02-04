@@ -1,0 +1,34 @@
+---
+title: "Query Services Status Codes"
+description: "Data 360 REST API Reference"
+---
+
+# Query Services Status Codes
+
+The Query Services APIs return standard HTTP status codes to indicate the success or failure of a request. This document provides details about the status codes and their meanings.
+
+| Status Code | Description | Details |
+| --- | --- | --- |
+| 200 OK | Request successful | The request was processed successfully and the response contains the requested data. |
+| 400 Bad Request | Invalid request | The request was malformed or contained invalid parameters. Check the request syntax and parameters. |
+| 403 Forbidden | Authorization failed | The request failed to pass authorization. Verify your authentication credentials and permissions. |
+| 404 Not Found | Resource not found | The requested resource (callback ID, verification key, or both) was not found. |
+| 422 Unprocessable Entity | Invalid attribute | The attribute name used in fields/filter parameter doesn't exist. Verify the field names in your query. |
+| 429 Too Many Requests | Rate limit exceeded | Too many requests were made in a given time period. Query API supports up to 15 concurrent requests. |
+| 500 Server Error | Internal error | An unexpected error occurred on the server. Contact support if the issue persists. |
+
+When an error occurs, the response includes:
+
+-   `error`: Error message describing the issue
+-   `errorCode`: Unique identifier for the error type
+-   `details`: Additional information about the error (if available)
+
+The following are examples of error code request and responses.
+
+-   All error responses are in JSON format
+-   Error messages are designed to be human-readable
+-   The `errorCode` field can be used for programmatic error handling
+-   Rate limits are enforced per organization
+
+-   [Query API Documentation](/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-queryservices-overview.html)
+-   [Data Cloud Query Guide](https://developer.salesforce.com/docs/data/data-cloud-query-guide/guide/query-guide-get-started.html)

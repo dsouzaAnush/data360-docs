@@ -1,0 +1,57 @@
+---
+title: "Data Cloud Architecture"
+description: "Data 360's architecture is designed to ingest, process, unify, and activate customer data from various sources. It encompasses several key capabilitie"
+---
+
+# Data 360 Architecture
+
+Data 360's architecture is designed to ingest, process, unify, and activate customer data from various sources. It encompasses several key capabilities, forming a comprehensive platform for managing customer experiences.
+
+This diagram shows the flow of data through Data 360 from left to right. The top layer shows the relationship between Data 360 Home orgs, Data 360 Companion orgs, and external LLMs. The middle layer shows functionality in a Data 360 Home org. The bottom layer shows the foundational capabilities that are part of the platform.
+
+![Data 360 Architecture](https://a.sfdcstatic.com/developer-website/sfdocs/data-cloud/media/data-cloud-dev/DataCloud_ArchDiagram052025.png)
+
+A Data 360 Home Org exchanges data and metadata with Companion Orgs through shared data spaces and companion connections. A Data 360 Home Org exchanges data and metadata with another Data 360 Home Org using the Data 360 APIs, Data 360 enrichments that copy fields and create related lists, and via record-triggered flows.
+
+Data 360 can ingest data from Salesforce products. For data outside Salesforce, it offers over 270 connectors, APIs, SDKs, and MuleSoft integration capabilities. Zero copy connectors provide data federation through read-only access to data from existing partner platforms, acknowledging prior investments in data modeling and business intelligence.
+
+Once data is ingested, it's stored in Data Lake Objects (DLOs), in its original schema. These DLOs are then mapped to Data Model Objects (DMOs), which use the C360 Data Model schema. The platform supports batch and streaming data transformations, including inline transformations using formulas (such as proper case, trim, concatenation), to ensure data is clean and consistently formatted. Unstructured data is stored in Unstructured Data Lake Objects (UDLOs) and goes through chunking, indexing, and embedding processes before being stored in Data 360's vector database for vector search or hybrid search.
+
+The core of Data 360 lies in its ability to harmonize and unify data across different data sources and schemas. The platform includes a pre-loaded data model with over 300 industry-agnostic objects, with customization options for specialized schemas. This is the c360 Data Model.
+
+The identity resolution process involves applying match rules to group individuals, and reconciliation rules to select the best quality data from these groups to generate a gold standard unified profile. The match rules have configurable criteria like fuzzy, exact, and normalized matching, based on factors like frequency, last updated attribute, or trusted data sources. Behind the scenes, Data 360 creates link tables that tie together all related data to the unified individual, ensuring original attributes and records remain intact while consolidating data under the unified profile.
+
+Use unified data for customer insights and actions:
+
+-   **Segmentation:** Group individuals based on specific criteria. Non-technical users define generative segments through Einstein Segment Creation using natural language. Waterfall segments prioritize an individual's segment if they qualify for multiple criteria, while nested segments allow for the reuse of complex segment criteria, saving time and effort.
+-   **Insights:** Use calculated insights to aggregate underlying individual data in meaningful ways, such as calculating lifetime value. You can create insights through a batch process and streaming.
+-   **Einstein Studio:** Data 360's machine learning and AI playground. It's forward-looking, making predictions about future customer behavior, and supports bring-your-own model (BYOM) from platforms like Vertex AI or SageMaker, reducing storage costs and syncing efforts. Use Einstein Studio to tie your machine learning models into your business processes and flows directly, instead of having custom models that are only theoretically useful.
+-   **Reporting:** Create reports and dashboards for visualizing data at scale. Connect to Data 360 with enterprise BI tools like Tableau and Power BI, and use the Data 360 JDBC driver for broader ecosystem access to underlying data.
+
+Access unified data and use data from across your enterprise in your business workflows.
+
+-   **Query:** Use SOQL, SQL, and vector/hybrid search.
+-   **Act:** Use the data and insights you gain in your marketing campaigns, apps, flows, and external systems
+    -   **Agents:** Salesforce's Agentforce uses Data 360 as a foundation for digital labor to interact with customers, leveraging topics, instructions, actions, and channels.
+    -   **Activations:** Send segments to external platforms or downstream systems (such as Marketing Cloud, ad platforms like Meta, LinkedIn, Amazon, or Core CRM) to orchestrate customer journeys.
+    -   **Flows and Actions:** Choose whether you want flows and actions to be record-triggered, send platform events, use webhooks, or initiate API calls for triggered emails.
+    -   **Data Shares:** Share derived data, segmentations, and activations from Data 360 to external systems without copying it, completing the feedback loop.
+
+Data 360 is built with robust foundational capabilities:
+
+-   **Governance:** Data 360 includes tagging, masking, and classification policies, as well as other governance features for IT teams to track usage and spending. The digital wallet offers transparency into usage types and credit consumption.
+-   **Security:** Natively secure, Data 360 is built on the same security principles as other Salesforce products, incorporating features like the Einstein Trust Layer for data protection.
+-   **Sandboxes:** Offers sandbox capabilities to support DevOps processes and application lifecycle management.
+-   **Data Cloud One:** Enables connecting with other CRM orgs and extending Data 360 functionality in a zero-copy manner, sharing metadata between home orgs and companion orgs.
+
+This comprehensive architecture allows you to design and deliver tailored customer experiences by connecting, preparing, unifying, analyzing, and activating your customer data.
+
+-   [_Data Cloud Connect REST API Guide and Reference_](https://developer.salesforce.com/docs/data/connectapi/overview)
+-   [_Data Cloud DMO and Mapping Guide_](https://developer.salesforce.com/docs/data/data-cloud-dmo-mapping/guide/c360dm-datamodelobjects.htm)
+-   [_Data Cloud Integration Guide_](https://developer.salesforce.com/docs/data/data-cloud-int/guide/c360-a-data-cloud-integrations.html)
+-   [_Data Cloud Query Guide_](https://developer.salesforce.com/docs/data/data-cloud-query-guide/guide/query-guide-get-started.html)
+-   [_Data Cloud SQL Reference_](https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/dc-sql-reference/data-cloud-sql-context.html)
+-   [_Data 360 Connect API Postman Collection_](https://www.postman.com/salesforce-developers/salesforce-developers/collection/wgh5wpn/salesforce-data-cloud-connect-apis)
+-   _Salesforce Help:_ [Data Cloud Features](https://help.salesforce.com/s/articleView?id=customer360_a.htm&type=5)
+-   [Custom App Development](/docs/data/data-cloud-dev/guide/custom-app-dev.html)
+-   [Integration with External Systems Using Data Actions](/docs/data/data-cloud-dev/guide/custom-app-dev.html#integration-with-external-systems-using-data-actions)

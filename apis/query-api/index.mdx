@@ -1,0 +1,63 @@
+---
+title: "Query API Overview"
+description: ":::note
+As of October 14, 2025, Data Cloud has been rebranded to Data 360. During this transition, you may see references to Data Cloud in our applica"
+---
+
+# Query Data in Data 360
+
+As of October 14, 2025, Data Cloud has been rebranded to Data 360. During this transition, you may see references to Data Cloud in our application and documentation. While the name is new, the functionality and content remains unchanged.
+
+Salesforce Data 360 enables you to collect, store, and process data from Salesforce clouds and external systems. After harmonizing and unifying your data, you can create metrics that span all data sources, providing comprehensive insights. To extract valuable insights from your Data 360 data, you can query it using integrated apps, object-specific APIs, client libraries, and Data 360 query APIs. This guide focuses on how to retrieve data from Data 360.
+
+Review this decision flow diagram to determine which data retrieval method works best for you.
+
+![Decision flow for querying Data 360 data](https://a.sfdcstatic.com/developer-website/sfdocs/data-cloud/media/dc-query-guide/data-cloud-query-data-decision-tree3.png)
+
+To help you choose the most suitable data retrieval method based on your specific needs, consider the following:
+
+-   **To explore and query data using a visual interface**, use integrated apps. For more information, see [Data 360 Integrated Apps](/docs/data/data-cloud-query-guide/guide/int-apps-data-cloud.html).
+-   **For object-oriented queries**, use the Data 360 Connect REST API or the Data Cloud REST API. See [Data 360 Object-Specific APIs](/docs/data/data-cloud-query-guide/guide/obj-specific-apis.html) for details.
+-   **To seamlessly integrate your applications with Data 360 data**, use a language-specific client library. The available libraries include JDBC, Python, and the Connect API for Apex. For more information, see [Language-Specific Client Libraries](/docs/data/data-cloud-query-guide/guide/lang-specific-libraries.html).
+-   **To query Data 360 data using custom SQL queries REST API calls**, you can use the Data 360 Connect API (REST API and Apex). See [Data 360 SQL Query APIs](/docs/data/data-cloud-query-guide/guide/dc-sql-query-apis.html) for more information.
+
+As an admin, you'll likely focus on data exploration, reporting, and user enablement:
+
+1.  **Start with Data Explorer**: Use Salesforce's built-in [Data Explorer](https://help.salesforce.com/s/articleView?id=data.c360_a_data_explorer.htm&type=5) tool to explore your data
+2.  **Understand Your Data Model**: Review available [data objects and relationships](https://help.salesforce.com/s/articleView?id=data.c360_a_data_lake_objects.htm&type=5)
+3.  **Set Up User Permissions**: Configure [user roles and permissions](https://help.salesforce.com/s/articleView?id=data.c360_a_userpermissions.htm&type=5) for data access
+4.  **Create Reports and Dashboards**: Build analytics using [integrated apps](/docs/data/data-cloud-query-guide/guide/int-apps-data-cloud.html)
+5.  **Monitor Usage**: Track API limits and performance
+
+**Quick Start**: Begin with [Query Editor](https://help.salesforce.com/s/articleView?id=data.c360_a_query_editor.htm&type=5) to run your first Data 360 SQL queries.
+
+As a developer, you'll focus on programmatic access and application integration:
+
+1.  **Choose Your Integration Method**: Review [Language-Specific Client Libraries](/docs/data/data-cloud-query-guide/guide/lang-specific-libraries.html) or [Data Cloud SQL Query APIs](/docs/data/data-cloud-query-guide/guide/dc-sql-query-apis.html) to select the right approach
+2.  **Set Up Authentication**: Configure [External Client Apps and OAuth](https://help.salesforce.com/s/articleView?id=xcloud.external_client_apps.htm&type=5)
+3.  **Explore the Data Model**: Use the [Metadata API](https://developer.salesforce.com/docs/atlas.en-us.c360a_api.meta/c360a_api/c360a_api_metadata_api.htm) to understand available objects
+4.  **Start with Simple Queries**: Follow [Get Started With Data Cloud SQL](/docs/data/data-cloud-query-guide/guide/dc-query-section.html) examples
+
+**Quick Start**: Try the [Data 360 Quick Start](https://developer.salesforce.com/docs/platform/data-cloud-dev/guide/dc-quick-start.html) to make your first API call.
+
+1.  [Write a Simple Query](/docs/data/data-cloud-query-guide/guide/write-simple-query.html)
+2.  [Filter Your Query Results](/docs/data/data-cloud-query-guide/guide/filter-query-results.html)
+3.  [Join Records from Different DMOs and DLOs](/docs/data/data-cloud-query-guide/guide/query-joins.html)
+
+1.  [Set up JDBC for Java applications](/docs/data/data-cloud-query-guide/guide/jdbc-setup.html)
+2.  [Use the Python Connector for data analysis](/docs/data/data-cloud-query-guide/guide/get-started-dc-python.html)
+3.  [Build with Connect API in Apex](/docs/data/data-cloud-query-guide/guide/dc-soql.html)
+
+Calculated insight and data transformation creation use a different SQL dialect than described in this guide. See [Calculated Insights](https://help.salesforce.com/s/articleView?id=data.c360_a_insights.htm&type=5) and [Streaming Data Transforms](https://help.salesforce.com/s/articleView?id=data.c360_a_streaming_transform_overview.htm&type=5) in Salesforce Help for more information about the different SQL dialect.
+
+-   **Understanding Data 360**:
+    -   [Data Objects in Data 360](https://help.salesforce.com/s/articleView?id=data.c360_a_data_lake_objects.htm&type=5)
+    -   [Data Model Concepts](https://help.salesforce.com/s/articleView?id=data.c360_a_understanding_and_using_the_data_model.htm&type=5)
+    -   [User Roles and Permissions](https://help.salesforce.com/s/articleView?id=data.c360_a_userpermissions.htm&type=5)
+-   **Development Resources**:
+    -   [Data Cloud Developer Guide](https://developer.salesforce.com/docs/platform/data-cloud-dev/guide/get-started.html)
+    -   [Data 360 Quick Start](https://developer.salesforce.com/docs/platform/data-cloud-dev/guide/dc-quick-start.html)
+    -   [API Limits and Guidelines](https://help.salesforce.com/s/articleView?id=data.c360_a_limits_and_guidelines.htm&type=5)
+-   **Working with Data**:
+    -   [Unify Source Profiles](https://help.salesforce.com/s/articleView?id=data.c360_a_identity_resolution.htm&type=5)
+    -   [Query Editor](https://help.salesforce.com/s/articleView?id=data.c360_a_query_editor.htm&type=5)

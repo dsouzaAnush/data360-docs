@@ -1,0 +1,265 @@
+{
+  "baseUrl": "https://developer.salesforce.com",
+  "documentationAreas": {
+    "developer-guide": {
+      "outputDir": "developer-guide",
+      "pages": [
+        {
+          "url": "/docs/data/data-cloud-dev/guide/dc-get-started.html",
+          "outputFile": "index.mdx",
+          "title": "Getting Started with Data Cloud"
+        },
+        {
+          "url": "/docs/data/data-cloud-dev/guide/dc-quick-start.html",
+          "outputFile": "quick-start.mdx",
+          "title": "Quick Start Tutorial"
+        },
+        {
+          "url": "/docs/data/data-cloud-dev/guide/dc-architecture.html",
+          "outputFile": "architecture.mdx",
+          "title": "Data Cloud Architecture"
+        },
+        {
+          "url": "/docs/data/data-cloud-dev/guide/dc-dev-env.html",
+          "outputFile": "environments.mdx",
+          "title": "Development Environments"
+        },
+        {
+          "url": "/docs/data/data-cloud-dev/guide/app-dev-comparison.html",
+          "outputFile": "platform-comparison.mdx",
+          "title": "Data Cloud vs Salesforce Platform"
+        },
+        {
+          "url": "/docs/data/data-cloud-dev/guide/data-cloud-2gp-workflow.html",
+          "outputFile": "2gp-workflow.mdx",
+          "title": "Second-Generation Managed Packages"
+        },
+        {
+          "url": "/docs/data/data-cloud-dev/guide/dc-apis-postman.html",
+          "outputFile": "postman-collection.mdx",
+          "title": "Postman Collection"
+        }
+      ]
+    },
+    "getting-started": {
+      "outputDir": "getting-started",
+      "pages": [
+        {
+          "url": "/docs/data/data-cloud-dev/guide/dc-get-started.html",
+          "outputFile": "introduction.mdx",
+          "title": "Introduction to Data 360"
+        },
+        {
+          "url": "/docs/data/data-cloud-dev/guide/dc-quick-start.html",
+          "outputFile": "quickstart.mdx",
+          "title": "Quick Start"
+        },
+        {
+          "url": "/docs/data/data-cloud-dev/guide/dc-architecture.html",
+          "outputFile": "architecture.mdx",
+          "title": "Architecture Overview"
+        }
+      ]
+    },
+    "connect-api": {
+      "outputDir": "apis/connect-api",
+      "pages": [
+        {
+          "url": "/docs/data/connectapi/guide/get-started.html",
+          "outputFile": "index.mdx",
+          "title": "Connect REST API Overview"
+        },
+        {
+          "url": "/docs/data/connectapi/guide/dc-connect-api-authentication.html",
+          "outputFile": "authentication.mdx",
+          "title": "Authentication"
+        },
+        {
+          "url": "/docs/data/connectapi/guide/dc-data-ingestion.html",
+          "outputFile": "data-ingestion.mdx",
+          "title": "Data Ingestion"
+        },
+        {
+          "url": "/docs/data/connectapi/guide/dc-calculated-insights.html",
+          "outputFile": "calculated-insights.mdx",
+          "title": "Calculated Insights"
+        },
+        {
+          "url": "/docs/data/connectapi/guide/dc-connect-api-datacloudidentityresolutionjob.html",
+          "outputFile": "identity-resolution.mdx",
+          "title": "Identity Resolution"
+        },
+        {
+          "url": "/docs/data/connectapi/guide/dc-connect-api-datastreams.html",
+          "outputFile": "data-streams.mdx",
+          "title": "Data Streams"
+        },
+        {
+          "url": "/docs/data/connectapi/guide/dc-connect-api-dataspace.html",
+          "outputFile": "data-space.mdx",
+          "title": "Data Spaces"
+        }
+      ]
+    },
+    "query-api": {
+      "outputDir": "apis/query-api",
+      "pages": [
+        {
+          "url": "/docs/data/data-cloud-query-guide/guide/query-guide-get-started.html",
+          "outputFile": "index.mdx",
+          "title": "Query API Overview"
+        },
+        {
+          "url": "/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-queryservices-overview.html",
+          "outputFile": "query-services.mdx",
+          "title": "Query Services"
+        },
+        {
+          "url": "/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-profile-call-overview.html",
+          "outputFile": "profile-api.mdx",
+          "title": "Profile API"
+        },
+        {
+          "url": "/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-metadata-api.html",
+          "outputFile": "metadata-api.mdx",
+          "title": "Metadata API"
+        },
+        {
+          "url": "/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-ci-call-overview.html",
+          "outputFile": "calculated-insights-api.mdx",
+          "title": "Calculated Insights API"
+        },
+        {
+          "url": "/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-universal-id-lookup.html",
+          "outputFile": "universal-id-lookup.mdx",
+          "title": "Universal ID Lookup"
+        },
+        {
+          "url": "/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-data-graphs-overview.html",
+          "outputFile": "data-graphs.mdx",
+          "title": "Data Graph API"
+        },
+        {
+          "url": "/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-queryservices-statuscodes.html",
+          "outputFile": "status-codes.mdx",
+          "title": "Query Services Status Codes"
+        },
+        {
+          "url": "/docs/data/data-cloud-query-guide/references/dc-sql-reference/data-cloud-sql-context.html",
+          "outputFile": "sql-reference.mdx",
+          "title": "SQL Reference"
+        }
+      ]
+    },
+    "web-sdk": {
+      "outputDir": "sdks/web-sdk",
+      "pages": [
+        {
+          "url": "/docs/data/salesforce-interactions-sdk/guide/c360a-api-salesforce-cdp-module-of-the-salesforce-web-sdk.html",
+          "outputFile": "index.mdx",
+          "title": "Web SDK Overview"
+        },
+        {
+          "url": "/docs/data/salesforce-interactions-sdk/guide/c360a-api-event-specifications.html",
+          "outputFile": "events.mdx",
+          "title": "Event Specifications"
+        },
+        {
+          "url": "/docs/data/salesforce-interactions-sdk/guide/c360a-api-api-reference.html",
+          "outputFile": "api-reference.mdx",
+          "title": "API Reference"
+        },
+        {
+          "url": "/docs/data/salesforce-interactions-sdk/guide/c360a-api-identity.html",
+          "outputFile": "identity.mdx",
+          "title": "Identity APIs"
+        },
+        {
+          "url": "/docs/data/salesforce-interactions-sdk/guide/c360a-api-consent.html",
+          "outputFile": "consent.mdx",
+          "title": "Consent API"
+        }
+      ]
+    },
+    "mobile-sdk": {
+      "outputDir": "sdks/mobile-sdk",
+      "pages": [
+        {
+          "url": "/docs/data/data-cloud-engagement-mobile-sdk/guide/dc-mobile-sdk-overview.html",
+          "outputFile": "index.mdx",
+          "title": "Mobile SDK Overview"
+        },
+        {
+          "url": "/docs/data/data-cloud-engagement-mobile-sdk/guide/dc-mobile-sdk-ios.html",
+          "outputFile": "ios.mdx",
+          "title": "iOS SDK"
+        },
+        {
+          "url": "/docs/data/data-cloud-engagement-mobile-sdk/guide/dc-mobile-sdk-android.html",
+          "outputFile": "android.mdx",
+          "title": "Android SDK"
+        }
+      ]
+    },
+    "data-models": {
+      "outputDir": "data-models",
+      "pages": [
+        {
+          "url": "/docs/data/data-cloud-dmo-mapping/guide/c360dm-datamodelobjects.htm",
+          "outputFile": "index.mdx",
+          "title": "Data Model Objects Overview"
+        },
+        {
+          "url": "/docs/data/data-cloud-dmo-mapping/guide/c360dm-mapping-overview.htm",
+          "outputFile": "mappings.mdx",
+          "title": "Mapping Overview"
+        },
+        {
+          "url": "/docs/data/data-cloud-dmo-mapping/guide/c360dm-relationships.htm",
+          "outputFile": "relationships.mdx",
+          "title": "Relationships"
+        }
+      ]
+    },
+    "integrations": {
+      "outputDir": "integrations",
+      "pages": [
+        {
+          "url": "/docs/data/data-cloud-int/guide/c360-a-data-cloud-integrations.html",
+          "outputFile": "index.mdx",
+          "title": "Integrations Overview"
+        },
+        {
+          "url": "/docs/data/data-cloud-int/guide/c360-a-data-streams-introduction.html",
+          "outputFile": "data-streams.mdx",
+          "title": "Data Streams"
+        },
+        {
+          "url": "/docs/data/data-cloud-int/guide/c360-a-connector-salesforce-crm.html",
+          "outputFile": "salesforce-crm.mdx",
+          "title": "Salesforce CRM Connector"
+        },
+        {
+          "url": "/docs/data/data-cloud-int/guide/c360-a-admin-web-sdk-setup.html",
+          "outputFile": "web-sdk-setup.mdx",
+          "title": "Web SDK Setup"
+        }
+      ]
+    },
+    "reference": {
+      "outputDir": "reference",
+      "pages": [
+        {
+          "url": "/docs/data/data-cloud-ref/guide/c360a-api-intro-cdpapis.html",
+          "outputFile": "index.mdx",
+          "title": "API Reference Overview"
+        },
+        {
+          "url": "/docs/data/data-cloud-ref/guide/c360a-api-limits.html",
+          "outputFile": "limits.mdx",
+          "title": "API Limits"
+        }
+      ]
+    }
+  }
+}

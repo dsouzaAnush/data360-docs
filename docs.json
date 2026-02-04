@@ -1,11 +1,15 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "Data 360 Developer Docs",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#0176D3",
+    "light": "#1B96FF",
+    "dark": "#032D60",
+    "anchors": {
+      "from": "#0176D3",
+      "to": "#1B96FF"
+    }
   },
   "favicon": "/favicon.svg",
   "navigation": {
@@ -14,55 +18,98 @@
         "tab": "Guides",
         "groups": [
           {
-            "group": "Getting started",
+            "group": "Getting Started",
             "pages": [
               "index",
-              "quickstart",
-              "development"
+              "getting-started/introduction",
+              "getting-started/quickstart",
+              "getting-started/architecture"
             ]
           },
           {
-            "group": "Customization",
+            "group": "Developer Guide",
             "pages": [
-              "essentials/settings",
-              "essentials/navigation"
-            ]
-          },
-          {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "AI tools",
-            "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
+              "developer-guide/index",
+              "developer-guide/quick-start",
+              "developer-guide/architecture",
+              "developer-guide/environments",
+              "developer-guide/platform-comparison",
+              "developer-guide/2gp-workflow",
+              "developer-guide/postman-collection"
             ]
           }
         ]
       },
       {
-        "tab": "API reference",
+        "tab": "API Reference",
         "groups": [
           {
-            "group": "API documentation",
+            "group": "Connect REST API",
             "pages": [
-              "api-reference/introduction"
+              "apis/connect-api/index"
             ]
           },
           {
-            "group": "Endpoint examples",
+            "group": "Query API",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              "apis/query-api/index",
+              "apis/query-api/query-services",
+              "apis/query-api/profile-api",
+              "apis/query-api/metadata-api",
+              "apis/query-api/calculated-insights-api",
+              "apis/query-api/universal-id-lookup",
+              "apis/query-api/data-graphs",
+              "apis/query-api/status-codes",
+              "apis/query-api/sql-reference"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "SDKs",
+        "groups": [
+          {
+            "group": "Web SDK",
+            "pages": [
+              "sdks/web-sdk/index",
+              "sdks/web-sdk/events",
+              "sdks/web-sdk/api-reference",
+              "sdks/web-sdk/identity",
+              "sdks/web-sdk/consent"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Data Models",
+        "groups": [
+          {
+            "group": "Data Model Objects",
+            "pages": [
+              "data-models/index"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Integrations",
+        "groups": [
+          {
+            "group": "Integration Guide",
+            "pages": [
+              "integrations/index",
+              "integrations/web-sdk-setup"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Reference",
+        "groups": [
+          {
+            "group": "Reference",
+            "pages": [
+              "reference/index"
             ]
           }
         ]
@@ -71,14 +118,14 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
+          "anchor": "Salesforce Docs",
+          "href": "https://developer.salesforce.com/docs/data/data-cloud-dev/guide/dc-get-started.html",
           "icon": "book-open-cover"
         },
         {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
+          "anchor": "GitHub",
+          "href": "https://github.com/dsouzaAnush/data360-docs",
+          "icon": "github"
         }
       ]
     }
@@ -90,33 +137,26 @@
   "navbar": {
     "links": [
       {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "label": "Salesforce",
+        "href": "https://developer.salesforce.com"
       }
-    ],
-    "primary": {
-      "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
-    }
+    ]
   },
   "contextual": {
     "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "github": "https://github.com/dsouzaAnush/data360-docs"
     }
   }
 }

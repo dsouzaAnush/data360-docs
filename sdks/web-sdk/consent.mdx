@@ -1,0 +1,31 @@
+---
+title: "Consent API"
+description: "The Salesforce Interactions SDK is designed to fully respect user privacy and doesn’t store or transmit any collected data until it has been granted e"
+---
+
+# Consent
+
+The Salesforce Interactions SDK is designed to fully respect user privacy and doesn’t store or transmit any collected data until it has been granted explicit consent. If your site has existing consent management features, you must integrate them with the SDK to signal the user's consent status.
+
+The SDK waits for a valid `Opt In` signal before beginning data collection.
+
+There are two primary ways to provide or update the user's consent status in the SDK:
+
+-   During [Initialization](/docs/data/salesforce-interactions-sdk/guide/c360a-api-initialization.html) for first load
+-   Using `updateConsents()` for real-time changes
+
+The recommended approach is to provide a JavaScript `Promise` for the `consent` object within the `SalesforceInteractions.init()` configuration. The SDK waits for the `Promise` to resolve before it starts collecting data. The `Promise` must resolve with an array of consent data objects, as shown in this example.
+
+Use the `getConsents()` method to retrieve the current consent state. This method returns the currently stored consent statuses along with metadata about when the status was last updated and when it was last included in a transmitted event.
+
+The syntax for this method is `getConsents(): ConsentWithMetadata[]`.
+
+Here's an example of using the `getConsents()` method.
+
+For details on the structure of the `Consent` and `ConsentWithMetadata` objects, see [Consent Data](/docs/data/salesforce-interactions-sdk/guide/c360a-api-consent-data.html).
+
+Use the `updateConsents()` method to update a user's consent status at any time after the initial SDK configuration. For example, when a user changes their consent preferences mid-session.
+
+The syntax for updating consent using this method is `SalesforceInteractions.updateConsents(consents: Consent | Consent[]): void`. The `updateConsents` method accepts either a single `Consent` object or an array of `Consent` objects and does not return a value.
+
+Here's an example of calling the `updateConsents()` method directly from a third-party consent management provider's event handler.

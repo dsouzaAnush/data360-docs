@@ -1,0 +1,62 @@
+---
+title: "Profile API"
+description: "Data 360 REST API Reference"
+---
+
+# Query Customer Profile Information
+
+The Profile API provides a powerful way to query and analyze customer profile information in Data 360. This API allows you to retrieve profile data, metadata, and computed insights for your customers.
+
+-   **Profile Data Access**: Retrieve information about customer profiles, including individual data, contact points, and addresses
+-   **Computed Insights**: Access calculated attributes and insights related to customer profiles
+-   **Flexible Querying**: Search and filter profile data using various criteria
+-   **Hierarchical Data**: Access related profile data through parent-child relationships
+-   **Accelerated Response**: Unified profile objects with index column filtering provide faster response times
+
+-   Data Cloud licenses must be provisioned for your org
+-   Users must have appropriate roles and permissions assigned
+-   Authentication requires a valid access token
+-   External Client App must be properly configured
+
+-   Maximum of 50 fields can be retrieved per request
+-   Default return limit is 4,999 rows
+-   Only AND logical operator and equality comparator are supported
+-   No limit on the number of filters in a query
+-   Date/time fields must use the format: `YYYY-MM-DD HH:MM:SS`
+
+-   [**GET /api/v1/profile/metadata**](/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-profile-meta.html)
+
+    -   Retrieves metadata for all profile data model objects
+    -   Returns field definitions and categories
+-   [**GET /api/v1/profile/metadata/{dataModelName}**](/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-profile-meta-dmname.html)
+
+    -   Retrieves metadata for a specific profile data model object
+    -   Returns field definitions, data types, and available indexes
+
+-   [**GET /api/v1/profile/{dataModelName}**](/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-profile-dmname.html)
+
+    -   Queries profile data based on search filters
+    -   Returns matching profile records
+-   [**GET /api/v1/profile/{dataModelName}/{Id}**](/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-profile-dmname-id.html)
+
+    -   Retrieves specific profile records by ID
+    -   Supports primary and secondary key lookups
+-   [**GET /api/v1/profile/{dataModelName}/{Id}/{childDataModelName}**](/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-profile-dmname-id-child-dmname.html)
+
+    -   Retrieves profile data with related child objects
+    -   Supports hierarchical data access
+-   [**GET /api/v1/profile/{dataModelName}/{Id}/calculated-insights/{ci-name}**](/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-profile-dmname-id-ci-ci-name.html)
+
+    -   Retrieves profile data with computed insights
+    -   Returns calculated attributes and metrics
+
+-   Profile API calls only support data model objects in the profile category
+-   Engagement category data model objects are not supported
+-   Unified profile objects with index column filtering have accelerated response rates
+-   You must explicitly specify fields to retrieve more than 10 fields
+-   The API follows REST standards for consistency and ease of use
+
+-   [User Roles and Permission Sets in Data 360](https://help.salesforce.com/s/articleView?id=data.c360_a_userpermissions.htm&type=5)
+-   [Set Up an External Client App](https://help.salesforce.com/s/articleView?id=xcloud.external_client_apps.htm&type=5)
+-   [Getting Started with Data Cloud API](https://developer.salesforce.com/docs/data/data-cloud-ref/guide/c360a-getting-started-with-cdp.html)
+-   [API Limits for Profile, Query, and Calculated Insights](https://help.salesforce.com/s/articleView?id=data.c360_a_limits_and_guidelines_cdp.htm&type=5)

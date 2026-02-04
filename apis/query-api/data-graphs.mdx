@@ -1,0 +1,33 @@
+---
+title: "Data Graph API"
+description: "Data 360 REST API Reference"
+---
+
+# Query Data Graph Data
+
+The Data Graph API provides a powerful way to query and analyze data from Data 360 data graphs. This API allows you to retrieve metadata about available data graphs and query the data with flexible lookup options.
+
+A data graph combines and transforms normalized table data from data model objects (DMOs) into new, materialized views of your data. Because the data is precalculated, you can make more calls, and queries respond in near real time. Query your precalculated data graphs or retrieve real-time data with a live query. Live queries are longer-latency and have higher-credit consumption in exchange for up-to-date information.
+
+-   Data Cloud licenses must be provisioned for your org
+-   Users must have appropriate roles and permissions assigned
+-   Authentication requires a valid access token
+
+-   [**GET /api/v1/dataGraph/metadata**](/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-v1-data-graphs-metadata.html)
+    -   Retrieves metadata for all accessible data graph objects
+    -   Returns primary data model objects, related objects, and their fields
+    -   Supports filtering by specific data graph name
+
+-   [**GET /api/v1/dataGraph/{dataGraphEntityName}/{id}**](/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-v1-data-graphs-name-id.html)
+
+    -   Retrieves specific records from a data graph by their unique identifier
+    -   Returns complete record data including all related fields
+-   [**GET /api/v1/dataGraph/{dataGraphEntityName}?lookupKeys=\[\]**](/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-v1-data-graphs-lookup.html)
+
+    -   Queries data using lookup keys from primary or participating data model objects
+    -   Supports flexible data retrieval based on various key fields
+
+-   [_Salesforce Help_: Data Graphs](https://help.salesforce.com/s/articleView?id=data.c360_a_data_graphs.htm&type=5)
+-   [User Roles and Permission Sets in Data 360](https://help.salesforce.com/s/articleView?id=data.c360_a_userpermissions.htm&type=5)
+-   [Getting Started with Data Cloud API](https://developer.salesforce.com/docs/data/data-cloud-ref/guide/c360a-getting-started-with-cdp.html)
+-   [Retrieve Metadata](/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-metadata-api.html)

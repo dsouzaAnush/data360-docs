@@ -1,0 +1,38 @@
+---
+title: "Web SDK Overview"
+description: "The Data 360 module is an extension of the core Interactions SDK. It acts as the authenticated gateway that sends user activity and profile data from "
+---
+
+# Data 360 Module of the Salesforce Interactions SDK
+
+The Data 360 module is an extension of the core Interactions SDK. It acts as the authenticated gateway that sends user activity and profile data from your website to Data 360.
+
+The Data 360 module performs two core functions:
+
+-   The module automatically converts the SDK's event structure into the specific, compatible format required by Data 360's ingestion pipelines.
+-   It authenticates and delivers all events over HTTP to your designated Data 360 Web Connector.
+
+This module is automatically included and configured with the instrumentation script provided when setting up a web connector in Data 360.
+
+To ensure your data is correctly understood and mapped to the unified data model in Data 360, use the [recommended web connector schema](https://cdn.c360a.salesforce.com/cdp/schemas/254/web-connector-schema.json) when configuring your web connector.
+
+This schema contains standard mappings for common SDK event types:
+
+-   Engagement Events
+
+    -   Cart Interaction Mapping
+    -   Catalog Interaction Mapping
+    -   Order Interaction Mapping
+    -   Consent Event Mapping
+-   Profile Events
+
+    -   Contact Point Email Mapping
+    -   Contact Point Phone Mapping
+    -   Identity Mapping
+    -   Party Identification Mapping
+
+**See Also**
+
+-   [Translation of SDK Events to Web Connector Schemas](/docs/data/salesforce-interactions-sdk/guide/c360a-api-translating-sdk-events-to-web-connector-schemas.html)
+-   [Profile Event Routing](https://developer.salesforce.com/docs/atlas.en-us.c360a_api.meta/c360a_api/c360a_apit_profile_event_routing.htm)
+-   [Custom Events](https://developer.salesforce.com/docs/atlas.en-us.c360a_api.meta/c360a_api/c360a_api_custom_events.htm)

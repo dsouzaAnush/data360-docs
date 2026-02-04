@@ -1,0 +1,36 @@
+---
+title: "API Reference"
+description: "This section provides guidance around references provided with the Salesforce Interactions Web SDK."
+---
+
+# API Reference
+
+This section provides guidance around references provided with the Salesforce Interactions Web SDK.
+
+[**Initialization**](/docs/data/salesforce-interactions-sdk/guide/c360a-api-initialization.html)
+
+The recommended initialization flow for the Salesforce Interactions SDK follows a general pattern.
+
+[**Data Collection**](/docs/data/salesforce-interactions-sdk/guide/c360a-api-data-collection.html)
+
+Before the Salesforce Interactions SDK can begin capturing data, initialize the Salesforce Interactions SDK and gain the user’s consent to track the data.
+
+[**Identity**](/docs/data/salesforce-interactions-sdk/guide/c360a-api-identity.html)
+
+The Salesforce Interactions SDK supports identification of new and returning customer using the first-party cookie `_sfid_${domainHash}`. Also, the `domainHash` is produced by running the website’s domain through a hashing function.
+
+[**Consent**](/docs/data/salesforce-interactions-sdk/guide/c360a-api-consent.html)
+
+The Salesforce Interactions SDK has been designed to respect user privacy and doesn’t store or transmit data collected until it has been granted consent. If your site has existing consent management features, those features must integrate with the SDK to signal when the user has given consent to track.
+
+[**Sitemap**](/docs/data/salesforce-interactions-sdk/guide/c360a-api-sitemap.html)
+
+Salesforce Interactions SDK Sitemap provides the ability to extract data during page navigation. Also, the sitemap can share data capture logic across multiple pages, and it can separate data capture logic from web page presentation logic.
+
+[**Integrations**](/docs/data/salesforce-interactions-sdk/guide/c360a-api-integration.html)
+
+The Salesforce Interactions SDK features built-in `CustomEvents` that you can use to bind listeners to events that are specific to the Web SDK. Data that these events pass are in the detail properties of the event object passed to a listener’s callback function.
+
+[**Debugging**](/docs/data/salesforce-interactions-sdk/guide/c360a-api-debugging.html)
+
+When configured, the Salesforce Interaction SDK can output messages to the browser console for debugging purposes. By default, the logger is configured with a log level of `none`. The logger used by the Web SDK wraps the standard browser `console.log` function and can be accessed at `SalesforceInteractions.log`.

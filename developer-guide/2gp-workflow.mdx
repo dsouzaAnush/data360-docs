@@ -1,0 +1,88 @@
+---
+title: "Second-Generation Managed Packages"
+description: "Second-generation managed packaging (managed 2GP) for Data 360 is a way for AppExchange partners to develop, distribute, and manage their Data 360 app"
+---
+
+# Workflow for Data 360 Second-Generation Managed Packages
+
+Second-generation managed packaging (managed 2GP) for Data 360 is a way for AppExchange partners to develop, distribute, and manage their Data 360 apps and metadata. You can use managed 2GP packaging to organize your source data, build small modular packages, integrate with your version control system, and better utilize your custom Apex code. To learn more about when to use a 2GP packaging, see [Why Switch to Second-Generation Managed Packaging?](https://developer.salesforce.com/docs/atlas.en-us.pkg2_dev.meta/pkg2_dev/why_switch_2GP.htm)
+
+Creating and packaging a Data 360 app is similar to creating and packaging any app using 2GP, but there are a few key differences in the process. You still use the Salesforce CLI commands and scratch orgs, but in Data 360, the features that you want to include must be added to a data kit first. Then you retrieve that metadata into a Salesforce DX project and move that project to a GitHub repository. Once there, other developers can clone it, deploy the data kit metadata to their scratch org, and continue to make customizations. When development is complete, you create a version of your app, package it up, and send it out into the world.
+
+Data 360 2GP packaging requires Dev Hub enabled in Developer, Enterprise, Performance, or Unlimited Editions. Scratch orgs are supported in Developer, Enterprise, Group, and Professional Editions.
+
+The basic 2GP workflow includes these steps. See specific topics for details about each step.
+
+Make sure to complete these prerequisites before you create and start working on a Data 360 2GP managed package.
+
+-   **Get a Developer Edition Org**
+
+    Sign-up for a [Sign up for a Developer Edition org](https://developer.salesforce.com/signup) to use as your Dev Hub org. If you're a Salesforce Partner, you can use your Partner Business Org (PBO) as your Dev Hub org. If you don’t yet have a PBO, follow the steps in [Join the Salesforce Partner Community](https://partners.salesforce.com/) and [Request a Salesforce Partner Business Org](https://developer.salesforce.com/docs/atlas.en-us.packagingGuide.meta/packagingGuide/appexchange_partner_request_pbo.htm) to get one.
+
+    Standard Developer Edition orgs may require specific activation or contact Salesforce support to provision Data 360 features. Data 360 provisioning can take time after activation.
+
+-   **Enable Dev Hub**
+
+    Enable Dev Hub in your Developer Edition org or PBO. See [Select and Enable a Dev Hub](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_setup_enable_devhub.htm).
+
+-   **Enable Data Cloud for Scratch Orgs**
+
+    To use Data 360 in scratch orgs, Salesforce partners must log a case with [Salesforce Partner Support](https://partners.salesforce.com/). This feature is only available for scratch orgs created from a Dev Hub that’s part of your Partner Business Org (PBO).
+
+-   **Enable Second-Generation Managed Packaging**
+
+    Enable 2GP in your Dev Hub org. See [Enable Dev Hub and Second-Generation Managed Packaging](https://developer.salesforce.com/docs/atlas.en-us.pkg2_dev.meta/pkg2_dev/sfdx_pkg_enable_devhub.htm).
+
+-   **Sign Up for a Namespace Org**
+
+    If you already have a registered namespace, you can skip this step. Otherwise, create a separate Developer Edition org to serve as your namespace org, and specify your desired namespace. See [Create and Register Your Namespace for Second-Generation Managed Packages](https://developer.salesforce.com/docs/atlas.en-us.pkg2_dev.meta/pkg2_dev/sfdx_dev_dev2gp_create_namespace.htm).
+
+-   **Register the Namespace**
+
+    From your Dev Hub org, register the namespace created in the previous step. See [Link a Namespace to a Dev Hub Org](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_reg_namespace.htm).
+
+-   **Install Development Tools**
+
+    -   Install VS Code. See [Install Salesforce Extensions Visual Studio Code](https://developer.salesforce.com/tools/vscode/en/vscode-desktop/install#visual-studio-code).
+    -   Install the Salesforce CLI. See [Install Salesforce CLI](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_install_cli.htm).
+    -   Install the Salesforce Extension Pack (Expanded) for VS Code. See [Salesforce Extension Pack (Expanded)](https://marketplace.visualstudio.com/items?itemName=salesforce.salesforcedx-vscode-expanded).
+
+-   Create a new project. See [Create a Salesforce DX Project](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_ws_create_new.htm).
+
+-   Configure `sfdx-project.json`:
+
+    -   Specify your package's namespace using the `namespace` attribute. For example: `"namespace":"exp-mgr"`
+    -   Specify the login URL for production, which is [https://login.salesforce.com](https://login.salesforce.com).
+
+To work with Data 360 features in a scratch org, you first need to set up a scratch definition file and use the Salesforce CLI to create the scratch org.
+
+-   To create a scratch org, from the CLI, use the command `sf org create scratch -a SCRATCH_ORG_NAME -f config/project-scratch-def.json -w 10 -v DEVHUB_ALIAS`. The next example shows a sample scratch definition file. See [Create Scratch Orgs](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_scratch_orgs_create.htm). This scratch org is the publisher or source org where you create the Data 360 elements and add them to a data kit.
+
+Sample `project-scratch-def.json` file with Data 360 license.
+
+-   Run the `sf org open` command to open the scratch org. Verify that Data 360 is enabled in the scratch org by navigating to Data Cloud Setup. If you see green checkmarks, then Data 360 is provisioned.
+
+-   In the scratch org, create your Data 360 elements: data streams, data mappings, calculated insights, streaming or batch data transforms, and so on. To know what Data 360 features can be packaged, see [Data Cloud Extensibility Readiness Matrix](https://developer.salesforce.com/docs/data/data-cloud-ref/guide/c360a-api-isv-readiness-data.htm).
+-   In the Data 360 UI, create a standard data kit and add the Data 360 features that you created to that data kit. See [Create a Data Kit](https://help.salesforce.com/s/articleView?id=data.c360_a_data_stream_bundle_package_kits.htm).
+-   Review the publishing sequence for the data kit.
+
+-   In your scratch org, from Data Cloud Setup, click **Data Kits**.
+-   Select the data kit, and then click **Download Manifest**. The `package.xml` file that you downloaded contains all the metadata entities related to the data kit.
+-   Use this `package.xml` file in your Salesforce DX project to retrieve the data kit metadata. From the CLI, use the command `sf project retrieve start --manifest package.xml` to retrieve the data kit metadata from the scratch org into the project that you created. See [Retrieve Source From the Scratch Org to Your Project](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_pull_md_from_scratch_org.htm). After this command completes, you see new project folders that contain the data kit metadata.
+-   At this point, you can upload the entire project to GitHub or any source control system. Another developer can then download that project, deploy the data kit into their scratch org, and modify it. For example, that developer can add a new data stream to the data kit. This workflow enables multiple developers to work on the same data kit.
+
+-   From your project directory, run the `sf project deploy start` command to deploy the components listed in the `package.xml` file. See [project deploy start](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference_project_commands_unified.htm#cli_reference_project_deploy_start_unified).
+
+-   At this point, the data kit is installed, but you still must deploy the data streams, data models, calculated insights, and all the data kit elements into the second scratch org to use them. See [Deploy a Data Stream from a Data Kit](https://help.salesforce.com/s/articleView?id=data.c360_a_install_package_kit.htm).
+-   After the data kit is deployed to the second scratch org, open the scratch org to see the data kit and all of its data stream bundles, data models, calculated insights, and so on.
+-   The second developer can then create a data stream in their scratch org, add it to a data kit, retrieve the metadata into their project, and then upload that project to GitHub for another developer to work on.
+
+-   From the CLI run the `sf package create -n PACKAGE_NAME -t Managed -v DEVHUB_ALIAS -p PATH_TO_DATA_KIT` command to create a beta Salesforce managed package that points to your data kit metadata folder. Beta packages can only be installed in scratch orgs. See [package create](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference_package_commands_unified.htm#cli_reference_package_create_unified).
+-   If your Data 360 app builds on the Data Cloud SSOT package, you must declare the SSOT package as a dependency in your `sfdx-project.json` file. You can find the latest SSOT package ID on the [Salesforce Partner Community](https://partners.salesforce.com/) site. For example, if your package includes a CRM data stream that maps to a standard DMO, the SSOT package must be included as a dependency.
+
+-   When the managed package is created, it produces a `0ho` ID. Copy that ID. Next, create a managed package version using that `0ho` ID.
+-   Use the command `sf package version create -v DEVHUB_ALIAS -k INSTALLATION_KEY -p 0ho_ID -w 45 -f config/project-scratch-def.json` to create the package version. See [package create](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference_package_commands_unified.htm#cli_reference_package_create_unified).
+-   When you have a package version that’s ready to distribute, promote that package to a released version. The released version can be installed in a production org. See [Release a Second-Generation Managed Package](https://developer.salesforce.com/docs/atlas.en-us.pkg2_dev.meta/pkg2_dev/sfdx_dev_dev2gp_create_pkg_ver_promote.htm).
+
+-   _Second-Generation Managed Packaging Developer Guide_: [Second-Generation Managed Packages](https://developer.salesforce.com/docs/atlas.en-us.pkg2_dev.meta/pkg2_dev/sfdx_dev_dev2gp.htm)
+-   _Data Cloud Developer Guide_: [Packages and Data Kits](https://developer.salesforce.com/docs/platform/data-cloud-dev/guide/packages-data-kits.html)
