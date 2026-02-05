@@ -59,6 +59,18 @@ For most integrations, you'll need at minimum: `api`, `cdp_query_api`, and `refr
 
 For detailed instructions, see [Create an External Client App](https://help.salesforce.com/s/articleView?id=xcloud.create_a_local_external_client_app.htm&type=5).
 
+### Ingestion API Authentication
+
+For server-to-server ingestion, use **OAuth 2.0 JWT Bearer Flow**:
+
+<Warning>
+When creating a connected app for ingestion, you **must uncheck** "Issue JWT-based access tokens for named users".
+</Warning>
+
+Required scopes for ingestion: `cdp_ingest_api`, `api`, `refresh_token`
+
+See [Ingestion API Guide](/integrations/ingestion-api-guide) for the complete setup workflow.
+
 ## Authentication Flow
 
 Authentication to Data 360 is a **two-step process**:

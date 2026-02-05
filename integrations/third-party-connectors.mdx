@@ -1,0 +1,89 @@
+---
+title: "Third-Party Connectors"
+description: "Connect external data sources to Data 360 using pre-built third-party connectors and MuleSoft integrations."
+---
+
+# Third-Party Connectors
+
+Data 360 provides pre-built connectors for common external data sources, enabling you to ingest or federate data without custom API integration.
+
+<Note>
+Third-party connector usage may consume **Data 360 credits** based on data volume and connector type. Review your license entitlements before enabling connectors.
+</Note>
+
+## Available Connectors
+
+| Connector | Type | Direction | Protocol |
+|-----------|------|-----------|----------|
+| **SQL Server** | Database | Inbound | JDBC |
+| **OData** | API | Inbound / Outbound | OData v4 |
+| **GraphQL** | API | Inbound | GraphQL |
+| **Apache Iceberg** | Data Lake | Inbound (federation) | Zero-copy |
+| **Airtable** | SaaS | Inbound | REST API |
+| **Google BigQuery** | Data Warehouse | Inbound (federation) | Zero-copy |
+| **Snowflake** | Data Warehouse | Inbound / Outbound | Zero-copy |
+| **Amazon S3** | Cloud Storage | Inbound | S3 API |
+
+### Setup Pattern
+
+Most third-party connectors follow the same general pattern:
+
+1. Navigate to **Data Cloud Setup** → **Other Connectors**
+2. Select the connector type and click **New**
+3. Enter connection credentials (host, port, authentication)
+4. Select objects/tables to import
+5. Map source fields to Data 360 data model objects
+6. Set a sync schedule (hourly, daily, or on-demand)
+
+<Note>
+Each connector has unique configuration requirements. Refer to the connector-specific setup guide in [Salesforce Help](https://help.salesforce.com/s/articleView?id=data.c360_a_data_ingestion.htm&type=5) for detailed instructions.
+</Note>
+
+## MuleSoft Integration
+
+The **Anypoint Connector for Data 360** extends Data 360 into MuleSoft's integration platform, enabling complex data orchestration workflows.
+
+### Use Cases
+
+<AccordionGroup>
+  <Accordion title="Data Ingestion Automation">
+    Use MuleSoft flows to transform and ingest data from any source into Data 360 via the Ingestion API. Ideal for complex ETL pipelines that require data transformation before ingestion.
+
+    ```text Example Flow
+    Source System → MuleSoft Transform → Data 360 Ingestion API
+    ```
+  </Accordion>
+
+  <Accordion title="Querying Data Cloud">
+    Execute SQL queries against Data 360 from MuleSoft flows to retrieve unified customer profiles, calculated insights, or segment memberships for use in downstream systems.
+
+    ```text Example Flow
+    Trigger → Data 360 Query → Transform → Target System
+    ```
+  </Accordion>
+
+  <Accordion title="Customer Profile Search">
+    Look up unified customer profiles in Data 360 using the Profile API. Use this for real-time personalization, customer service enrichment, or identity verification workflows.
+
+    ```text Example Flow
+    Customer Identifier → Data 360 Profile Lookup → Enrich Response
+    ```
+  </Accordion>
+</AccordionGroup>
+
+### Getting Started with MuleSoft
+
+1. Install the **Anypoint Connector for Salesforce Data Cloud** from [MuleSoft Exchange](https://www.mulesoft.com/exchange/)
+2. Configure a Data 360 connection using your OAuth credentials (see [Quick Start](/getting-started/quickstart))
+3. Add Data 360 operations to your MuleSoft flows
+
+<Note>
+The MuleSoft connector requires a MuleSoft Anypoint Platform license in addition to your Data 360 license.
+</Note>
+
+## Related Resources
+
+- [Connector Services](/integrations/connector-services) — Compare all connector types
+- [Ingestion API Guide](/integrations/ingestion-api-guide) — Build custom integrations with the REST API
+- [Data Ingestion API](/apis/connect-api/data-ingestion) — API endpoint reference
+- Salesforce Help: [Connect Data](https://help.salesforce.com/s/articleView?id=data.c360_a_data_ingestion.htm&type=5)

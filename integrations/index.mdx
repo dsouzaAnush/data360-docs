@@ -1,22 +1,95 @@
 ---
 title: "Integrations Overview"
-description: ":::note
-As of October 14, 2025, Data Cloud has been rebranded to Data 360. During this transition, you may see references to Data Cloud in our applica"
+description: "Learn how data is ingested, connected, and integrated with Data 360 through connectors, connector services, and strategic partners."
 ---
 
 # Data 360 Integrations
 
-As of October 14, 2025, Data Cloud has been rebranded to Data 360. During this transition, you may see references to Data Cloud in our application and documentation. While the name is new, the functionality and content remains unchanged.
+<Note>
+As of October 14, 2025, Data Cloud has been rebranded to **Data 360**. During this transition, you may see references to Data Cloud in our application and documentation.
+</Note>
 
-Learn about how data is ingested, connected, and integrated with Data 360 through connectors, connector services, integrations, enterprise data, and strategic partners.
+Data sources connect into Data 360 via connectors that ingest data, or through zero-copy data federation which syncs data from external sources. After data is harmonized and segmented, it can be sent to targets or shared with integration partners.
 
-Data sources are connected into Data 360 via a connector that ingests data into Data 360 or through zero-copy data federation which syncs data from external sources to Data 360.
+## Data Flow
 
-After data is manipulated, harmonized, or segmented in Data 360, data can be sent to targets such as an SFTP or shared with integrations, such as Snowflake.
+```mermaid
+flowchart LR
+    subgraph Sources
+        A[CRM / ERP]
+        B[Web & Mobile Apps]
+        C[Databases & Lakes]
+        D[REST APIs]
+    end
 
-Some connectors offer the ability to connect data into Data 360, others allows share of data out of Data 360, and others offer bidirectional functionality.
+    subgraph Connectors
+        E[Ingestion API]
+        F[Mobile & Web App]
+        G[Third-Party]
+        H[Zero-Copy Federation]
+    end
 
--   Salesforce Help: [Connect Data](https://help.salesforce.com/s/articleView?id=data.c360_a_data_ingestion.htm&type=5)
--   Salesforce Help: [Data 360 Standard Permission Sets](https://help.salesforce.com/s/articleView?id=data.c360_a_userpermissions.htm&type=5)
--   Trailhead: [Data 360 Connectors and Integrations](https://trailhead.salesforce.com/content/learn/modules/data-cloud-connectors-and-integrations)
--   Salesforce Help: [Data 360 Glossary](https://help.salesforce.com/s/articleView?id=data.c360_a_glossary_guide.htm&type=5)
+    subgraph Data 360
+        I[Data Processing & Harmonization]
+    end
+
+    subgraph Targets
+        J[Activations]
+        K[SFTP / S3]
+        L[Snowflake / BigQuery]
+    end
+
+    A --> E
+    B --> F
+    C --> G
+    D --> E
+    C --> H
+
+    E --> I
+    F --> I
+    G --> I
+    H --> I
+
+    I --> J
+    I --> K
+    I --> L
+```
+
+## Connector Types
+
+| Type | Direction | Example | Guide |
+|------|-----------|---------|-------|
+| **Ingestion API** | Inbound | REST streaming / batch from custom apps | [Ingestion API Guide](/integrations/ingestion-api-guide) |
+| **Mobile & Web App** | Inbound | SDK-based behavioral events | [Mobile & Web Connector](/integrations/mobile-web-connector) |
+| **Third-Party** | Varies | SQL Server, OData, Snowflake, BigQuery | [Third-Party Connectors](/integrations/third-party-connectors) |
+| **Zero-Copy Federation** | Inbound (sync) | External lake access without data movement | [Salesforce Help](https://help.salesforce.com/s/articleView?id=data.c360_a_data_ingestion.htm&type=5) |
+
+## Explore Integrations
+
+<CardGroup cols={2}>
+  <Card title="Connector Services" icon="plug" href="/integrations/connector-services">
+    Compare all connector types and choose the right one
+  </Card>
+  <Card title="Ingestion API Guide" icon="code" href="/integrations/ingestion-api-guide">
+    End-to-end workflow for REST-based data ingestion
+  </Card>
+  <Card title="Schema Requirements" icon="file-code" href="/integrations/schema-requirements">
+    OpenAPI YAML format, naming rules, and data types
+  </Card>
+  <Card title="Mobile & Web Connector" icon="mobile" href="/integrations/mobile-web-connector">
+    Capture events from websites and mobile apps
+  </Card>
+  <Card title="Third-Party Connectors" icon="puzzle-piece" href="/integrations/third-party-connectors">
+    Pre-built connectors and MuleSoft integration
+  </Card>
+  <Card title="Web SDK Setup" icon="globe" href="/integrations/web-sdk-setup">
+    Deploy the Salesforce Interactions SDK
+  </Card>
+</CardGroup>
+
+## External Resources
+
+- Salesforce Help: [Connect Data](https://help.salesforce.com/s/articleView?id=data.c360_a_data_ingestion.htm&type=5)
+- Salesforce Help: [Data 360 Standard Permission Sets](https://help.salesforce.com/s/articleView?id=data.c360_a_userpermissions.htm&type=5)
+- Trailhead: [Data 360 Connectors and Integrations](https://trailhead.salesforce.com/content/learn/modules/data-cloud-connectors-and-integrations)
+- Salesforce Help: [Data 360 Glossary](https://help.salesforce.com/s/articleView?id=data.c360_a_glossary_guide.htm&type=5)

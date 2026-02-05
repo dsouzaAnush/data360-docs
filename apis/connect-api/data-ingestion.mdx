@@ -298,6 +298,36 @@ if __name__ == "__main__":
     print(f"Final result: {result['accepted']} accepted, {result['rejected']} rejected")
 ```
 
+## Partial Record Updates
+
+<Warning>
+Partial updates only work with the **streaming** endpoint.
+Bulk ingestion treats missing fields as null (upsert behavior).
+</Warning>
+
+### Behavior Comparison
+
+| | Streaming | Bulk / Batch |
+|---|-----------|------------|
+| Missing fields | **Unchanged** — existing values preserved | Set to **null** |
+| Required in payload | Primary key + modified fields | All fields |
+
+### Example
+
+```json partial_update.json icon=database {3-5}
+{
+  "data": [{
+    "CustomerId__c": "CUST_001",
+    "LastModified__c": "2024-01-15T10:30:00Z",
+    "Email__c": "updated@example.com"
+  }]
+}
+```
+
+<Note>
+The data stream must have **Partial** refresh mode enabled. This setting is immutable after stream creation — see [Create a Data Stream](/integrations/ingestion-data-stream#select-refresh-mode).
+</Note>
+
 ## Best Practices
 
 <AccordionGroup>

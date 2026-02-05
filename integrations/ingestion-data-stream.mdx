@@ -1,0 +1,120 @@
+---
+title: "Create a Data Stream"
+description: "Create and configure data streams in the Data 360 UI to map ingested data into Data 360 objects for processing."
+---
+
+# Create a Data Stream
+
+Data streams define how ingested data maps into Data 360 objects. Each stream corresponds to one schema object and controls the primary key, category, and refresh behavior.
+
+## Prerequisites
+
+| Requirement | Details |
+|-------------|---------|
+| Connector status | **Needs Data Stream** or **In Use** — see [Ingestion API Setup](/integrations/ingestion-api-setup) |
+| Schema uploaded | At least one object defined — see [Schema Requirements](/integrations/schema-requirements) |
+
+## Create a Data Stream
+
+<Steps>
+  <Step title="Navigate to Your Connector">
+    In Data Cloud Setup, go to **Ingestion API** and select your connector. Click **Create Data Stream**.
+  </Step>
+
+  <Step title="Select Schema Object">
+    Choose the schema object you want to create a stream for (e.g., `Customer`, `OrderEvent`).
+  </Step>
+
+  <Step title="Configure Primary Key">
+    Select the field that uniquely identifies each record. This is used for deduplication and upsert operations.
+
+    ```text Example
+    Primary Key: CustomerId
+    ```
+  </Step>
+
+  <Step title="Set Category">
+    Assign a data category that determines how Data 360 processes the stream:
+
+    | Category | Use For | Processing |
+    |----------|---------|------------|
+    | **Profile** | Customer/account master data | Upsert by primary key |
+    | **Engagement** | Events, interactions, activities | Time-series append |
+    | **Other** | Reference data, lookup tables | Upsert by primary key |
+  </Step>
+
+  <Step title="Select Refresh Mode">
+    Choose how records are updated when new data arrives:
+
+    | Mode | Behavior | Best For |
+    |------|----------|----------|
+    | **Full** | Replaces all existing records with new payload | Complete data snapshots |
+    | **Incremental** | Upserts by primary key, all fields required | Regular updates with full records |
+    | **Partial** | Upserts by primary key, only sent fields updated | Sparse updates to specific fields |
+
+    <Warning>
+    Refresh mode is **immutable after creation**. You cannot change it once the data stream is deployed. Choose carefully.
+    </Warning>
+  </Step>
+
+  <Step title="Set Event Time Field (Engagement only)">
+    For **Engagement** category streams, select the `date-time` field to use as the event timestamp.
+
+    <Note>
+    This field must have `format: date-time` in your schema. It determines the event ordering for time-series processing.
+    </Note>
+  </Step>
+
+  <Step title="Review Configuration">
+    Confirm all settings — primary key, category, refresh mode, and event time field (if applicable).
+  </Step>
+
+  <Step title="Deploy">
+    Click **Deploy** to activate the data stream. The connector status transitions to **In Use**.
+  </Step>
+</Steps>
+
+## Post-Deployment
+
+<Note>
+After deployment, it takes approximately **1 hour** for the data stream to be fully provisioned and ready to receive data. Data may take additional time to appear in queries.
+</Note>
+
+### Verify Your Data Stream
+
+Once data has been ingested, run a quick query to confirm records are flowing:
+
+```sql verify_stream.sql icon=database
+SELECT COUNT(*) as record_count
+FROM   Customer_Stream__dll
+WHERE  ssot__CreatedDate__c > DATEADD(hour, -24, CURRENT_TIMESTAMP)
+```
+
+### Send Test Data
+
+Use the streaming endpoint to send a test record. See [Data Ingestion API](/apis/connect-api/data-ingestion) for full endpoint details.
+
+```bash test_ingest.sh icon=terminal
+curl -X POST "https://{instance}.salesforce.com/services/data/v64.0/ssot/streaming/{streamName}" \
+  -H "Authorization: Bearer {access_token}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "data": [{
+      "CustomerId": "TEST_001",
+      "FirstName": "Test",
+      "LastName": "User",
+      "Email": "test@example.com"
+    }]
+  }'
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Map to Data Model Objects" icon="diagram-project" href="/data-models/index">
+    Map data stream objects to Data Model Objects (DMOs)
+  </Card>
+  <Card title="Ingestion API Guide" icon="book" href="/integrations/ingestion-api-guide">
+    Complete end-to-end workflow reference
+  </Card>
+</CardGroup>

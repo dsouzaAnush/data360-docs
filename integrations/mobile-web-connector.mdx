@@ -1,0 +1,166 @@
+---
+title: "Mobile & Web App Connector"
+description: "Set up the Mobile and Web App connector to capture behavioral events from websites, iOS, and Android apps into Data 360."
+---
+
+# Mobile & Web App Connector
+
+The Mobile & Web App connector captures real-time behavioral events (page views, clicks, form submissions) from websites and mobile apps, and streams them into Data 360 for unified customer profiles.
+
+## Data Timing
+
+| Data Category | Ingestion Latency |
+|---------------|-------------------|
+| **Engagement** events | ~15 minutes |
+| **Profile** updates | ~1 hour |
+
+## Setup Overview
+
+<Steps>
+  <Step title="Create the Connection">
+    In Salesforce Setup, navigate to **Data Cloud Setup** → **Websites & Mobile Apps** → **New**.
+
+    Enter the app name and select the connector type (Website, iOS, or Android).
+  </Step>
+
+  <Step title="Upload Event Schema">
+    Define the events your app will track by uploading a JSON event schema. Each event specifies the fields and data types sent from your app.
+
+    <Note>
+    You can only **add** new events and fields to an existing schema. Previous events and fields must be retained. See the JSON Event Schema section below.
+    </Note>
+  </Step>
+
+  <Step title="Configure Data Capture Rules">
+    Set up which events to capture and any filtering rules. Configure consent tracking if required by your compliance policies.
+  </Step>
+
+  <Step title="Deploy the SDK">
+    Install the appropriate SDK in your app. Choose your platform:
+
+    <CodeGroup>
+    ```html Web (CDN) icon=globe
+    <!-- Add to your website's <head> tag -->
+    <script src="https://cdn.sfdc-content.com/interactions/v1/interactions.js"></script>
+    <script>
+      SalesforceInteractions.init({
+        cookieDomain: "yourdomain.com",
+        orgId: "YOUR_ORG_ID",
+        siteId: "YOUR_SITE_ID"
+      });
+    </script>
+    ```
+
+    ```swift iOS icon=apple
+    import SalesforceDataCloudSDK
+
+    let config = CdpConfigBuilder(
+        appId: "YOUR_APP_ID",
+        endpoint: "YOUR_ENDPOINT"
+    )
+    .trackScreenViews(true)
+    .trackLifecycleEvents(true)
+    .build()
+
+    Cdp.configure(with: config)
+    ```
+
+    ```kotlin Android icon=android
+    import com.salesforce.datacloud.sdk.Cdp
+    import com.salesforce.datacloud.sdk.CdpConfig
+
+    val config = CdpConfig.Builder("YOUR_APP_ID", "YOUR_ENDPOINT")
+        .trackScreenViews(true)
+        .trackLifecycleEvents(true)
+        .build()
+
+    Cdp.configure(context, config)
+    ```
+    </CodeGroup>
+
+    For detailed Web SDK instructions, see the [Web SDK Setup](/integrations/web-sdk-setup) guide.
+  </Step>
+
+  <Step title="Create Data Streams">
+    After the connector is active, [create data streams](/integrations/ingestion-data-stream) to map captured events into Data 360 objects for processing.
+  </Step>
+</Steps>
+
+## JSON Event Schema
+
+The event schema defines the structure of events your app sends to Data 360.
+
+### Required Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `masterLabel` | string | Display name for the event |
+| `developerName` | string | API name (unique, no spaces) |
+| `category` | string | `Engagement` or `Profile` |
+| `fields` | array | List of field definitions |
+
+### Example Schema
+
+```json event_schema.json icon=code
+{
+  "events": [
+    {
+      "masterLabel": "Page View",
+      "developerName": "PageView",
+      "category": "Engagement",
+      "fields": [
+        {
+          "name": "PageUrl",
+          "type": "string",
+          "maxLength": 255
+        },
+        {
+          "name": "PageTitle",
+          "type": "string",
+          "maxLength": 100
+        },
+        {
+          "name": "ViewDuration",
+          "type": "integer"
+        },
+        {
+          "name": "EventTimestamp",
+          "type": "dateTime"
+        }
+      ]
+    },
+    {
+      "masterLabel": "Add to Cart",
+      "developerName": "AddToCart",
+      "category": "Engagement",
+      "fields": [
+        {
+          "name": "ProductId",
+          "type": "string",
+          "maxLength": 36
+        },
+        {
+          "name": "ProductName",
+          "type": "string",
+          "maxLength": 100
+        },
+        {
+          "name": "Price",
+          "type": "number"
+        },
+        {
+          "name": "EventTimestamp",
+          "type": "dateTime"
+        }
+      ]
+    }
+  ]
+}
+```
+
+## Related Resources
+
+- [Web SDK Setup](/integrations/web-sdk-setup) — Detailed Web SDK deployment instructions
+- [Web SDK Events](/sdks/web-sdk/events) — Event tracking API reference
+- [Ingestion Data Stream](/integrations/ingestion-data-stream) — Create data streams from connector events
+- [Connector Services](/integrations/connector-services) — Compare all connector types

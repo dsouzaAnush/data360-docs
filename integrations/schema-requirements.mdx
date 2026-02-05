@@ -1,0 +1,179 @@
+---
+title: "Schema Requirements"
+description: "OpenAPI YAML schema format, naming rules, supported data types, and schema evolution guidelines for Data 360 Ingestion API connectors."
+---
+
+# Schema Requirements
+
+Your ingestion connector schema defines the structure of data you send to Data 360. Schemas use the **OpenAPI 3.0.x** YAML format and are uploaded during [connector setup](/integrations/ingestion-api-setup).
+
+<Warning>
+Once an object is created, it **cannot be deleted**. Once a field is added, it **cannot be removed**. Plan your schema carefully before uploading.
+</Warning>
+
+## File Format
+
+| Requirement | Value |
+|-------------|-------|
+| Specification | OpenAPI 3.0.x |
+| File extension | `.yaml` or `.yml` |
+| Encoding | UTF-8 |
+
+## Naming Rules
+
+### Object Names
+
+| Constraint | Rule |
+|------------|------|
+| Maximum length | 80 characters |
+| Allowed characters | Letters, numbers, underscores |
+| Must start with | A letter |
+| Maximum fields per object | 1,000 |
+| Maximum objects per schema | 100 |
+
+### Field Names
+
+| Constraint | Rule |
+|------------|------|
+| Maximum length | 80 characters |
+| Allowed characters | Letters, numbers, single underscores |
+| Cannot start with | Double underscore (`__`) |
+| Cannot contain | Unicode characters, spaces, or special characters |
+| Case sensitivity | Case-insensitive (avoid duplicates differing only by case) |
+
+<Warning>
+**Reserved field names** — do not use these as custom field names:
+
+`Id`, `DataSourceId`, `DataSource`, `ssot__Id__c`, `ssot__DataSourceId__c`, `ssot__DataSourceObjectId__c`,
+`ssot__CreatedDate__c`, `ssot__UpdatedDate__c`, `InternalOrganization__c`
+</Warning>
+
+## Supported Data Types
+
+| Type | OpenAPI `type` | `format` | Example Value |
+|------|---------------|----------|---------------|
+| Text | `string` | — | `"John Smith"` |
+| Number (integer) | `integer` | `int32` | `42` |
+| Number (long) | `integer` | `int64` | `9876543210` |
+| Number (decimal) | `number` | `double` | `99.95` |
+| Boolean | `boolean` | — | `true` |
+| Date | `string` | `date` | `"2024-01-15"` |
+| DateTime | `string` | `date-time` | `"2024-01-15T10:30:00.000Z"` |
+| UUID | `string` | `uuid` | `"550e8400-e29b-41d4-a716-446655440000"` |
+| JSON | `string` | `json` | `"{\"key\": \"value\"}"` |
+
+### Date & DateTime Formats
+
+```yaml date_formats.yaml icon=code
+# Date — ISO 8601 date only
+order_date:
+  type: string
+  format: date
+  # Example: "2024-01-15"
+
+# DateTime — ISO 8601 with UTC Zulu notation
+event_time:
+  type: string
+  format: date-time
+  # Example: "2024-01-15T10:30:00.000Z"
+```
+
+<Note>
+DateTime values **must** use UTC Zulu notation (`Z` suffix). Other timezone offsets are not supported.
+</Note>
+
+## Category Requirements
+
+Each data stream object is assigned a category that determines how Data 360 processes it:
+
+| Category | When to Use | Special Requirement |
+|----------|-------------|---------------------|
+| **Profile** | Customer/account master data | None |
+| **Engagement** | Events, interactions, activities | Must include a `date-time` field |
+| **Other** | Reference data, lookup tables | None |
+
+<Note>
+**Engagement** objects require at least one field with `format: date-time`. This field is used as the event timestamp for time-series processing.
+</Note>
+
+## Schema Evolution Rules
+
+<AccordionGroup>
+  <Accordion title="What you CAN do">
+    - Add new objects to an existing schema
+    - Add new fields to an existing object
+    - Upload an updated schema file with additions
+    - Change field descriptions (metadata only)
+  </Accordion>
+
+  <Accordion title="What you CANNOT do">
+    - Delete an existing object
+    - Remove a field from an existing object
+    - Change a field's data type after creation
+    - Rename an existing field or object
+    - Reduce the maximum length of a text field
+  </Accordion>
+</AccordionGroup>
+
+## Complete Example Schema
+
+```yaml example_schema.yaml icon=code expandable
+openapi: 3.0.1
+info:
+  title: E-Commerce Data Schema
+  version: "1.0"
+paths: {}
+components:
+  schemas:
+    Customer:
+      type: object
+      properties:
+        CustomerId:
+          type: string
+          maxLength: 36
+        FirstName:
+          type: string
+          maxLength: 80
+        LastName:
+          type: string
+          maxLength: 80
+        Email:
+          type: string
+          maxLength: 255
+        PhoneNumber:
+          type: string
+          maxLength: 20
+        CreatedDate:
+          type: string
+          format: date
+        IsActive:
+          type: boolean
+
+    OrderEvent:
+      type: object
+      properties:
+        OrderId:
+          type: string
+          maxLength: 36
+        CustomerId:
+          type: string
+          maxLength: 36
+        OrderTotal:
+          type: number
+          format: double
+        Currency:
+          type: string
+          maxLength: 3
+        OrderDate:
+          type: string
+          format: date-time
+        ItemCount:
+          type: integer
+          format: int32
+```
+
+## Related Resources
+
+- [Ingestion API Setup](/integrations/ingestion-api-setup) — Upload your schema during connector configuration
+- [Ingestion Data Stream](/integrations/ingestion-data-stream) — Create data streams from your schema objects
+- [Ingestion Schema Metadata](/apis/metadata-types/ingestion-schema) — XML metadata type reference (different format)

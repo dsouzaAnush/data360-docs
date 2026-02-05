@@ -142,7 +142,24 @@
             "group": "Integration Guide",
             "pages": [
               "integrations/index",
-              "integrations/web-sdk-setup"
+              "integrations/connector-services"
+            ]
+          },
+          {
+            "group": "Ingestion API",
+            "pages": [
+              "integrations/ingestion-api-guide",
+              "integrations/ingestion-api-setup",
+              "integrations/schema-requirements",
+              "integrations/ingestion-data-stream"
+            ]
+          },
+          {
+            "group": "Connectors",
+            "pages": [
+              "integrations/web-sdk-setup",
+              "integrations/mobile-web-connector",
+              "integrations/third-party-connectors"
             ]
           }
         ]
