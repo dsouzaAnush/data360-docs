@@ -11,7 +11,7 @@ When creating or updating segments using SQL expressions, your queries must comp
 
 SQL-based segments use the `sql` property in segment definitions. The SQL must select unified profile identifiers that define segment membership.
 
-```json Example Segment with SQL
+```json segment_definition.json {3-4}
 {
   "name": "High_Value_Customers",
   "displayName": "High Value Customers",
@@ -25,22 +25,26 @@ SQL-based segments use the `sql` property in segment definitions. The SQL must s
 
 The SELECT clause must contain **only the primary key** of the target Data Model Object (DMO):
 
-```sql Valid - Primary key only
+<CodeGroup>
+```sql valid_primary_key.sql icon=check {1}
 SELECT Id__c
 FROM UnifiedIndividual__dlm
 WHERE LifetimeValue__c > 1000
 ```
 
-```sql Invalid - Multiple columns
+```sql invalid_multiple_columns.sql icon=xmark {1}
+-- INVALID: Multiple columns not allowed
 SELECT Id__c, FirstName__c, Email__c
 FROM UnifiedIndividual__dlm
 ```
+</CodeGroup>
 
 ### No Aggregation Functions
 
 Top-level SELECT statements cannot include aggregation functions:
 
-```sql Invalid - Aggregation at top level
+```sql invalid_aggregations.sql icon=xmark {2-4}
+-- INVALID: Aggregation functions not allowed at top level
 SELECT MAX(Id__c) FROM UnifiedIndividual__dlm
 SELECT COUNT(Id__c) FROM UnifiedIndividual__dlm
 SELECT AVG(LifetimeValue__c) FROM UnifiedIndividual__dlm
@@ -54,7 +58,8 @@ Aggregation functions can be used in subqueries within the WHERE clause.
 
 Wildcard expressions (`*`) are not permitted:
 
-```sql Invalid - Wildcard
+```sql invalid_wildcard.sql icon=xmark {2}
+-- INVALID: Wildcards not allowed
 SELECT * FROM UnifiedIndividual__dlm
 ```
 
@@ -62,7 +67,8 @@ SELECT * FROM UnifiedIndividual__dlm
 
 Case statements are not allowed in the primary SELECT:
 
-```sql Invalid - CASE in SELECT
+```sql invalid_case.sql icon=xmark {2-3}
+-- INVALID: CASE statements not allowed
 SELECT CASE WHEN Active__c THEN Id__c ELSE NULL END
 FROM UnifiedIndividual__dlm
 ```
@@ -71,7 +77,8 @@ FROM UnifiedIndividual__dlm
 
 Columns in the SELECT clause cannot be aliased:
 
-```sql Invalid - Column alias
+```sql invalid_alias.sql icon=xmark {2-3}
+-- INVALID: Column aliases not allowed
 SELECT Id__c AS ProfileId
 FROM UnifiedIndividual__dlm
 ```
@@ -80,7 +87,7 @@ FROM UnifiedIndividual__dlm
 
 When the primary key includes key qualifiers, **both the key and qualifiers must be projected**:
 
-```sql Valid - Key with qualifiers
+```sql key_qualifiers.sql icon=check {1-2,4}
 SELECT Id__c, DataSource__c
 FROM UnifiedIndividual__dlm
 WHERE Region__c = 'West'
@@ -95,18 +102,21 @@ The key and qualifiers must also be included in the GROUP BY clause when present
 
 All columns in JOIN queries must include the table name or alias:
 
-```sql Valid - Fully qualified
+<CodeGroup>
+```sql valid_qualified.sql icon=check {1,4}
 SELECT ui.Id__c
 FROM UnifiedIndividual__dlm ui
 JOIN UnifiedContactPointEmail__dlm cpe ON ui.Id__c = cpe.PartyId__c
 WHERE ui.Region__c = 'West'
 ```
 
-```sql Invalid - Unqualified columns
+```sql invalid_unqualified.sql icon=xmark {2,4}
+-- INVALID: Columns must be qualified
 SELECT Id__c
 FROM UnifiedIndividual__dlm ui
 JOIN UnifiedContactPointEmail__dlm cpe ON Id__c = PartyId__c
 ```
+</CodeGroup>
 
 ### Relationship Requirements
 
@@ -116,11 +126,11 @@ JOINs must use established relationships between DMOs:
 - Join conditions must use the related join keys
 - Only equality comparisons (`=`) are allowed in join conditions
 
-```sql Valid - Using relationship
+```sql valid_relationship.sql icon=check {3-4}
 SELECT ui.Id__c
 FROM UnifiedIndividual__dlm ui
 JOIN UnifiedContactPointEmail__dlm cpe
-  ON ui.Id__c = cpe.PartyId__c  -- Valid relationship
+  ON ui.Id__c = cpe.PartyId__c  -- Valid relationship key
 WHERE cpe.IsPrimary__c = true
 ```
 
@@ -128,17 +138,19 @@ WHERE cpe.IsPrimary__c = true
 
 The first table in the FROM clause must be a **profile DMO**:
 
-```sql Valid - Profile table first
+<CodeGroup>
+```sql valid_profile_first.sql icon=check {2}
 SELECT ui.Id__c
-FROM UnifiedIndividual__dlm ui  -- Profile DMO
+FROM UnifiedIndividual__dlm ui  -- Profile DMO first
 JOIN SalesData__dlm sd ON ui.Id__c = sd.CustomerId__c
 ```
 
-```sql Invalid - Non-profile table first
-SELECT sd.CustomerId__c
+```sql invalid_non_profile_first.sql icon=xmark {2}
+-- INVALID: Non-profile table first
 FROM SalesData__dlm sd  -- Not a profile DMO
 JOIN UnifiedIndividual__dlm ui ON sd.CustomerId__c = ui.Id__c
 ```
+</CodeGroup>
 
 ## Subquery Rules
 
@@ -146,7 +158,8 @@ JOIN UnifiedIndividual__dlm ui ON sd.CustomerId__c = ui.Id__c
 
 Subqueries are only allowed in the WHERE clause:
 
-```sql Valid - Subquery in WHERE
+<CodeGroup>
+```sql valid_subquery_where.sql icon=check {3-7}
 SELECT Id__c
 FROM UnifiedIndividual__dlm
 WHERE Id__c IN (
@@ -156,22 +169,28 @@ WHERE Id__c IN (
 )
 ```
 
-```sql Invalid - Subquery in SELECT
+```sql invalid_subquery_select.sql icon=xmark {2}
+-- INVALID: Subquery in SELECT not allowed
 SELECT (SELECT COUNT(*) FROM Orders__dlm WHERE CustomerId__c = ui.Id__c)
 FROM UnifiedIndividual__dlm ui
 ```
+</CodeGroup>
 
 ### Single Column Output
 
 Subqueries must return a single column:
 
-```sql Valid - Single column subquery
+<CodeGroup>
+```sql valid_single_column.sql icon=check {2}
+-- Valid: Single column in subquery
 WHERE Id__c IN (SELECT PartyId__c FROM UnifiedContactPointEmail__dlm)
 ```
 
-```sql Invalid - Multiple column subquery
+```sql invalid_multiple_columns_sub.sql icon=xmark {2}
+-- INVALID: Multiple columns in subquery
 WHERE (Id__c, Region__c) IN (SELECT PartyId__c, Region__c FROM ...)
 ```
+</CodeGroup>
 
 ## Data Type Rules
 
@@ -179,15 +198,19 @@ WHERE (Id__c, Region__c) IN (SELECT PartyId__c, Region__c FROM ...)
 
 Column data types must match in comparisons:
 
-```sql Valid - Matching types
-WHERE Age__c > 25  -- Numeric comparison
-WHERE Email__c = 'john@example.com'  -- String comparison
-WHERE CreatedDate__c > '2024-01-01'  -- Date comparison
+<CodeGroup>
+```sql valid_type_matching.sql icon=check {2-4}
+-- Valid: Matching data types
+WHERE Age__c > 25                          -- Numeric comparison
+WHERE Email__c = 'john@example.com'        -- String comparison
+WHERE CreatedDate__c > '2024-01-01'        -- Date comparison
 ```
 
-```sql Invalid - Mismatched types
+```sql invalid_type_mismatch.sql icon=xmark {2}
+-- INVALID: Type mismatch
 WHERE Age__c = 'twenty-five'  -- Number compared to string
 ```
+</CodeGroup>
 
 ## Supported Clauses
 
@@ -195,7 +218,7 @@ WHERE Age__c = 'twenty-five'  -- Number compared to string
 
 Both LIMIT and OFFSET are supported for result pagination:
 
-```sql Valid - With pagination
+```sql pagination.sql icon=check {4-5}
 SELECT Id__c
 FROM UnifiedIndividual__dlm
 WHERE IsActive__c = true
@@ -218,16 +241,19 @@ The following are **not allowed** in segment SQL:
 
 Only DMO table aliases are permitted. Column aliases are not allowed:
 
-```sql Valid - Table alias
+<CodeGroup>
+```sql valid_table_alias.sql icon=check {2-3}
 SELECT ui.Id__c
 FROM UnifiedIndividual__dlm ui
 WHERE ui.IsActive__c = true
 ```
 
-```sql Invalid - Column alias
+```sql invalid_column_alias.sql icon=xmark {2-3}
+-- INVALID: Column alias not allowed
 SELECT ui.Id__c AS ProfileIdentifier
 FROM UnifiedIndividual__dlm ui
 ```
+</CodeGroup>
 
 ## Validation Error Messages
 
@@ -241,11 +267,11 @@ Common validation errors and solutions:
 | `INVALID_SUBQUERY` | Subquery outside WHERE | Move subquery to WHERE clause |
 | `TYPE_MISMATCH` | Incompatible comparison types | Match data types |
 
-## Examples
+## Complete Examples
 
 ### Simple Segment
 
-```sql
+```sql simple_segment.sql icon=database {1-3}
 SELECT Id__c
 FROM UnifiedIndividual__dlm
 WHERE Region__c = 'West' AND IsActive__c = true
@@ -253,7 +279,7 @@ WHERE Region__c = 'West' AND IsActive__c = true
 
 ### Segment with JOIN
 
-```sql
+```sql segment_with_join.sql icon=database {1-5}
 SELECT ui.Id__c
 FROM UnifiedIndividual__dlm ui
 JOIN UnifiedContactPointEmail__dlm cpe
@@ -263,7 +289,7 @@ WHERE cpe.IsVerified__c = true
 
 ### Segment with Subquery
 
-```sql
+```sql segment_with_subquery.sql icon=database {3-7}
 SELECT Id__c
 FROM UnifiedIndividual__dlm
 WHERE Id__c IN (
@@ -275,7 +301,7 @@ WHERE Id__c IN (
 
 ### Segment with Key Qualifiers
 
-```sql
+```sql segment_with_qualifiers.sql icon=database {1-2,4}
 SELECT Id__c, DataSource__c
 FROM UnifiedIndividual__dlm
 WHERE LifetimeValue__c > 500
