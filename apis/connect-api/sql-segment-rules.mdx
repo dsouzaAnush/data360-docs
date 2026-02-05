@@ -1,0 +1,289 @@
+---
+title: "SQL Segment Validation Rules"
+description: "SQL validation rules and constraints for creating segments with SQL expressions in Data 360"
+---
+
+# SQL Segment Validation Rules
+
+When creating or updating segments using SQL expressions, your queries must comply with these validation rules. These constraints ensure segments can be properly processed and activated.
+
+## Overview
+
+SQL-based segments use the `sql` property in segment definitions. The SQL must select unified profile identifiers that define segment membership.
+
+```json Example Segment with SQL
+{
+  "name": "High_Value_Customers",
+  "displayName": "High Value Customers",
+  "sql": "SELECT Id__c FROM UnifiedIndividual__dlm WHERE LifetimeValue__c > 1000"
+}
+```
+
+## SELECT Statement Rules
+
+### Primary Key Only
+
+The SELECT clause must contain **only the primary key** of the target Data Model Object (DMO):
+
+```sql Valid - Primary key only
+SELECT Id__c
+FROM UnifiedIndividual__dlm
+WHERE LifetimeValue__c > 1000
+```
+
+```sql Invalid - Multiple columns
+SELECT Id__c, FirstName__c, Email__c
+FROM UnifiedIndividual__dlm
+```
+
+### No Aggregation Functions
+
+Top-level SELECT statements cannot include aggregation functions:
+
+```sql Invalid - Aggregation at top level
+SELECT MAX(Id__c) FROM UnifiedIndividual__dlm
+SELECT COUNT(Id__c) FROM UnifiedIndividual__dlm
+SELECT AVG(LifetimeValue__c) FROM UnifiedIndividual__dlm
+```
+
+<Note>
+Aggregation functions can be used in subqueries within the WHERE clause.
+</Note>
+
+### No Wildcards
+
+Wildcard expressions (`*`) are not permitted:
+
+```sql Invalid - Wildcard
+SELECT * FROM UnifiedIndividual__dlm
+```
+
+### No Case Statements
+
+Case statements are not allowed in the primary SELECT:
+
+```sql Invalid - CASE in SELECT
+SELECT CASE WHEN Active__c THEN Id__c ELSE NULL END
+FROM UnifiedIndividual__dlm
+```
+
+### No Column Aliases
+
+Columns in the SELECT clause cannot be aliased:
+
+```sql Invalid - Column alias
+SELECT Id__c AS ProfileId
+FROM UnifiedIndividual__dlm
+```
+
+## Key Qualifier Requirements
+
+When the primary key includes key qualifiers, **both the key and qualifiers must be projected**:
+
+```sql Valid - Key with qualifiers
+SELECT Id__c, DataSource__c
+FROM UnifiedIndividual__dlm
+WHERE Region__c = 'West'
+GROUP BY Id__c, DataSource__c
+```
+
+The key and qualifiers must also be included in the GROUP BY clause when present.
+
+## JOIN Rules
+
+### Fully Qualified Column Names
+
+All columns in JOIN queries must include the table name or alias:
+
+```sql Valid - Fully qualified
+SELECT ui.Id__c
+FROM UnifiedIndividual__dlm ui
+JOIN UnifiedContactPointEmail__dlm cpe ON ui.Id__c = cpe.PartyId__c
+WHERE ui.Region__c = 'West'
+```
+
+```sql Invalid - Unqualified columns
+SELECT Id__c
+FROM UnifiedIndividual__dlm ui
+JOIN UnifiedContactPointEmail__dlm cpe ON Id__c = PartyId__c
+```
+
+### Relationship Requirements
+
+JOINs must use established relationships between DMOs:
+
+- A relationship must exist between the joined tables
+- Join conditions must use the related join keys
+- Only equality comparisons (`=`) are allowed in join conditions
+
+```sql Valid - Using relationship
+SELECT ui.Id__c
+FROM UnifiedIndividual__dlm ui
+JOIN UnifiedContactPointEmail__dlm cpe
+  ON ui.Id__c = cpe.PartyId__c  -- Valid relationship
+WHERE cpe.IsPrimary__c = true
+```
+
+### Profile Table First
+
+The first table in the FROM clause must be a **profile DMO**:
+
+```sql Valid - Profile table first
+SELECT ui.Id__c
+FROM UnifiedIndividual__dlm ui  -- Profile DMO
+JOIN SalesData__dlm sd ON ui.Id__c = sd.CustomerId__c
+```
+
+```sql Invalid - Non-profile table first
+SELECT sd.CustomerId__c
+FROM SalesData__dlm sd  -- Not a profile DMO
+JOIN UnifiedIndividual__dlm ui ON sd.CustomerId__c = ui.Id__c
+```
+
+## Subquery Rules
+
+### WHERE Clause Only
+
+Subqueries are only allowed in the WHERE clause:
+
+```sql Valid - Subquery in WHERE
+SELECT Id__c
+FROM UnifiedIndividual__dlm
+WHERE Id__c IN (
+  SELECT PartyId__c
+  FROM UnifiedContactPointEmail__dlm
+  WHERE Domain__c = 'enterprise.com'
+)
+```
+
+```sql Invalid - Subquery in SELECT
+SELECT (SELECT COUNT(*) FROM Orders__dlm WHERE CustomerId__c = ui.Id__c)
+FROM UnifiedIndividual__dlm ui
+```
+
+### Single Column Output
+
+Subqueries must return a single column:
+
+```sql Valid - Single column subquery
+WHERE Id__c IN (SELECT PartyId__c FROM UnifiedContactPointEmail__dlm)
+```
+
+```sql Invalid - Multiple column subquery
+WHERE (Id__c, Region__c) IN (SELECT PartyId__c, Region__c FROM ...)
+```
+
+## Data Type Rules
+
+### Type Matching
+
+Column data types must match in comparisons:
+
+```sql Valid - Matching types
+WHERE Age__c > 25  -- Numeric comparison
+WHERE Email__c = 'john@example.com'  -- String comparison
+WHERE CreatedDate__c > '2024-01-01'  -- Date comparison
+```
+
+```sql Invalid - Mismatched types
+WHERE Age__c = 'twenty-five'  -- Number compared to string
+```
+
+## Supported Clauses
+
+### LIMIT and OFFSET
+
+Both LIMIT and OFFSET are supported for result pagination:
+
+```sql Valid - With pagination
+SELECT Id__c
+FROM UnifiedIndividual__dlm
+WHERE IsActive__c = true
+LIMIT 10000
+OFFSET 5000
+```
+
+## Prohibited Operations
+
+The following are **not allowed** in segment SQL:
+
+| Operation | Example | Reason |
+|-----------|---------|--------|
+| Non-SELECT statements | `UPDATE`, `INSERT`, `DELETE` | Segments are read-only |
+| DDL statements | `CREATE TABLE`, `ALTER` | Schema modifications not allowed |
+| Multiple statements | `SELECT...; SELECT...` | Single query only |
+| Non-DMO tables | `SELECT * FROM CustomTable` | Must use DMO objects |
+
+## Table Aliases
+
+Only DMO table aliases are permitted. Column aliases are not allowed:
+
+```sql Valid - Table alias
+SELECT ui.Id__c
+FROM UnifiedIndividual__dlm ui
+WHERE ui.IsActive__c = true
+```
+
+```sql Invalid - Column alias
+SELECT ui.Id__c AS ProfileIdentifier
+FROM UnifiedIndividual__dlm ui
+```
+
+## Validation Error Messages
+
+Common validation errors and solutions:
+
+| Error | Cause | Solution |
+|-------|-------|----------|
+| `INVALID_SELECT_EXPRESSION` | Multiple columns or aggregates | Select only primary key |
+| `INVALID_JOIN_CONDITION` | Non-equality or unrelated tables | Use `=` with related keys |
+| `INVALID_TABLE_ORDER` | Non-profile table first | Put profile DMO in FROM |
+| `INVALID_SUBQUERY` | Subquery outside WHERE | Move subquery to WHERE clause |
+| `TYPE_MISMATCH` | Incompatible comparison types | Match data types |
+
+## Examples
+
+### Simple Segment
+
+```sql
+SELECT Id__c
+FROM UnifiedIndividual__dlm
+WHERE Region__c = 'West' AND IsActive__c = true
+```
+
+### Segment with JOIN
+
+```sql
+SELECT ui.Id__c
+FROM UnifiedIndividual__dlm ui
+JOIN UnifiedContactPointEmail__dlm cpe
+  ON ui.Id__c = cpe.PartyId__c
+WHERE cpe.IsVerified__c = true
+```
+
+### Segment with Subquery
+
+```sql
+SELECT Id__c
+FROM UnifiedIndividual__dlm
+WHERE Id__c IN (
+  SELECT PartyId__c
+  FROM PurchaseHistory__dlm
+  WHERE PurchaseDate__c > '2024-01-01'
+)
+```
+
+### Segment with Key Qualifiers
+
+```sql
+SELECT Id__c, DataSource__c
+FROM UnifiedIndividual__dlm
+WHERE LifetimeValue__c > 500
+GROUP BY Id__c, DataSource__c
+```
+
+## Related Resources
+
+- [Segments API](/apis/connect-api/segments) - Create and manage segments
+- [Segment Metadata Type](/apis/metadata-types/segments) - Deploy segment definitions
+- [SQL Reference](/apis/query-api/sql-reference) - Data 360 SQL syntax

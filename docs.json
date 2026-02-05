@@ -38,6 +38,7 @@
             "pages": [
               "developer-guide/index",
               "developer-guide/quick-start",
+              "developer-guide/use-cases",
               "developer-guide/architecture",
               "developer-guide/environments",
               "developer-guide/platform-comparison",
@@ -58,6 +59,7 @@
               "apis/connect-api/data-streams",
               "apis/connect-api/identity-resolution",
               "apis/connect-api/segments",
+              "apis/connect-api/sql-segment-rules",
               "apis/connect-api/activations"
             ]
           },
