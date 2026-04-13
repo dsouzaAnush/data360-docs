@@ -1,0 +1,36 @@
+diff --git a/apis/connect-api/identity-resolution.mdx b/apis/connect-api/identity-resolution.mdx
+index 523f388..c75c358 100644
+--- a/apis/connect-api/identity-resolution.mdx
++++ b/apis/connect-api/identity-resolution.mdx
+@@ -419,6 +419,7 @@ System.out.println(response.body());
+ 
+ ## Related Resources
+ 
++- [Identity Resolution Best Practices](/developer-guide/identity-resolution-best-practices) - Strategies for trusted unified profiles
+ - [Identity Resolution Settings Metadata](/apis/metadata-types/identity-resolution) - Deploy ID resolution configurations
+ - [Profile API](/apis/query-api/profile-api) - Query unified profiles
+ - [Universal ID Lookup](/apis/query-api/universal-id-lookup) - Look up unified IDs
+diff --git a/apis/metadata-types/identity-resolution.mdx b/apis/metadata-types/identity-resolution.mdx
+index aeefad1..fe81acb 100644
+--- a/apis/metadata-types/identity-resolution.mdx
++++ b/apis/metadata-types/identity-resolution.mdx
+@@ -411,6 +411,7 @@ sf project deploy start -m IdentityResolutionSettings:Customer_Identity_Resoluti
+ 
+ ## Related Resources
+ 
++- [Identity Resolution Best Practices](/developer-guide/identity-resolution-best-practices) - Strategies for trusted unified profiles
+ - [Identity Resolution API](/apis/connect-api/identity-resolution) - Runtime ID resolution
+ - [Profile API](/apis/query-api/profile-api) - Query unified profiles
+ - [Universal ID Lookup](/apis/query-api/universal-id-lookup) - Look up unified IDs
+diff --git a/docs.json b/docs.json
+index 9028ae9..de5188c 100644
+--- a/docs.json
++++ b/docs.json
+@@ -38,6 +38,7 @@
+             "pages": [
+               "developer-guide/index",
+               "developer-guide/quick-start",
++              "developer-guide/identity-resolution-best-practices",
+               "developer-guide/use-cases",
+               "developer-guide/architecture",
+               "developer-guide/environments",

@@ -8,3 +8,6 @@ drafts/
 
 # Crawler scripts
 scripts/
+
+# Salesforce skills submodule (consumed via .mintlify/skills/ symlinks)
+.salesforce-skills/
