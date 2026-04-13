@@ -1,244 +1,168 @@
 ---
 title: "Segmentation"
-description: "Create, publish, and manage customer segments in Data 360 — standard, rapid, waterfall, and SQL-based segment types."
+description: "Create and manage audience segments in Data 360 — standard, Einstein, waterfall, nested, and rapid segment types."
+icon: "users"
 ---
 
 # Segmentation
 
-<Note>
-As of October 14, 2025, Data Cloud has been rebranded to **Data 360**. During this transition, you may see references to Data Cloud in our application and documentation.
-</Note>
+<Snippet file="/snippets/note-rebranding.mdx" />
 
-Segments group unified customer profiles based on attributes, behaviors, and calculated insights. Use segments to build targeted audiences for activation to marketing platforms, advertising networks, and downstream systems.
+Segments are groups of individuals or accounts that share common characteristics. They're the foundation for targeted marketing, personalized experiences, and audience activation in Data 360.
+
+## How Segmentation Works
+
+```mermaid
+flowchart LR
+    A[Unified Profiles] --> B[Segment Criteria]
+    B --> C[Segment]
+    C --> D[Activations]
+    C --> E[Analytics]
+    C --> F[Flows & Actions]
+```
+
+Segments operate on **unified profiles** — the consolidated customer records created by identity resolution. You define criteria based on profile attributes, engagement data, calculated insights, or other segment membership, and Data 360 evaluates which profiles qualify.
 
 ## Segment Types
 
-| Type | Creation Method | Refresh | Use Case |
-|------|----------------|---------|----------|
-| **Standard** | Visual builder or SQL | Scheduled (1+ hours) | Most segmentation needs |
-| **Rapid** | Visual builder | Near real-time (~minutes) | Time-sensitive audiences |
-| **Waterfall** | Visual builder | Scheduled | Campaign prioritization with mutual exclusion |
+| Type | Creation Method | Key Feature | Best For |
+|---|---|---|---|
+| **Standard** | Visual rule builder | Attribute-based filtering with AND/OR logic | Most segmentation use cases |
+| **Einstein** | Natural language prompt | AI-generated criteria from plain English descriptions | Non-technical users, rapid exploration |
+| **Waterfall** | Priority-ordered groups | Mutually exclusive — each profile lands in the first group they qualify for | Tiered campaigns (VIP → Standard → New) |
+| **Nested** | References other segments | Reuses existing segment criteria as building blocks | Complex multi-condition audiences |
+| **Rapid** | Same as standard, with accelerated refresh | Near real-time membership updates | Time-sensitive campaigns, triggered experiences |
 
 ### Standard Segments
 
-The most common segment type. Define criteria using the visual builder or SQL, and schedule automatic refreshes.
+The most common segment type. Use the visual builder to define criteria with drag-and-drop attribute selection and AND/OR logic.
 
-### Rapid Segments
+**Example:** Customers who made a purchase in the last 90 days AND have a lifetime value above $500 AND are subscribed to email communications.
 
-Rapid segments update in near real-time as data changes. Use them when audience freshness is critical (e.g., abandoned cart campaigns). Limited to **20 rapid segments per org**.
+### Einstein Segments
+
+Describe your target audience in plain English, and Einstein generates the segment criteria automatically.
+
+**Example prompt:** *"Customers who bought running shoes in the last 6 months but haven't purchased anything in the last 30 days"*
+
+Einstein translates this into the equivalent attribute-based criteria and creates a standard segment you can review, edit, and publish.
 
 ### Waterfall Segments
 
-Waterfall segments create mutually exclusive audience groups with priority ordering. A customer who qualifies for multiple segments is placed only in the highest-priority one. Ideal for:
+Waterfall segments divide your audience into **mutually exclusive, priority-ordered groups**. Each profile is evaluated against criteria in order and placed into the first group they match.
 
-- Campaign prioritization (loyalty offers > general promotions)
-- Budget allocation across audiences
-- Preventing audience overlap in advertising
+**Example:**
+1. **VIP** — Lifetime value > $5,000 → placed here first
+2. **High Value** — Lifetime value > $1,000 → only if not VIP
+3. **Standard** — All remaining customers → catch-all group
 
-## Creating Segments
+This prevents double-counting and is ideal for campaigns where each customer should receive only one treatment.
 
-### Visual Segment Creation
+### Nested Segments
 
-The visual builder uses a container-based interface for defining segment criteria without SQL:
+Nested segments reference other published segments as part of their criteria. This enables reuse of complex logic across multiple segments.
+
+**Example:** Create a base segment "Active Email Subscribers" and reference it inside other segments like "Active Email Subscribers in California" or "Active Email Subscribers with High LTV."
+
+### Rapid Segments
+
+Rapid segments use the same criteria as standard segments but with an **accelerated refresh schedule** for near real-time membership updates. Use these when segment membership needs to reflect data changes within minutes rather than on the standard refresh schedule.
+
+## Creating a Standard Segment
 
 <Steps>
   <Step title="Navigate to Segments">
-    Go to **Data 360 > Segments** and click **New Segment**.
+    In Data 360, go to the **Segments** tab and click **New Segment**.
   </Step>
-  <Step title="Select Segment Type">
-    Choose **Standard**, **Rapid**, or **Waterfall**.
+  <Step title="Choose Segment Type">
+    Select **Standard Segment** (or another type). Provide a name and description.
   </Step>
-  <Step title="Choose the Target Entity">
-    Select the DMO that represents your audience (typically **Unified Individual**).
+  <Step title="Define Criteria">
+    Use the visual builder to add conditions:
+    - Select an **attribute** from any DMO (e.g., `Individual.Age`, `Sales Order.GrandTotalAmount`)
+    - Choose an **operator** (equals, greater than, contains, between, is not blank, etc.)
+    - Set the **value** to filter on
+    - Combine conditions with **AND** (all must be true) or **OR** (any can be true)
   </Step>
-  <Step title="Add Containers">
-    Containers define groups of filter criteria. Each container applies to a specific DMO or related object.
-    - **Include container** — Customers matching these criteria are included
-    - **Exclude container** — Customers matching these criteria are excluded
+  <Step title="Add Related Attributes (Optional)">
+    Filter on attributes from related DMOs. For example, segment individuals based on their most recent order total, email engagement in the last 30 days, or calculated insight values.
   </Step>
-  <Step title="Define Attributes">
-    Within each container, add attribute filters:
-    - **Profile attributes** — Name, email, location, custom fields
-    - **Behavioral attributes** — Purchase history, page views, email engagement
-    - **Calculated insights** — LTV, engagement score, prediction scores
-    - **Segment membership** — Include/exclude members of other segments
-  </Step>
-  <Step title="Set Logic">
-    Configure container logic:
-    - **AND** — All conditions must be met
-    - **OR** — Any condition must be met
-    - Nest containers for complex logic
-  </Step>
-  <Step title="Preview">
-    Preview the estimated segment size before publishing.
+  <Step title="Preview & Publish">
+    Preview the estimated segment size. When satisfied, click **Publish** to activate the segment. Data 360 evaluates all unified profiles and populates the segment membership.
   </Step>
 </Steps>
 
-### Container-Based Filtering
+## Segment Criteria
 
-Containers group related filter criteria. They support:
+### Attribute Sources
 
-| Feature | Description |
-|---------|-------------|
-| **Nested containers** | Up to 10 levels of nesting for complex logic |
-| **Include/Exclude** | Include customers matching criteria or exclude them |
-| **Related objects** | Filter on related DMOs (e.g., "customers who purchased Product X") |
-| **Time-based** | Filter by date ranges (e.g., "purchased in the last 30 days") |
-| **Aggregate** | Filter by aggregated values (e.g., "ordered more than 3 times") |
-| **Exists/Not exists** | Check for existence of related records |
+Segment criteria can reference attributes from:
 
-### SQL-Based Segments
+| Source | Examples | Notes |
+|---|---|---|
+| **Profile DMOs** | Individual name, email, location, age | Direct attributes of the unified profile |
+| **Engagement DMOs** | Website visits, email opens, purchase history | Time-windowed (e.g., "in the last 30 days") |
+| **Calculated Insights** | Lifetime value, engagement score, churn risk | Pre-computed metrics on profiles |
+| **Other Segments** | "Members of Segment X" | Nested segment references |
 
-For complex criteria that exceed the visual builder's capabilities, use SQL:
+### Operators
 
-```sql
--- High-value customers who engaged recently but haven't purchased in 30 days
-SELECT ui.ssot__Id__c
-FROM UnifiedIndividual__dlm ui
-JOIN CustomerLTV__cio ltv
-    ON ui.ssot__Id__c = ltv.IndividualId
-JOIN ssot__WebsiteEngagement__dlm we
-    ON ui.ssot__Id__c = we.ssot__IndividualId__c
-WHERE ltv.LifetimeValue > 5000
-    AND we.ssot__EngagementDatetime__c > DATEADD(day, -7, CURRENT_DATE)
-    AND ui.ssot__Id__c NOT IN (
-        SELECT so.ssot__IndividualId__c
-        FROM ssot__SalesOrder__dlm so
-        WHERE so.ssot__OrderDate__c > DATEADD(day, -30, CURRENT_DATE)
-    )
+| Category | Operators |
+|---|---|
+| **Comparison** | Equals, Not Equals, Greater Than, Less Than, Between |
+| **String** | Contains, Starts With, Ends With, Is Blank, Is Not Blank |
+| **Date** | Before, After, Between, In Last N Days, In Next N Days |
+| **Set** | In, Not In |
+| **Existence** | Has Related (e.g., has at least one order), Does Not Have Related |
+
+## Segment Lifecycle
+
+```mermaid
+stateDiagram-v2
+    [*] --> Draft
+    Draft --> Publishing : Publish
+    Publishing --> Published : Processing complete
+    Published --> Paused : Pause
+    Paused --> Published : Resume
+    Published --> Published : Scheduled refresh
+    Draft --> [*] : Delete
+    Paused --> [*] : Delete
 ```
-
-See [SQL Segment Validation Rules](/apis/connect-api/sql-segment-rules) for SQL constraints and syntax rules.
-
-### Creating a Waterfall Segment
-
-<Steps>
-  <Step title="Create Waterfall Segment">
-    Click **New Segment** and select **Waterfall**.
-  </Step>
-  <Step title="Define Priority Tiers">
-    Add tiers in priority order (highest priority first):
-    1. **Tier 1**: VIP loyalty members → Exclusive offer
-    2. **Tier 2**: High spenders → Premium promotion
-    3. **Tier 3**: Everyone else → General campaign
-  </Step>
-  <Step title="Configure Tier Criteria">
-    Each tier uses the same container-based builder. A customer who qualifies for Tier 1 is excluded from all lower tiers.
-  </Step>
-  <Step title="Publish">
-    Publish the waterfall segment. Each tier becomes a separate activatable audience.
-  </Step>
-</Steps>
-
-## Publishing & Scheduling
-
-### Publishing a Segment
-
-After creating a segment, publish it to make it available for activation:
-
-1. Click **Publish** on the segment detail page
-2. The segment processes against unified profiles
-3. Processing time depends on data volume and segment complexity
-4. Check segment status: **Draft → Publishing → Active**
-
-### Scheduling Refreshes
-
-| Schedule | Use Case |
-|----------|----------|
-| **Every 1 hour** | Near-real-time audiences (use Rapid segments for faster) |
-| **Every 6 hours** | Active campaigns with moderate freshness needs |
-| **Daily** | Standard campaigns, reporting audiences |
-| **Weekly** | Stable audiences, analytics cohorts |
-
-### Segment Statuses
 
 | Status | Description |
-|--------|-------------|
-| **Draft** | Created but not yet published |
-| **Publishing** | Currently processing |
-| **Active** | Published and available for activation |
-| **Paused** | Temporarily disabled, not refreshing |
-| **Error** | Processing failed — check error details |
+|---|---|
+| **Draft** | Segment is created but not yet published. No membership is calculated. |
+| **Publishing** | Data 360 is evaluating all profiles against the criteria. May take minutes to hours depending on data volume. |
+| **Published** | Segment is active. Membership is calculated and refreshes on schedule. Available for activation. |
+| **Paused** | Segment exists but is not refreshing. Membership is frozen at the last refresh. |
 
-## Using Segments
+## Segment Refresh
 
-### Activation
+Published segments refresh on a schedule to incorporate new data, updated profiles, and changed attribute values.
 
-Activate segments to send audience data to external platforms:
-
-- **Advertising** — Google Ads, Meta, LinkedIn, TikTok
-- **Marketing** — Marketing Cloud, Pardot, HubSpot
-- **Cloud Storage** — Snowflake, S3, BigQuery, Azure
-- **CRM** — Create leads, update records via flows
-
-See [Activations API](/apis/connect-api/activations) for programmatic activation.
-
-### In Calculated Insights
-
-Use segment membership as a dimension in calculated insights:
-
-```sql
-SELECT
-    s.SegmentName,
-    COUNT(*) AS MemberCount,
-    AVG(ltv.LifetimeValue) AS AvgLTV
-FROM SegmentMembership__dlm s
-JOIN CustomerLTV__cio ltv ON s.IndividualId = ltv.IndividualId
-GROUP BY s.SegmentName
-```
-
-### In Data Cloud-Triggered Flows
-
-Trigger automation when segment membership changes — see [Flows & Automation](/developer-guide/flows-automation).
-
-## Segments API
-
-Manage segments programmatically via the Connect REST API:
-
-```bash
-# List all segments
-curl "https://{instance}.salesforce.com/services/data/v64.0/ssot/segments" \
-  -H "Authorization: Bearer {access_token}"
-
-# Get segment details
-curl "https://{instance}.salesforce.com/services/data/v64.0/ssot/segments/{segmentId}" \
-  -H "Authorization: Bearer {access_token}"
-```
-
-See [Segments API](/apis/connect-api/segments) for the complete API reference.
+| Refresh Type | Frequency | Use Case |
+|---|---|---|
+| **Standard** | Every 12–24 hours (configurable) | Most segments |
+| **Rapid** | Every few minutes | Time-sensitive campaigns, real-time personalization |
+| **On-demand** | Manual trigger | Ad-hoc analysis, pre-campaign validation |
 
 ## Best Practices
 
-<AccordionGroup>
-  <Accordion title="Segment Design">
-    - Start with broad segments and narrow down — it's easier to add criteria than to debug why an audience is empty
-    - Use calculated insights for complex criteria rather than deeply nested containers
-    - Name segments descriptively: `HighValue_RecentEngaged_NoRecentPurchase` not `Segment_v3_final`
-    - Document segment criteria and business purpose for team clarity
-  </Accordion>
-
-  <Accordion title="Performance">
-    - Use Rapid segments only when near real-time freshness is truly needed (limit: 20/org)
-    - Avoid overly complex SQL with multiple subqueries — they increase processing time
-    - Preview segment size before publishing to catch criteria errors early
-    - Schedule refreshes at appropriate intervals — not everything needs hourly updates
-  </Accordion>
-
-  <Accordion title="Waterfall Segments">
-    - Order tiers by business priority, not segment size
-    - Keep the number of tiers manageable (3–7 is typical)
-    - Review tier distributions after publishing — adjust criteria if one tier captures too many/few
-    - Use waterfall segments for campaigns with budget constraints to prevent audience overlap
-  </Accordion>
-</AccordionGroup>
+- **Name segments descriptively** — Use names that describe the audience, not the campaign (e.g., "High-Value West Coast Shoppers" not "Spring Campaign Segment 3")
+- **Start simple, then refine** — Begin with 1–2 criteria and check the estimated size. Add criteria incrementally to narrow the audience.
+- **Use calculated insights for behavioral criteria** — Rather than building complex engagement logic in segment criteria, create calculated insights (e.g., purchase frequency, last activity date) and segment on those
+- **Leverage nested segments** — Extract reusable criteria into base segments. This reduces duplication and makes updates easier across multiple campaigns.
+- **Monitor segment sizes** — Very large segments (>80% of your population) or very small segments (<100 members) may indicate overly broad or narrow criteria
+- **Pause unused segments** — Paused segments don't consume refresh resources. Pause segments that aren't actively used in activations or campaigns.
+- **Test with Einstein first** — Use Einstein Segment Creation to quickly explore audience ideas before building detailed standard segments
 
 ## Related Resources
 
-- [Segments API](/apis/connect-api/segments) — Programmatic segment management
-- [SQL Segment Rules](/apis/connect-api/sql-segment-rules) — SQL syntax and validation rules
-- [Activations API](/apis/connect-api/activations) — Activate segments to external platforms
-- [Calculated Insights](/apis/query-api/calculated-insights-api) — Create metrics for segmentation
-- Salesforce Help: [Create Segments in Data 360](https://help.salesforce.com/s/articleView?id=data.c360_a_segments.htm&type=5)
-- Salesforce Help: [Visual Segment Creation](https://help.salesforce.com/s/articleView?id=data.c360_a_create_segments_to_data_cloud.htm&type=5)
+- [Segments API](/apis/connect-api/segments) — Create and manage segments programmatically
+- [SQL Segment Rules](/apis/connect-api/sql-segment-rules) — Define segment criteria using SQL
+- [Segment Metadata](/apis/metadata-types/segments) — Deploy segment configurations via metadata
+- [Activations & Data Sharing](/developer-guide/activations-guide) — Send segments to external platforms
+- [Calculated Insights API](/apis/query-api/calculated-insights-api) — Create metrics for segmentation
+- Salesforce Help: [Create Segments](https://help.salesforce.com/s/articleView?id=data.c360_a_segments.htm&type=5)
 - Salesforce Help: [Segment Types and Statuses](https://help.salesforce.com/s/articleView?id=data.c360_a_segment_types_statuses.htm&type=5)
-- Salesforce Help: [Waterfall Segments](https://help.salesforce.com/s/articleView?id=sf.c360_a_create_a_waterfall_segment.htm&type=5)
+- Salesforce Help: [Einstein Segments](https://help.salesforce.com/s/articleView?id=data.c360_a_create_segment_einstein.htm&type=5)

@@ -1,38 +1,124 @@
 ---
 title: "Web SDK Overview"
-description: "The Data 360 module is an extension of the core Interactions SDK. It acts as the authenticated gateway that sends user activity and profile data from "
+description: "Capture website engagement data with the Salesforce Interactions SDK and send it to Data 360 for profile unification and activation."
+icon: "globe"
 ---
 
-# Data 360 Module of the Salesforce Interactions SDK
+# Salesforce Interactions Web SDK
 
-The Data 360 module is an extension of the core Interactions SDK. It acts as the authenticated gateway that sends user activity and profile data from your website to Data 360.
+The Data 360 module of the Salesforce Interactions SDK captures user activity and profile data from your website and sends it to Data 360 for identity resolution, segmentation, and activation.
 
-The Data 360 module performs two core functions:
+## Architecture
 
--   The module automatically converts the SDK's event structure into the specific, compatible format required by Data 360's ingestion pipelines.
--   It authenticates and delivers all events over HTTP to your designated Data 360 Web Connector.
+```mermaid
+flowchart LR
+    A[Website] --> B[Interactions SDK]
+    B --> C[Data 360 Module]
+    C --> D[Web Connector]
+    D --> E[Data 360 DLO]
+    E --> F[DMO Mapping]
+    F --> G[Unified Profiles]
+```
 
-This module is automatically included and configured with the instrumentation script provided when setting up a web connector in Data 360.
+The SDK consists of a **base SDK** (event capture, identity, consent) and **product-specific modules** (Data 360 and Marketing Cloud Personalization). The Data 360 module converts SDK events into the format required by Data 360's ingestion pipelines and delivers them via HTTP to your Web Connector.
 
-To ensure your data is correctly understood and mapped to the unified data model in Data 360, use the [recommended web connector schema](https://cdn.c360a.salesforce.com/cdp/schemas/254/web-connector-schema.json) when configuring your web connector.
+## Installation
 
-This schema contains standard mappings for common SDK event types:
+Add the SDK script to the `<head>` of your web pages. The script URL is provided when you configure a Web Connector in Data 360 Setup:
 
--   Engagement Events
+```html
+<head>
+  <script src="https://cdn.c360a.salesforce.com/beacon/YOUR_TENANT_ID/YOUR_CONNECTOR_ID/scripts/sfInteractions.js"></script>
+</head>
+```
 
-    -   Cart Interaction Mapping
-    -   Catalog Interaction Mapping
-    -   Order Interaction Mapping
-    -   Consent Event Mapping
--   Profile Events
+## Initialization
 
-    -   Contact Point Email Mapping
-    -   Contact Point Phone Mapping
-    -   Identity Mapping
-    -   Party Identification Mapping
+Initialize the SDK with your configuration before sending any events:
 
-**See Also**
+```javascript
+SalesforceInteractions.init({
+  cookieDomain: 'yourdomain.com',
+  consent: getConsentPromise(), // Promise that resolves with consent status
+}).then(() => {
+  console.log('SDK initialized');
+});
+```
 
--   [Translation of SDK Events to Web Connector Schemas](https://developer.salesforce.com/docs/data/salesforce-interactions-sdk/guide/c360a-api-translating-sdk-events-to-web-connector-schemas.html)
--   [Profile Event Routing](https://developer.salesforce.com/docs/atlas.en-us.c360a_api.meta/c360a_api/c360a_apit_profile_event_routing.htm)
--   [Custom Events](https://developer.salesforce.com/docs/atlas.en-us.c360a_api.meta/c360a_api/c360a_api_custom_events.htm)
+### Configuration Options
+
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `cookieDomain` | string | No | Domain for the first-party cookie. Set to share cookies across subdomains. |
+| `consent` | Promise | Yes | Must resolve with an array of `Consent` objects before data collection begins. |
+
+## Sending Events
+
+After initialization and consent, send engagement and profile events:
+
+```javascript
+// Track a page view
+SalesforceInteractions.sendEvent({
+  interaction: {
+    name: 'Page Viewed',
+    eventType: 'pageView'
+  }
+});
+
+// Track a product view (catalog interaction)
+SalesforceInteractions.sendEvent({
+  interaction: {
+    name: 'Product Viewed',
+    catalogObject: {
+      type: 'Product',
+      id: 'SKU-12345',
+      attributes: {
+        name: 'Running Shoes',
+        price: 129.99,
+        category: 'Footwear'
+      }
+    }
+  }
+});
+```
+
+## Web Connector Schema
+
+Use the [recommended web connector schema](https://cdn.c360a.salesforce.com/cdp/schemas/254/web-connector-schema.json) to ensure events map correctly to DMOs. It includes standard mappings for:
+
+**Engagement Events:**
+- Cart Interaction → Cart / Cart Product DMOs
+- Catalog Interaction → Website Engagement DMO
+- Order Interaction → Sales Order / Sales Order Product DMOs
+- Consent Event → Contact Point Consent DMO
+
+**Profile Events:**
+- Contact Point Email → Contact Point Email DMO
+- Contact Point Phone → Contact Point Phone DMO
+- Identity → Individual DMO
+- Party Identification → Party Identification DMO
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Event Specifications" icon="list" href="/sdks/web-sdk/events">
+    All event types and their payload schemas
+  </Card>
+  <Card title="Identity Management" icon="user" href="/sdks/web-sdk/identity">
+    Anonymous and named identity tracking
+  </Card>
+  <Card title="Consent API" icon="shield-check" href="/sdks/web-sdk/consent">
+    Privacy-first consent management
+  </Card>
+  <Card title="API Reference" icon="code" href="/sdks/web-sdk/api-reference">
+    Complete method reference and debugging
+  </Card>
+</CardGroup>
+
+## Related Resources
+
+- [Web SDK Setup](/integrations/web-sdk-setup) — Connector configuration in Data 360
+- [Mobile SDK](/sdks/mobile-sdk/index) — Native mobile app equivalent
+- Salesforce Docs: [Salesforce Interactions SDK](https://developer.salesforce.com/docs/data/salesforce-interactions-sdk/guide/c360a-api-salesforce-interactions-web-sdk.html)
+- Salesforce Docs: [Event to Schema Translation](https://developer.salesforce.com/docs/data/salesforce-interactions-sdk/guide/c360a-api-translating-sdk-events-to-web-connector-schemas.html)
+- Salesforce Docs: [Custom Events](https://developer.salesforce.com/docs/atlas.en-us.c360a_api.meta/c360a_api/c360a_api_custom_events.htm)

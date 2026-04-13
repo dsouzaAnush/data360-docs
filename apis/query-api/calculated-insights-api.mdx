@@ -1,6 +1,6 @@
 ---
 title: "Calculated Insights API"
-description: "Data 360 REST API Reference"
+description: "Query pre-computed metrics and aggregations from calculated insight objects."
 openapi: "GET /api/v1/insight/metadata"
 ---
 
@@ -18,16 +18,16 @@ The Calculated Insights API provides a powerful way to query and analyze data fr
 -   Pagination support via limit and offset parameters
 -   Comprehensive error handling with detailed response codes
 
--   [**GET /api/v1/insight/metadata**](/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-v1-insight-metadata.html)
+-   [**GET /api/v1/insight/metadata**](https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-v1-insight-metadata.html)
 
     -   Retrieves metadata for all available calculated insights
     -   Returns dimensions, measures, and relationships for each insight
--   [**GET /api/v1/insight/metadata/{ci-name}**](/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-insights-meta-ci-name.html)
+-   [**GET /api/v1/insight/metadata/{ci-name}**](https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-insights-meta-ci-name.html)
 
     -   Retrieves metadata for a specific calculated insight
     -   Returns detailed information about dimensions, measures, and relationships
 
--   [**GET /api/v1/insight/calculated-insights/{ci-name}**](/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-insights-ci-ci-name.html)
+-   [**GET /api/v1/insight/calculated-insights/{ci-name}**](https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-insights-ci-ci-name.html)
     -   Query a specific calculated insight with customizable parameters
     -   Supports filtering, sorting, pagination, and time-based aggregation
     -   Returns actual data values based on specified dimensions and measures

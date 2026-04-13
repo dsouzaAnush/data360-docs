@@ -1,6 +1,6 @@
 ---
 title: "Profile API"
-description: "Data 360 REST API Reference"
+description: "Retrieve unified customer profiles and computed insights by profile ID."
 openapi: "GET /api/v1/profile/metadata"
 ---
 
@@ -25,28 +25,28 @@ The Profile API provides a powerful way to query and analyze customer profile in
 -   No limit on the number of filters in a query
 -   Date/time fields must use the format: `YYYY-MM-DD HH:MM:SS`
 
--   [**GET /api/v1/profile/metadata**](/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-profile-meta.html)
+-   [**GET /api/v1/profile/metadata**](https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-profile-meta.html)
 
     -   Retrieves metadata for all profile data model objects
     -   Returns field definitions and categories
--   [**GET /api/v1/profile/metadata/{dataModelName}**](/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-profile-meta-dmname.html)
+-   [**GET /api/v1/profile/metadata/{dataModelName}**](https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-profile-meta-dmname.html)
 
     -   Retrieves metadata for a specific profile data model object
     -   Returns field definitions, data types, and available indexes
 
--   [**GET /api/v1/profile/{dataModelName}**](/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-profile-dmname.html)
+-   [**GET /api/v1/profile/{dataModelName}**](https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-profile-dmname.html)
 
     -   Queries profile data based on search filters
     -   Returns matching profile records
--   [**GET /api/v1/profile/{dataModelName}/{Id}**](/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-profile-dmname-id.html)
+-   [**GET /api/v1/profile/{dataModelName}/{Id}**](https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-profile-dmname-id.html)
 
     -   Retrieves specific profile records by ID
     -   Supports primary and secondary key lookups
--   [**GET /api/v1/profile/{dataModelName}/{Id}/{childDataModelName}**](/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-profile-dmname-id-child-dmname.html)
+-   [**GET /api/v1/profile/{dataModelName}/{Id}/{childDataModelName}**](https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-profile-dmname-id-child-dmname.html)
 
     -   Retrieves profile data with related child objects
     -   Supports hierarchical data access
--   [**GET /api/v1/profile/{dataModelName}/{Id}/calculated-insights/{ci-name}**](/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-profile-dmname-id-ci-ci-name.html)
+-   [**GET /api/v1/profile/{dataModelName}/{Id}/calculated-insights/{ci-name}**](https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-profile-dmname-id-ci-ci-name.html)
 
     -   Retrieves profile data with computed insights
     -   Returns calculated attributes and metrics

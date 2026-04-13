@@ -1,6 +1,6 @@
 ---
 title: "Data Graph API"
-description: "Data 360 REST API Reference"
+description: "Query pre-built hierarchical JSON views combining data from multiple related DMOs."
 openapi: "GET /api/v1/dataGraph/metadata"
 ---
 
@@ -14,16 +14,16 @@ A data graph combines and transforms normalized table data from data model objec
 -   Users must have appropriate roles and permissions assigned
 -   Authentication requires a valid access token
 
--   [**GET /api/v1/dataGraph/metadata**](/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-v1-data-graphs-metadata.html)
+-   [**GET /api/v1/dataGraph/metadata**](https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-v1-data-graphs-metadata.html)
     -   Retrieves metadata for all accessible data graph objects
     -   Returns primary data model objects, related objects, and their fields
     -   Supports filtering by specific data graph name
 
--   [**GET /api/v1/dataGraph/{dataGraphEntityName}/{id}**](/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-v1-data-graphs-name-id.html)
+-   [**GET /api/v1/dataGraph/{dataGraphEntityName}/{id}**](https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-v1-data-graphs-name-id.html)
 
     -   Retrieves specific records from a data graph by their unique identifier
     -   Returns complete record data including all related fields
--   [**GET /api/v1/dataGraph/{dataGraphEntityName}?lookupKeys=\[\]**](/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-v1-data-graphs-lookup.html)
+-   [**GET /api/v1/dataGraph/{dataGraphEntityName}?lookupKeys=\[\]**](https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-v1-data-graphs-lookup.html)
 
     -   Queries data using lookup keys from primary or participating data model objects
     -   Supports flexible data retrieval based on various key fields
@@ -31,4 +31,4 @@ A data graph combines and transforms normalized table data from data model objec
 -   [_Salesforce Help_: Data Graphs](https://help.salesforce.com/s/articleView?id=data.c360_a_data_graphs.htm&type=5)
 -   [User Roles and Permission Sets in Data 360](https://help.salesforce.com/s/articleView?id=data.c360_a_userpermissions.htm&type=5)
 -   [Getting Started with Data Cloud API](https://developer.salesforce.com/docs/data/data-cloud-ref/guide/c360a-getting-started-with-cdp.html)
--   [Retrieve Metadata](/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-metadata-api.html)
+-   [Retrieve Metadata](https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-metadata-api.html)

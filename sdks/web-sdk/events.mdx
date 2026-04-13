@@ -1,40 +1,190 @@
 ---
 title: "Event Specifications"
-description: "Event specifications for Salesforce Interactions SDK."
+description: "Event types, payload schemas, and data structures for the Salesforce Interactions Web SDK."
 ---
 
 # Event Specifications
 
-Event specifications for Salesforce Interactions SDK.
+The Salesforce Interactions SDK supports several event types for capturing customer engagement on your website. Each event has a defined structure that maps to Data 360 DMOs through the Web Connector schema.
 
-[**Event Structure**](/docs/data/salesforce-interactions-sdk/guide/c360a-api-event-structure.html)
+## Event Structure
 
-An event collected by Salesforce Interactions Web SDK contains properties that are automatically set by the system and optional properties that are set by you.
+Every event contains system-set properties and optional custom properties:
 
-[**Cart Interaction**](/docs/data/salesforce-interactions-sdk/guide/c360a-api-cart-interaction.html)
+```javascript
+SalesforceInteractions.sendEvent({
+  interaction: {
+    name: 'Event Name',          // Required: descriptive name
+    eventType: 'eventType',      // Optional: categorization
+    // ... event-specific properties
+  },
+  user: { /* optional user data */ },
+  account: { /* optional account data */ }
+});
+```
 
-A cart interaction is where a customer modifies the contents of their online shopping cart.
+| Property | Type | Auto-Set | Description |
+|----------|------|----------|-------------|
+| `interaction.name` | string | No | Descriptive event name |
+| `interaction.eventType` | string | No | Event categorization |
+| `timestamp` | datetime | Yes | Event time (auto-generated) |
+| `anonymousId` | string | Yes | First-party cookie ID |
+| `pageUrl` | string | Yes | Current page URL |
+| `referrerUrl` | string | Yes | Referring page URL |
 
-[**Catalog Interaction**](/docs/data/salesforce-interactions-sdk/guide/c360a-api-catalog-interaction.html)
+## Cart Interaction
 
-Use a catalog interaction to capture when a customer interacts with various tracking items. For example, a product or a blog post.
+Captures when a customer modifies their shopping cart — add, remove, or update items.
 
-[**Order Interaction**](/docs/data/salesforce-interactions-sdk/guide/c360a-api-order-interaction.html)
+```javascript
+SalesforceInteractions.sendEvent({
+  interaction: {
+    name: 'Add to Cart',
+    lineItem: {
+      catalogObjectType: 'Product',
+      catalogObjectId: 'SKU-12345',
+      quantity: 2,
+      price: 129.99,
+      currency: 'USD'
+    }
+  }
+});
+```
 
-An order interaction is an ecommerce event that captures actions performed by a user to manage new, in progress, or completed orders.
+### Line Item Properties
 
-[**Line Item Data**](/docs/data/salesforce-interactions-sdk/guide/c360a-api-line-item-data.html)
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `catalogObjectType` | string | Yes | Object type (e.g., "Product") |
+| `catalogObjectId` | string | Yes | Unique product identifier |
+| `quantity` | number | Yes | Number of items |
+| `price` | number | No | Unit price |
+| `currency` | string | No | ISO 4217 currency code |
 
-Line items are intended to describe purchasable items and are used in cart and order interactions.
+**Maps to:** Cart DMO, Cart Product DMO
 
-[**User Data**](/docs/data/salesforce-interactions-sdk/guide/c360a-api-user-data.html)
+## Catalog Interaction
 
-Track profile data for a user with or without an associated interaction using Salesforce Interactions Web SDK.
+Captures when a customer views or interacts with catalog items — product pages, blog posts, search results.
 
-[**Account Data**](/docs/data/salesforce-interactions-sdk/guide/c360a-api-account-data.html)
+```javascript
+SalesforceInteractions.sendEvent({
+  interaction: {
+    name: 'Product Viewed',
+    catalogObject: {
+      type: 'Product',
+      id: 'SKU-12345',
+      attributes: {
+        name: 'Running Shoes',
+        price: 129.99,
+        category: ['Footwear', 'Athletic'],
+        brand: 'Northern Trail',
+        imageUrl: 'https://example.com/shoes.jpg'
+      }
+    }
+  }
+});
+```
 
-Account data represent user information at the account level. The account fields allow you to capture data for many customers in one account.
+**Maps to:** Website Engagement DMO
 
-[**Consent Data**](/docs/data/salesforce-interactions-sdk/guide/c360a-api-consent-data.html)
+## Order Interaction
 
-Consent data is used to either grant or revoke consent in Salesforce Interactions SDK. When a customer chooses to opt in to tracking these consent details are attached to the Event Structure of the first tracked event.
+Captures ecommerce order events — purchase completion, order status changes.
+
+```javascript
+SalesforceInteractions.sendEvent({
+  interaction: {
+    name: 'Order Completed',
+    order: {
+      id: 'ORD-67890',
+      totalValue: 259.98,
+      currency: 'USD',
+      lineItems: [
+        {
+          catalogObjectType: 'Product',
+          catalogObjectId: 'SKU-12345',
+          quantity: 2,
+          price: 129.99
+        }
+      ]
+    }
+  }
+});
+```
+
+**Maps to:** Sales Order DMO, Sales Order Product DMO
+
+## User Data
+
+Send profile data for a known or anonymous user, with or without an associated interaction:
+
+```javascript
+SalesforceInteractions.sendEvent({
+  user: {
+    identities: {
+      emailAddress: 'jane@example.com',
+      customerId: 'CUST-001'
+    },
+    attributes: {
+      firstName: 'Jane',
+      lastName: 'Doe',
+      loyaltyTier: 'Gold'
+    }
+  }
+});
+```
+
+**Maps to:** Individual DMO, Contact Point Email DMO
+
+## Account Data
+
+Capture account-level data for B2B scenarios:
+
+```javascript
+SalesforceInteractions.sendEvent({
+  account: {
+    id: 'ACCT-001',
+    attributes: {
+      name: 'Acme Corp',
+      industry: 'Technology',
+      employeeCount: 500
+    }
+  }
+});
+```
+
+**Maps to:** Account DMO
+
+## Consent Data
+
+See [Consent API](/sdks/web-sdk/consent) for the full consent event specification.
+
+## Custom Events
+
+For events that don't fit standard types, use custom events:
+
+```javascript
+SalesforceInteractions.sendEvent({
+  interaction: {
+    name: 'Survey Completed',
+    eventType: 'custom',
+    attributes: {
+      surveyId: 'SURV-001',
+      score: 9,
+      category: 'NPS'
+    }
+  }
+});
+```
+
+Custom events require a matching custom schema in your Web Connector configuration.
+
+## Related Resources
+
+- [Web SDK Overview](/sdks/web-sdk/index) — SDK setup and architecture
+- [Identity Management](/sdks/web-sdk/identity) — User identification
+- Salesforce Docs: [Event Structure](https://developer.salesforce.com/docs/data/salesforce-interactions-sdk/guide/c360a-api-event-structure.html)
+- Salesforce Docs: [Cart Interaction](https://developer.salesforce.com/docs/data/salesforce-interactions-sdk/guide/c360a-api-cart-interaction.html)
+- Salesforce Docs: [Catalog Interaction](https://developer.salesforce.com/docs/data/salesforce-interactions-sdk/guide/c360a-api-catalog-interaction.html)
+- Salesforce Docs: [Order Interaction](https://developer.salesforce.com/docs/data/salesforce-interactions-sdk/guide/c360a-api-order-interaction.html)

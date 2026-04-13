@@ -29,37 +29,38 @@
             "pages": [
               "index",
               "getting-started/introduction",
-              "getting-started/setup",
               "getting-started/quickstart",
-              "getting-started/architecture"
+              "getting-started/architecture",
+              "getting-started/setup",
+              "getting-started/data-strategy"
             ]
           },
           {
             "group": "Developer Guide",
             "pages": [
               "developer-guide/index",
-              "developer-guide/quick-start",
               "developer-guide/use-cases",
-              "developer-guide/architecture",
               "developer-guide/platform-comparison",
               "developer-guide/postman-collection"
             ]
           },
           {
-            "group": "Platform Features",
+            "group": "Platform Guides",
             "pages": [
-              "developer-guide/data-strategy",
-              "developer-guide/data-mapping",
-              "developer-guide/segmentation",
+              "developer-guide/data-ingestion-guide",
+              "developer-guide/data-modeling",
               "developer-guide/data-transforms",
-              "developer-guide/data-actions",
-              "developer-guide/flows-automation",
-              "developer-guide/platform-events",
+              "developer-guide/identity-resolution-guide",
+              "developer-guide/segmentation",
+              "developer-guide/activations-guide",
+              "developer-guide/analytics-reporting",
               "developer-guide/ai-ml-integration",
               "developer-guide/unstructured-data-rag",
               "developer-guide/profile-data-explorer",
-              "developer-guide/tableau-analytics",
-              "developer-guide/reports-dashboards"
+              "developer-guide/data-actions",
+              "developer-guide/flows-automation",
+              "developer-guide/platform-events",
+              "developer-guide/tableau-analytics"
             ]
           },
           {
@@ -261,6 +262,12 @@
       "cursor",
       "vscode"
     ]
+  },
+  "seo": {
+    "metatags": {
+      "og:site_name": "Salesforce Data 360 Developer Docs",
+      "og:type": "website"
+    }
   },
   "footer": {
     "socials": {

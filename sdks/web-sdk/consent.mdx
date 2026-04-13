@@ -1,31 +1,158 @@
 ---
 title: "Consent API"
-description: "The Salesforce Interactions SDK is designed to fully respect user privacy and doesn’t store or transmit any collected data until it has been granted e"
+description: "Privacy-first consent management with the Salesforce Interactions SDK — initialization, real-time updates, and integration with consent management platforms."
 ---
 
-# Consent
+# Consent Management
 
-The Salesforce Interactions SDK is designed to fully respect user privacy and doesn’t store or transmit any collected data until it has been granted explicit consent. If your site has existing consent management features, you must integrate them with the SDK to signal the user's consent status.
+The Salesforce Interactions SDK is built with privacy-first design. It **does not store or transmit any data** until explicit consent is granted. If your site has a consent management platform (CMP), integrate it with the SDK to signal consent status.
 
-The SDK waits for a valid `Opt In` signal before beginning data collection.
+## How Consent Works
 
-There are two primary ways to provide or update the user's consent status in the SDK:
+```mermaid
+flowchart LR
+    A[SDK Loaded] --> B{Consent granted?}
+    B -->|No| C[SDK idle - no data collected]
+    B -->|Yes| D[Data collection begins]
+    D --> E{Consent revoked?}
+    E -->|Yes| C
+    E -->|No| D
+```
 
--   During [Initialization](/docs/data/salesforce-interactions-sdk/guide/c360a-api-initialization.html) for first load
--   Using `updateConsents()` for real-time changes
+## Providing Consent at Initialization
 
-The recommended approach is to provide a JavaScript `Promise` for the `consent` object within the `SalesforceInteractions.init()` configuration. The SDK waits for the `Promise` to resolve before it starts collecting data. The `Promise` must resolve with an array of consent data objects, as shown in this example.
+The recommended approach is to provide a `Promise` for the `consent` option in `init()`. The SDK waits for the promise to resolve before collecting data:
 
-Use the `getConsents()` method to retrieve the current consent state. This method returns the currently stored consent statuses along with metadata about when the status was last updated and when it was last included in a transmitted event.
+```javascript
+function getConsentPromise() {
+  return new Promise((resolve) => {
+    // Integrate with your CMP (e.g., OneTrust, Cookiebot)
+    yourCMP.onConsentReady((status) => {
+      resolve([
+        {
+          provider: 'yourCMP',
+          purpose: 'Analytics',
+          status: status.analytics ? 'OptIn' : 'OptOut'
+        },
+        {
+          provider: 'yourCMP',
+          purpose: 'Marketing',
+          status: status.marketing ? 'OptIn' : 'OptOut'
+        }
+      ]);
+    });
+  });
+}
 
-The syntax for this method is `getConsents(): ConsentWithMetadata[]`.
+SalesforceInteractions.init({
+  consent: getConsentPromise()
+});
+```
 
-Here's an example of using the `getConsents()` method.
+### Consent Object Structure
 
-For details on the structure of the `Consent` and `ConsentWithMetadata` objects, see [Consent Data](/docs/data/salesforce-interactions-sdk/guide/c360a-api-consent-data.html).
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `provider` | string | Yes | Name of the consent management provider |
+| `purpose` | string | Yes | Consent purpose category (e.g., "Analytics", "Marketing") |
+| `status` | string | Yes | `"OptIn"` or `"OptOut"` |
 
-Use the `updateConsents()` method to update a user's consent status at any time after the initial SDK configuration. For example, when a user changes their consent preferences mid-session.
+## Updating Consent at Runtime
 
-The syntax for updating consent using this method is `SalesforceInteractions.updateConsents(consents: Consent | Consent[]): void`. The `updateConsents` method accepts either a single `Consent` object or an array of `Consent` objects and does not return a value.
+When a user changes their consent preferences mid-session:
 
-Here's an example of calling the `updateConsents()` method directly from a third-party consent management provider's event handler.
+```javascript
+// Update a single consent
+SalesforceInteractions.updateConsents({
+  provider: 'yourCMP',
+  purpose: 'Marketing',
+  status: 'OptOut'
+});
+
+// Update multiple consents
+SalesforceInteractions.updateConsents([
+  { provider: 'yourCMP', purpose: 'Analytics', status: 'OptIn' },
+  { provider: 'yourCMP', purpose: 'Marketing', status: 'OptOut' }
+]);
+```
+
+When consent is revoked (`OptOut`), the SDK **immediately stops** collecting and transmitting events.
+
+## Reading Current Consent State
+
+```javascript
+const consents = SalesforceInteractions.getConsents();
+// Returns: ConsentWithMetadata[]
+
+consents.forEach((c) => {
+  console.log(`${c.purpose}: ${c.status}`);
+  console.log(`  Last updated: ${c.lastUpdated}`);
+  console.log(`  Last sent: ${c.lastSentInEvent}`);
+});
+```
+
+### ConsentWithMetadata Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `provider` | string | CMP name |
+| `purpose` | string | Consent purpose |
+| `status` | string | Current status (`OptIn` / `OptOut`) |
+| `lastUpdated` | datetime | When the status was last changed |
+| `lastSentInEvent` | datetime | When this status was last included in a transmitted event |
+
+## Consent API Methods
+
+| Method | Signature | Description |
+|--------|-----------|-------------|
+| `init({ consent })` | `consent: Promise<Consent[]>` | Provide initial consent at SDK startup |
+| `updateConsents()` | `(consents: Consent \| Consent[]): void` | Update consent status at any time |
+| `getConsents()` | `(): ConsentWithMetadata[]` | Read current consent state |
+
+## CMP Integration Patterns
+
+### OneTrust
+
+```javascript
+SalesforceInteractions.init({
+  consent: new Promise((resolve) => {
+    window.OneTrust?.OnConsentChanged(() => {
+      const groups = window.OnetrustActiveGroups || '';
+      resolve([
+        { provider: 'OneTrust', purpose: 'Analytics', status: groups.includes('C0002') ? 'OptIn' : 'OptOut' },
+        { provider: 'OneTrust', purpose: 'Marketing', status: groups.includes('C0004') ? 'OptIn' : 'OptOut' }
+      ]);
+    });
+  })
+});
+```
+
+### Cookiebot
+
+```javascript
+SalesforceInteractions.init({
+  consent: new Promise((resolve) => {
+    window.addEventListener('CookiebotOnAccept', () => {
+      resolve([
+        { provider: 'Cookiebot', purpose: 'Analytics', status: Cookiebot.consent.statistics ? 'OptIn' : 'OptOut' },
+        { provider: 'Cookiebot', purpose: 'Marketing', status: Cookiebot.consent.marketing ? 'OptIn' : 'OptOut' }
+      ]);
+    });
+  })
+});
+```
+
+## GDPR / CCPA Compliance
+
+- The SDK collects **no data** before consent — fully GDPR-compliant by default
+- Consent revocation is **immediate** — no delay in stopping data collection
+- Consent events are sent to Data 360 and map to the **Contact Point Consent** DMO
+- Use [Consent & Governance](/developer-guide/consent-governance) for platform-wide consent management
+
+## Related Resources
+
+- [Web SDK Overview](/sdks/web-sdk/index) — SDK architecture and setup
+- [Identity Management](/sdks/web-sdk/identity) — Identity depends on consent
+- [Consent & Governance](/developer-guide/consent-governance) — Platform-wide consent framework
+- Salesforce Docs: [Consent](https://developer.salesforce.com/docs/data/salesforce-interactions-sdk/guide/c360a-api-consent.html)
+- Salesforce Docs: [Consent Data](https://developer.salesforce.com/docs/data/salesforce-interactions-sdk/guide/c360a-api-consent-data.html)

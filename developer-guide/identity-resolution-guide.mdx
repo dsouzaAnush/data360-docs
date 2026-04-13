@@ -1,0 +1,176 @@
+---
+title: "Identity Resolution"
+description: "Understand how Data 360 matches, groups, and reconciles customer records from multiple sources into unified profiles."
+icon: "fingerprint"
+sidebarTitle: "Identity Resolution"
+---
+
+# Identity Resolution
+
+<Snippet file="/snippets/note-rebranding.mdx" />
+
+Identity resolution is the process of matching and merging customer records from multiple data sources into a single, unified profile. When the same customer appears in your CRM, ecommerce platform, and marketing tools — often with different data formats or slight variations — identity resolution links those records together.
+
+## How Identity Resolution Works
+
+Identity resolution follows a three-step process — **Match → Group → Reconcile**:
+
+| Step | What Happens | Output |
+|---|---|---|
+| **Match** | Apply match rules to compare records across sources and find potential duplicates | Match candidates (pairs of records that may be the same person) |
+| **Group** | Cluster matched records into groups representing the same individual or account | Match groups (clusters of related records) |
+| **Reconcile** | Apply reconciliation rules to select the best value for each field from across the group | Unified profile with golden record values |
+
+## Match Rule Types
+
+Match rules define how Data 360 compares records. You can combine multiple match rules in a ruleset, and each rule can use a different match type.
+
+| Match Type | How It Works | Precision | Example |
+|---|---|---|---|
+| **Exact** | Field values must be identical (case-sensitive) | Highest | `john@acme.com` = `john@acme.com` |
+| **Normalized** | Values are cleaned before comparison (trim whitespace, lowercase, remove special characters) | High | `John@ACME.com` = `john@acme.com` |
+| **Fuzzy** | Probabilistic algorithms assess similarity, allowing minor differences | Medium | `Jon Smith` ≈ `John Smith` |
+| **Phonetic** | Compares how names sound rather than how they're spelled | Medium | `Steven` ≈ `Stephen` |
+
+### Match Rule Fields
+
+Common fields used for matching:
+
+| Field | Match Type | Confidence | Notes |
+|---|---|---|---|
+| **Email** | Exact or Normalized | Very high | Best single-field match rule. Normalize to lowercase + trim. |
+| **Phone** | Exact or Normalized | High | Normalize to E.164 format. Watch for shared family/business phones. |
+| **Full Name + Postal Code** | Fuzzy + Exact | Medium–High | Useful when email/phone are unavailable |
+| **First Name + Last Name + Date of Birth** | Fuzzy + Exact | Medium–High | Good for B2C scenarios |
+| **External ID** | Exact | Very high | Loyalty IDs, CRM IDs, or other system-specific identifiers |
+
+## Setting Up Identity Resolution
+
+<Steps>
+  <Step title="Navigate to Identity Resolution">
+    In Data 360, go to the **Identity Resolution** tab and click **New Ruleset**.
+  </Step>
+  <Step title="Choose Unification Entity">
+    Select whether to unify **Individuals** (B2C) or **Accounts** (B2B). You can create separate rulesets for each.
+  </Step>
+  <Step title="Configure Match Rules">
+    Add one or more match rules. For each rule, select:
+    - The **source DMO fields** to compare
+    - The **match type** (Exact, Normalized, Fuzzy, or Phonetic)
+    - The **match criteria** (which fields must match)
+  </Step>
+  <Step title="Set Reconciliation Rules">
+    Define how conflicting field values are resolved when multiple source records have different values for the same field (see Reconciliation Rules below).
+  </Step>
+  <Step title="Run the Identity Resolution Job">
+    Save and run the ruleset. The job processes all records and creates unified profiles. Monitor progress in the job history.
+  </Step>
+  <Step title="Review Results">
+    Check the resolution summary for match rates, cluster sizes, and potential issues. Use Profile Explorer to inspect individual unified profiles.
+  </Step>
+</Steps>
+
+## Reconciliation (Survivorship) Rules
+
+When multiple source records have different values for the same field, reconciliation rules determine which value "wins" and appears on the unified profile.
+
+| Rule | How It Works | Best For |
+|---|---|---|
+| **Most Recent** | The value from the most recently updated record wins | Fields that change over time (address, phone, job title) |
+| **Most Frequent** | The value that appears most often across sources wins | Fields where consensus matters (name spelling) |
+| **Source Priority** | Values from a designated source always win | Fields where one source is authoritative (e.g., CRM for account info, billing for address) |
+| **Manual Override** | Admin-specified values take precedence | Fields requiring human review or regulatory compliance |
+
+### Example: Multi-Source Reconciliation
+
+A customer exists in three systems:
+
+| Field | CRM (Source Priority: 1) | Ecommerce (Priority: 2) | Marketing (Priority: 3) |
+|---|---|---|---|
+| First Name | Jonathan | Jon | Jonathan |
+| Email | jon@example.com | jon@example.com | jonathan@example.com |
+| Phone | +1-415-555-1234 | (empty) | +1-415-555-1234 |
+| Address | 123 Main St, SF | 456 Oak Ave, SF | 123 Main St, SF |
+
+With **Source Priority** reconciliation (CRM as highest priority), the unified profile uses:
+- First Name: **Jonathan** (from CRM)
+- Email: **jon@example.com** (from CRM)
+- Phone: **+1-415-555-1234** (from CRM)
+- Address: **123 Main St, SF** (from CRM)
+
+## Unification Types
+
+| Type | Use Case | What Gets Unified |
+|---|---|---|
+| **Individual Unification** | B2C scenarios | Person records across all sources → Unified Individual |
+| **Account Unification** | B2B scenarios | Organization records across all sources → Unified Account |
+| **Both** | B2B2C or complex models | Individuals and accounts unified independently, linked via relationships |
+
+## Monitoring Identity Resolution
+
+### Resolution Summary
+
+After each identity resolution job, review the summary for:
+
+| Metric | What to Check |
+|---|---|
+| **Total source profiles** | Number of input records processed |
+| **Unique individuals/accounts** | Number of unified profiles created |
+| **Match rate** | Percentage of records that matched with at least one other record |
+| **Average cluster size** | Average number of source records per unified profile |
+| **Largest cluster** | The unified profile with the most source records (watch for over-merging) |
+
+### Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Over-merging: Too many records in one profile">
+    **Symptoms:** Cluster sizes are abnormally large (50+ records). Unrelated people are merged into the same profile.
+
+    **Common causes:**
+    - Matching on a field with low uniqueness (e.g., first name only)
+    - Matching on shared contact points (family email, company phone)
+    - Fuzzy matching threshold too loose
+
+    **Fix:** Tighten match rules. Add additional match criteria (e.g., require email AND name match). Remove overly broad fuzzy rules. Review and exclude shared identifiers.
+  </Accordion>
+
+  <Accordion title="Under-merging: Same person has multiple profiles">
+    **Symptoms:** Known duplicate customers still appear as separate unified profiles. Match rate is lower than expected.
+
+    **Common causes:**
+    - Match rules are too strict (exact only, no normalization)
+    - Source data has inconsistent formatting (mixed case, extra whitespace)
+    - Missing match fields in source data
+
+    **Fix:** Add normalized and fuzzy match rules. Apply data transforms to clean source data before identity resolution. Ensure contact points are properly mapped in all sources.
+  </Accordion>
+
+  <Accordion title="Job failures or slow performance">
+    **Symptoms:** Identity resolution jobs fail or take hours to complete.
+
+    **Common causes:**
+    - Very large data volumes without proper indexing
+    - Too many complex fuzzy rules running simultaneously
+    - Insufficient org resources
+
+    **Fix:** Start with exact/normalized rules and add fuzzy rules incrementally. Process data in stages. Contact Salesforce support for resource allocation issues.
+  </Accordion>
+</AccordionGroup>
+
+## Best Practices
+
+- **Start strict, then loosen** — Begin with high-confidence exact match rules (email, phone). Add fuzzy and phonetic rules only after validating the initial results.
+- **Normalize before matching** — Use inline formulas or streaming transforms to standardize data formats (lowercase emails, E.164 phones, trim whitespace) before identity resolution runs.
+- **Spot-check results** — After each run, manually review 20-30 unified profiles in Profile Explorer. Look for both over-merged and under-merged cases.
+- **Monitor cluster sizes** — Set up alerts for unusually large clusters. A cluster of 100+ records almost always indicates over-merging.
+- **Use source priority for authoritative fields** — If your CRM is the source of truth for customer names and your billing system is authoritative for addresses, configure source priority accordingly.
+
+## Related Resources
+
+- [Identity Resolution Best Practices](/developer-guide/identity-resolution-best-practices) — Strategic guidance on designing match rules
+- [Identity Resolution API](/apis/connect-api/identity-resolution) — Manage rulesets and jobs programmatically
+- [Identity Resolution Metadata](/apis/metadata-types/identity-resolution) — Deploy identity resolution configurations
+- [Profile & Data Explorer](/developer-guide/profile-data-explorer) — Inspect unified profiles and match results
+- Salesforce Help: [Identity Resolution](https://help.salesforce.com/s/articleView?id=data.c360_a_identity_resolution.htm&type=5)
+- Salesforce Help: [Match Rules](https://help.salesforce.com/s/articleView?id=sf.c360_a_match_rules.htm&type=5)
+- Salesforce Developer Blog: [Building a Complete View with Identity Resolution](https://developer.salesforce.com/blogs/2024/10/data-cloud-and-identity-resolution)
