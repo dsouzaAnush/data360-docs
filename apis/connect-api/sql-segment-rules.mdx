@@ -25,7 +25,7 @@ SQL-based segments use the `sql` property in segment definitions. The SQL must s
 
 The SELECT clause must contain **only the primary key** of the target Data Model Object (DMO):
 
-<CodeGroup>
+<RequestExample>
 ```sql valid_primary_key.sql icon=check highlight={1}
 SELECT Id__c
 FROM UnifiedIndividual__dlm
@@ -37,7 +37,7 @@ WHERE LifetimeValue__c > 1000
 SELECT Id__c, FirstName__c, Email__c
 FROM UnifiedIndividual__dlm
 ```
-</CodeGroup>
+</RequestExample>
 
 ### No Aggregation Functions
 
@@ -102,7 +102,7 @@ The key and qualifiers must also be included in the GROUP BY clause when present
 
 All columns in JOIN queries must include the table name or alias:
 
-<CodeGroup>
+<RequestExample>
 ```sql valid_qualified.sql icon=check highlight={1,4}
 SELECT ui.Id__c
 FROM UnifiedIndividual__dlm ui
@@ -116,7 +116,7 @@ SELECT Id__c
 FROM UnifiedIndividual__dlm ui
 JOIN UnifiedContactPointEmail__dlm cpe ON Id__c = PartyId__c
 ```
-</CodeGroup>
+</RequestExample>
 
 ### Relationship Requirements
 
@@ -138,7 +138,7 @@ WHERE cpe.IsPrimary__c = true
 
 The first table in the FROM clause must be a **profile DMO**:
 
-<CodeGroup>
+<RequestExample>
 ```sql valid_profile_first.sql icon=check highlight={2}
 SELECT ui.Id__c
 FROM UnifiedIndividual__dlm ui  -- Profile DMO first
@@ -150,7 +150,7 @@ JOIN SalesData__dlm sd ON ui.Id__c = sd.CustomerId__c
 FROM SalesData__dlm sd  -- Not a profile DMO
 JOIN UnifiedIndividual__dlm ui ON sd.CustomerId__c = ui.Id__c
 ```
-</CodeGroup>
+</RequestExample>
 
 ## Subquery Rules
 
@@ -158,7 +158,7 @@ JOIN UnifiedIndividual__dlm ui ON sd.CustomerId__c = ui.Id__c
 
 Subqueries are only allowed in the WHERE clause:
 
-<CodeGroup>
+<RequestExample>
 ```sql valid_subquery_where.sql icon=check highlight={3-7}
 SELECT Id__c
 FROM UnifiedIndividual__dlm
@@ -174,13 +174,13 @@ WHERE Id__c IN (
 SELECT (SELECT COUNT(*) FROM Orders__dlm WHERE CustomerId__c = ui.Id__c)
 FROM UnifiedIndividual__dlm ui
 ```
-</CodeGroup>
+</RequestExample>
 
 ### Single Column Output
 
 Subqueries must return a single column:
 
-<CodeGroup>
+<RequestExample>
 ```sql valid_single_column.sql icon=check highlight={2}
 -- Valid: Single column in subquery
 WHERE Id__c IN (SELECT PartyId__c FROM UnifiedContactPointEmail__dlm)
@@ -190,7 +190,7 @@ WHERE Id__c IN (SELECT PartyId__c FROM UnifiedContactPointEmail__dlm)
 -- INVALID: Multiple columns in subquery
 WHERE (Id__c, Region__c) IN (SELECT PartyId__c, Region__c FROM ...)
 ```
-</CodeGroup>
+</RequestExample>
 
 ## Data Type Rules
 
@@ -198,7 +198,7 @@ WHERE (Id__c, Region__c) IN (SELECT PartyId__c, Region__c FROM ...)
 
 Column data types must match in comparisons:
 
-<CodeGroup>
+<RequestExample>
 ```sql valid_type_matching.sql icon=check highlight={2-4}
 -- Valid: Matching data types
 WHERE Age__c > 25                          -- Numeric comparison
@@ -210,7 +210,7 @@ WHERE CreatedDate__c > '2024-01-01'        -- Date comparison
 -- INVALID: Type mismatch
 WHERE Age__c = 'twenty-five'  -- Number compared to string
 ```
-</CodeGroup>
+</RequestExample>
 
 ## Supported Clauses
 
@@ -241,7 +241,7 @@ The following are **not allowed** in segment SQL:
 
 Only DMO table aliases are permitted. Column aliases are not allowed:
 
-<CodeGroup>
+<RequestExample>
 ```sql valid_table_alias.sql icon=check highlight={2-3}
 SELECT ui.Id__c
 FROM UnifiedIndividual__dlm ui
@@ -253,7 +253,7 @@ WHERE ui.IsActive__c = true
 SELECT ui.Id__c AS ProfileIdentifier
 FROM UnifiedIndividual__dlm ui
 ```
-</CodeGroup>
+</RequestExample>
 
 ## Validation Error Messages
 

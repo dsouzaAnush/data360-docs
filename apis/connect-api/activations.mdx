@@ -35,6 +35,7 @@ Retrieve all configured activation targets.
 
 **Response:**
 
+<ResponseExample>
 ```json icon=brackets-curly
 {
   "activationTargets": [
@@ -75,6 +76,7 @@ Retrieve all configured activation targets.
   "totalCount": 8
 }
 ```
+</ResponseExample>
 
 ### Get Activation Target Details
 
@@ -88,6 +90,7 @@ Retrieve detailed configuration for a specific activation target.
 
 **Response:**
 
+<ResponseExample>
 ```json icon=brackets-curly
 {
   "id": "ACT_001",
@@ -135,6 +138,7 @@ Retrieve detailed configuration for a specific activation target.
   }
 }
 ```
+</ResponseExample>
 
 ### List Activations
 
@@ -152,6 +156,7 @@ Retrieve all segment-to-target activations.
 
 **Response:**
 
+<ResponseExample>
 ```json icon=brackets-curly
 {
   "activations": [
@@ -183,6 +188,7 @@ Retrieve all segment-to-target activations.
   "totalCount": 12
 }
 ```
+</ResponseExample>
 
 ### Create Activation
 
@@ -192,6 +198,7 @@ Create a new activation to sync a segment to a target.
 
 **Request Body:**
 
+<RequestExample>
 ```json Request highlight={2-3,4-14,15-18}
 {
   "segmentId": "SEG_003",
@@ -216,9 +223,11 @@ Create a new activation to sync a segment to a target.
   }
 }
 ```
+</RequestExample>
 
 **Response:**
 
+<ResponseExample>
 ```json Response highlight={2-3}
 {
   "id": "ACTV_003",
@@ -226,6 +235,7 @@ Create a new activation to sync a segment to a target.
   "message": "Activation created. Initial sync will begin at scheduled time."
 }
 ```
+</ResponseExample>
 
 ### Trigger Activation Sync
 
@@ -239,15 +249,18 @@ Manually trigger an immediate sync for an activation.
 
 **Request Body (Optional):**
 
+<RequestExample>
 ```json icon=brackets-curly
 {
   "syncType": "FULL",
   "priority": "HIGH"
 }
 ```
+</RequestExample>
 
 **Response:**
 
+<ResponseExample>
 ```json icon=brackets-curly
 {
   "activationId": "ACTV_001",
@@ -256,6 +269,7 @@ Manually trigger an immediate sync for an activation.
   "estimatedCompletionTime": "2024-01-15T10:45:00Z"
 }
 ```
+</ResponseExample>
 
 ### Get Activation Sync History
 
@@ -277,6 +291,7 @@ Retrieve sync history for an activation.
 
 **Response:**
 
+<ResponseExample>
 ```json icon=brackets-curly
 {
   "activationId": "ACTV_001",
@@ -312,6 +327,7 @@ Retrieve sync history for an activation.
   ]
 }
 ```
+</ResponseExample>
 
 ### Pause/Resume Activation
 
@@ -325,14 +341,17 @@ Update activation status (pause or resume).
 
 **Request Body:**
 
+<RequestExample>
 ```json icon=brackets-curly
 {
   "status": "PAUSED"
 }
 ```
+</RequestExample>
 
 **Response:**
 
+<ResponseExample>
 ```json icon=brackets-curly
 {
   "id": "ACTV_001",
@@ -340,6 +359,7 @@ Update activation status (pause or resume).
   "message": "Activation paused. No further syncs will occur until resumed."
 }
 ```
+</ResponseExample>
 
 ## Supported Platforms
 
@@ -372,7 +392,7 @@ Update activation status (pause or resume).
 
 ## Code Examples
 
-<CodeGroup>
+<RequestExample>
 ```bash cURL icon=terminal
 curl -X POST "https://{instance}.salesforce.com/services/data/v64.0/ssot/activations" \
   -H "Authorization: Bearer {access_token}" \
@@ -420,7 +440,7 @@ HttpRequest request = HttpRequest.newBuilder()
 HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 System.out.println(response.body());
 ```
-</CodeGroup>
+</RequestExample>
 
 ## Sync Types
 

@@ -35,6 +35,7 @@ Retrieve all data streams configured in your org.
 
 **Response:**
 
+<ResponseExample>
 ```json Response highlight={3-12}
 {
   "dataStreams": [
@@ -64,6 +65,7 @@ Retrieve all data streams configured in your org.
   "limit": 100
 }
 ```
+</ResponseExample>
 
 ### Get Data Stream Details
 
@@ -77,6 +79,7 @@ Retrieve detailed information about a specific data stream.
 
 **Response:**
 
+<ResponseExample>
 ```json icon=brackets-curly
 {
   "name": "WebEngagement_Stream",
@@ -118,6 +121,7 @@ Retrieve detailed information about a specific data stream.
   }
 }
 ```
+</ResponseExample>
 
 ### Get Data Stream Schema
 
@@ -127,6 +131,7 @@ Retrieve the full schema definition for a data stream.
 
 **Response:**
 
+<ResponseExample>
 ```json icon=brackets-curly
 {
   "streamName": "WebEngagement_Stream",
@@ -194,6 +199,7 @@ Retrieve the full schema definition for a data stream.
   ]
 }
 ```
+</ResponseExample>
 
 ### Get Data Stream Statistics
 
@@ -211,6 +217,7 @@ Retrieve ingestion statistics and health metrics.
 
 **Response:**
 
+<ResponseExample>
 ```json icon=brackets-curly
 {
   "streamName": "WebEngagement_Stream",
@@ -246,10 +253,11 @@ Retrieve ingestion statistics and health metrics.
   ]
 }
 ```
+</ResponseExample>
 
 ## Code Examples
 
-<CodeGroup>
+<RequestExample>
 ```bash cURL icon=terminal
 curl -X GET "https://{instance}.salesforce.com/services/data/v64.0/ssot/data-streams?status=ACTIVE" \
   -H "Authorization: Bearer {access_token}"
@@ -281,7 +289,7 @@ HttpRequest request = HttpRequest.newBuilder()
 HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 System.out.println(response.body());
 ```
-</CodeGroup>
+</RequestExample>
 
 ## Data Stream Categories
 

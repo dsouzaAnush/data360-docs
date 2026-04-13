@@ -37,6 +37,7 @@ Ingest records into a specific data stream in real-time.
 
 #### Request Body
 
+<RequestExample>
 ```json Request Body highlight={2-12}
 {
   "data": [
@@ -59,10 +60,11 @@ Ingest records into a specific data stream in real-time.
   ]
 }
 ```
+</RequestExample>
 
 #### Response
 
-<CodeGroup>
+<ResponseExample>
 ```json Success (200) highlight={2-3}
 {
   "accepted": 2,
@@ -92,11 +94,11 @@ Ingest records into a specific data stream in real-time.
   "details": "Data stream 'InvalidStream' does not exist"
 }
 ```
-</CodeGroup>
+</ResponseExample>
 
 ## Code Examples
 
-<CodeGroup>
+<RequestExample>
 ```bash cURL icon=terminal
 curl -X POST "https://{instance}.salesforce.com/services/data/v64.0/ssot/streaming/WebEngagement_Stream" \
   -H "Authorization: Bearer {access_token}" \
@@ -188,7 +190,7 @@ request.setBody(JSON.serialize(new Map<String, Object>{
 HttpResponse response = http.send(request);
 System.debug(response.getBody());
 ```
-</CodeGroup>
+</RequestExample>
 
 ## Batch Ingestion
 
@@ -202,6 +204,7 @@ For larger data volumes, use batch ingestion which accepts multiple records and 
 
 #### Request Body
 
+<RequestExample>
 ```json Batch Request highlight={2-5}
 {
   "data": [
@@ -211,9 +214,11 @@ For larger data volumes, use batch ingestion which accepts multiple records and 
   ]
 }
 ```
+</RequestExample>
 
 #### Response
 
+<ResponseExample>
 ```json Batch Response highlight={2-3}
 {
   "batchId": "batch_abc123",
@@ -221,6 +226,7 @@ For larger data volumes, use batch ingestion which accepts multiple records and 
   "recordCount": 50000
 }
 ```
+</ResponseExample>
 
 ## Complete Ingestion Example
 
@@ -314,6 +320,7 @@ Bulk ingestion treats missing fields as null (upsert behavior).
 
 ### Example
 
+<RequestExample>
 ```json partial_update.json icon=database highlight={3-5}
 {
   "data": [{
@@ -323,6 +330,7 @@ Bulk ingestion treats missing fields as null (upsert behavior).
   }]
 }
 ```
+</RequestExample>
 
 <Note>
 The data stream must have **Partial** refresh mode enabled. This setting is immutable after stream creation — see [Create a Data Stream](/integrations/ingestion-data-stream#select-refresh-mode).

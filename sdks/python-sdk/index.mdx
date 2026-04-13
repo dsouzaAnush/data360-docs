@@ -39,7 +39,7 @@ from salesforce_cdp_connector import SalesforceCDPConnection
 
 ### 2. Establish a Connection
 
-<CodeGroup>
+<RequestExample>
 ```python Client Credentials Flow icon=python lines highlight={1-7}
 connection = SalesforceCDPConnection(
     login_url='https://login.salesforce.com',
@@ -59,7 +59,7 @@ connection = SalesforceCDPConnection(
     refresh_token='YOUR_REFRESH_TOKEN'
 )
 ```
-</CodeGroup>
+</RequestExample>
 
 ### 3. Execute a Query
 

@@ -26,6 +26,7 @@ Retrieve all configured identity resolution rulesets.
 
 **Response:**
 
+<ResponseExample>
 ```json icon=brackets-curly
 {
   "rules": [
@@ -79,6 +80,7 @@ Retrieve all configured identity resolution rulesets.
   ]
 }
 ```
+</ResponseExample>
 
 ### Get Rule Details
 
@@ -92,6 +94,7 @@ Retrieve detailed configuration for a specific identity resolution rule.
 
 **Response:**
 
+<ResponseExample>
 ```json icon=brackets-curly
 {
   "id": "IR001",
@@ -134,6 +137,7 @@ Retrieve detailed configuration for a specific identity resolution rule.
   }
 }
 ```
+</ResponseExample>
 
 ### List Identity Resolution Jobs
 
@@ -152,6 +156,7 @@ Retrieve the history of identity resolution job runs.
 
 **Response:**
 
+<ResponseExample>
 ```json icon=brackets-curly
 {
   "jobs": [
@@ -187,6 +192,7 @@ Retrieve the history of identity resolution job runs.
   "totalCount": 45
 }
 ```
+</ResponseExample>
 
 ### Get Job Details
 
@@ -200,6 +206,7 @@ Get detailed information about a specific identity resolution job.
 
 **Response:**
 
+<ResponseExample>
 ```json icon=brackets-curly
 {
   "jobId": "JOB_001",
@@ -237,6 +244,7 @@ Get detailed information about a specific identity resolution job.
   ]
 }
 ```
+</ResponseExample>
 
 ### Trigger Identity Resolution Job
 
@@ -246,6 +254,7 @@ Manually trigger an identity resolution job.
 
 **Request Body:**
 
+<RequestExample>
 ```json Request highlight={2-4}
 {
   "type": "INCREMENTAL",
@@ -254,9 +263,11 @@ Manually trigger an identity resolution job.
   "priority": "HIGH"
 }
 ```
+</RequestExample>
 
 **Response:**
 
+<ResponseExample>
 ```json Response highlight={2-3}
 {
   "jobId": "JOB_003",
@@ -265,6 +276,7 @@ Manually trigger an identity resolution job.
   "message": "Job queued successfully"
 }
 ```
+</ResponseExample>
 
 ### Get Unified Profile Match History
 
@@ -278,6 +290,7 @@ Retrieve the match history for a unified profile showing all contributing source
 
 **Response:**
 
+<ResponseExample>
 ```json icon=brackets-curly
 {
   "unifiedId": "UI_001ABC",
@@ -330,6 +343,7 @@ Retrieve the match history for a unified profile showing all contributing source
   ]
 }
 ```
+</ResponseExample>
 
 ## Match Types
 
@@ -353,7 +367,7 @@ When merging records, survivorship rules determine which values persist:
 
 ## Code Examples
 
-<CodeGroup>
+<RequestExample>
 ```bash cURL icon=terminal
 curl -X GET "https://{instance}.salesforce.com/services/data/v64.0/ssot/identity-resolution/rules" \
   -H "Authorization: Bearer {access_token}"
@@ -390,7 +404,7 @@ HttpRequest request = HttpRequest.newBuilder()
 HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 System.out.println(response.body());
 ```
-</CodeGroup>
+</RequestExample>
 
 ## Best Practices
 

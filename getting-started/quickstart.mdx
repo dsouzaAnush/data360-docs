@@ -116,7 +116,7 @@ https://your-callback-url.com/callback?code=AUTHORIZATION_CODE
 
 ### 1.2 Exchange Code for Salesforce Token
 
-<CodeGroup>
+<RequestExample>
 ```bash cURL icon=terminal
 curl -X POST "https://login.salesforce.com/services/oauth2/token" \
   -H "Content-Type: application/x-www-form-urlencoded" \
@@ -161,7 +161,7 @@ const response = await fetch('https://login.salesforce.com/services/oauth2/token
 
 const { access_token, instance_url } = await response.json();
 ```
-</CodeGroup>
+</RequestExample>
 
 **Response:**
 
@@ -179,7 +179,7 @@ const { access_token, instance_url } = await response.json();
 
 Exchange your Salesforce access token for a Data 360 access token:
 
-<CodeGroup>
+<RequestExample>
 ```bash cURL icon=terminal
 curl -X POST "https://your-org.my.salesforce.com/services/a360/token" \
   -H "Content-Type: application/x-www-form-urlencoded" \
@@ -226,7 +226,7 @@ const data360Response = await fetch(`${instance_url}/services/a360/token`, {
 
 const { access_token: data360Token, instance_url: data360Url } = await data360Response.json();
 ```
-</CodeGroup>
+</RequestExample>
 
 **Response:**
 
@@ -249,7 +249,7 @@ With your Data 360 access token and instance URL, you can now make API calls.
 
 ### Get Tenant Metadata
 
-<CodeGroup>
+<RequestExample>
 ```bash cURL icon=terminal
 curl -X GET "https://your-tenant.c360a.salesforce.com/api/v1/metadata/" \
   -H "Authorization: Bearer DATA_360_ACCESS_TOKEN" \
@@ -282,7 +282,7 @@ const metadataResponse = await fetch(`${data360Url}/api/v1/metadata/`, {
 const metadata = await metadataResponse.json();
 console.log(`Found ${metadata.metadata.length} entities`);
 ```
-</CodeGroup>
+</RequestExample>
 
 **Response:**
 
@@ -307,7 +307,7 @@ console.log(`Found ${metadata.metadata.length} entities`);
 
 ### Execute a SQL Query
 
-<CodeGroup>
+<RequestExample>
 ```bash cURL icon=terminal
 curl -X POST "https://your-tenant.c360a.salesforce.com/services/data/v64.0/ssot/query-sql" \
   -H "Authorization: Bearer DATA_360_ACCESS_TOKEN" \
@@ -352,7 +352,7 @@ const queryResponse = await fetch(`${data360Url}/services/data/v64.0/ssot/query-
 const result = await queryResponse.json();
 console.log(`Query returned ${result.rowCount} rows`);
 ```
-</CodeGroup>
+</RequestExample>
 
 **Response:**
 
