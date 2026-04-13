@@ -29,6 +29,7 @@
             "pages": [
               "index",
               "getting-started/introduction",
+              "getting-started/setup",
               "getting-started/quickstart",
               "getting-started/architecture"
             ]
@@ -47,6 +48,9 @@
           {
             "group": "Platform Features",
             "pages": [
+              "developer-guide/data-strategy",
+              "developer-guide/data-mapping",
+              "developer-guide/segmentation",
               "developer-guide/data-transforms",
               "developer-guide/data-actions",
               "developer-guide/flows-automation",
@@ -54,7 +58,8 @@
               "developer-guide/ai-ml-integration",
               "developer-guide/unstructured-data-rag",
               "developer-guide/profile-data-explorer",
-              "developer-guide/tableau-analytics"
+              "developer-guide/tableau-analytics",
+              "developer-guide/reports-dashboards"
             ]
           },
           {

@@ -1,0 +1,172 @@
+---
+title: "Set Up Data 360"
+description: "Initial provisioning, user creation, permission assignment, and data space configuration for Data 360."
+---
+
+# Set Up Data 360
+
+<Note>
+As of October 14, 2025, Data Cloud has been rebranded to **Data 360**. During this transition, you may see references to Data Cloud in our application and documentation.
+</Note>
+
+This guide walks through the initial setup steps to get Data 360 running in your Salesforce org — from provisioning to creating your first users and data spaces.
+
+## Prerequisites
+
+Data 360 requires one of the following editions:
+
+- **Enterprise Edition**
+- **Corporate Edition**
+- **Developer Edition**
+
+Data 360 may be included with your Salesforce license or available as an add-on. Check your contract or contact your Account Executive.
+
+## Setup Walkthrough
+
+### Step 1: Enable and Provision Data 360
+
+<Steps>
+  <Step title="Navigate to Data Cloud Setup">
+    Go to **Setup** and search for **Data Cloud** or **Data 360** in the Quick Find box. Click **Data Cloud Setup**.
+  </Step>
+  <Step title="Accept Terms">
+    Review and accept the Data 360 terms of service if prompted.
+  </Step>
+  <Step title="Wait for Provisioning">
+    Data 360 provisioning begins automatically. This process can take several minutes to a few hours. You'll see green checkmarks once provisioning is complete.
+  </Step>
+  <Step title="Verify">
+    After provisioning, confirm you see the Data Cloud navigation items: **Data Streams**, **Data Model**, **Identity Resolution**, **Segments**, and **Activations**.
+  </Step>
+</Steps>
+
+### Step 2: Create Users and Assign Permissions
+
+Every user who needs access to Data 360 must be assigned an appropriate permission set.
+
+| Permission Set | Who Needs It | Access Level |
+|---------------|-------------|-------------|
+| **Data Cloud Architect** (formerly Admin) | Platform administrators | Full admin access |
+| **Data Cloud Data Aware Specialist** | Data analysts, engineers | Data operations, queries, insights |
+| **Data Cloud Activation Manager** (formerly Marketing Manager) | Marketing ops | Segments, activations |
+| **Data Cloud Activation Specialist** (formerly Marketing Specialist) | Marketing team | Segment creation, view activations |
+| **Data Cloud User** | General users | Read-only access |
+
+<Steps>
+  <Step title="Navigate to Permission Sets">
+    Go to **Setup > Permission Sets**.
+  </Step>
+  <Step title="Select the Permission Set">
+    Click the appropriate Data Cloud permission set.
+  </Step>
+  <Step title="Assign Users">
+    Click **Manage Assignments > Add Assignment**, select users, and click **Assign**.
+  </Step>
+  <Step title="Verify Access">
+    Have users log in and confirm they can see Data 360 features in the app launcher.
+  </Step>
+</Steps>
+
+See [Security & Permissions](/developer-guide/security-permissions) for the complete permission set reference.
+
+### Step 3: Configure Data Spaces
+
+Data spaces partition your Data 360 data into logical segments for access control.
+
+<Steps>
+  <Step title="Navigate to Data Spaces">
+    Go to **Data 360 Setup > Data Spaces**.
+  </Step>
+  <Step title="Review the Default Space">
+    Every org comes with a **default** data space. For many implementations, this is sufficient.
+  </Step>
+  <Step title="Create Additional Spaces (Optional)">
+    If you need data isolation by region, business unit, or brand, click **New Data Space** and configure:
+    - **Name** — A descriptive name (e.g., "EMEA", "Retail Brand")
+    - **Prefix** — A unique prefix for the data space
+  </Step>
+  <Step title="Assign Data Space Permissions">
+    Create data space permission sets and assign them to users who need access to specific spaces.
+  </Step>
+</Steps>
+
+### Step 4: Connect Your First Data Source
+
+<Steps>
+  <Step title="Navigate to Data Streams">
+    Go to **Data 360 > Data Streams** and click **New**.
+  </Step>
+  <Step title="Choose a Connector">
+    Select a data source:
+    - **Salesforce CRM** — Your existing CRM data (recommended starting point)
+    - **Ingestion API** — Push data from external systems via REST
+    - **Third-party connector** — Pre-built connectors for external platforms
+  </Step>
+  <Step title="Configure and Deploy">
+    Follow the connector-specific setup wizard. Map source fields to data model objects.
+  </Step>
+  <Step title="Verify Ingestion">
+    After the data stream runs, check **Data Explorer** to verify data has been ingested correctly.
+  </Step>
+</Steps>
+
+See [Integrations Overview](/integrations/index) for detailed connector setup guides.
+
+### Step 5: Configure Identity Resolution
+
+<Steps>
+  <Step title="Navigate to Identity Resolution">
+    Go to **Data 360 > Identity Resolution**.
+  </Step>
+  <Step title="Create a Ruleset">
+    Click **New Ruleset** and configure match rules (e.g., exact email match, fuzzy name match) and reconciliation rules (e.g., most recent value wins).
+  </Step>
+  <Step title="Run Identity Resolution">
+    Execute the ruleset to create unified customer profiles.
+  </Step>
+  <Step title="Verify in Profile Explorer">
+    Use **Profile Explorer** to review unified profiles and verify source records are linked correctly.
+  </Step>
+</Steps>
+
+See [Identity Resolution Best Practices](/developer-guide/identity-resolution-best-practices) for configuration guidance.
+
+## Post-Setup Checklist
+
+| Task | Status |
+|------|--------|
+| Data 360 provisioned and green checkmarks visible | |
+| Admin user assigned Data Cloud Architect permission set | |
+| Data spaces configured (default at minimum) | |
+| At least one data source connected and ingesting | |
+| Data stream mapped to DMOs | |
+| Identity resolution ruleset created and run | |
+| Profile Explorer showing unified profiles | |
+| Additional users assigned appropriate permission sets | |
+
+## What's Next
+
+After initial setup, explore these areas:
+
+<CardGroup cols={2}>
+  <Card title="Plan Your Data Strategy" icon="map" href="/developer-guide/data-strategy">
+    Design your data model and implementation approach
+  </Card>
+  <Card title="Data Mapping" icon="arrows-turn-right" href="/developer-guide/data-mapping">
+    Map and harmonize data from multiple sources
+  </Card>
+  <Card title="Segmentation" icon="users" href="/developer-guide/segmentation">
+    Create customer segments for activation
+  </Card>
+  <Card title="Reports & Dashboards" icon="chart-bar" href="/developer-guide/reports-dashboards">
+    Analyze Data 360 data with native reports
+  </Card>
+</CardGroup>
+
+## Related Resources
+
+- [Security & Permissions](/developer-guide/security-permissions) — Detailed permission set reference
+- [Architecture](/getting-started/architecture) — Data 360 platform architecture
+- [Quick Start](/getting-started/quickstart) — API quick start tutorial
+- Salesforce Help: [Set Up Data 360](https://help.salesforce.com/s/articleView?id=data.c360_a_set_up.htm&type=5)
+- Salesforce Help: [Create Users and Assign Permissions](https://help.salesforce.com/s/articleView?id=data.c360_a_setup_walkthrough.htm&type=5)

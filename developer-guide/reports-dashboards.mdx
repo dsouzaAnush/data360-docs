@@ -1,0 +1,178 @@
+---
+title: "Reports & Dashboards"
+description: "Create Salesforce reports and dashboards directly from Data 360 data model objects and calculated insights."
+---
+
+# Reports & Dashboards
+
+<Note>
+As of October 14, 2025, Data Cloud has been rebranded to **Data 360**. During this transition, you may see references to Data Cloud in our application and documentation.
+</Note>
+
+Data 360 supports native Salesforce Reports and Dashboards, enabling you to build visualizations and analytics directly from data model objects (DMOs) and calculated insights — without needing Tableau or external BI tools.
+
+## Overview
+
+| Analytics Tool | Data Source | Best For |
+|---------------|------------|----------|
+| **DC Reports & Dashboards** | DMOs, Calculated Insights | Salesforce-native reporting, executive dashboards |
+| **Data Explorer** | DMOs, DLOs, CIOs | Ad-hoc data exploration, spot checks |
+| **Query Editor** | Any DC object (SQL) | Custom SQL analysis, data science |
+| **Tableau** | DMOs, CIOs, Segments | Advanced visualizations, embedded analytics |
+| **JDBC / Python** | Any DC object | External BI tools, notebooks |
+
+## Creating Reports from Data 360 Data
+
+### Prerequisites
+
+- Data 360 enabled with data ingested and mapped to DMOs
+- Calculated insights created (for insight-based reports)
+- User has **Data Cloud Data Aware Specialist** permission set (minimum)
+
+### Building a Report
+
+<Steps>
+  <Step title="Navigate to Reports">
+    Go to the **Reports** tab in Salesforce and click **New Report**.
+  </Step>
+  <Step title="Select Report Type">
+    Choose a Data Cloud report type. Available types include:
+    - **Data Cloud Individual** — Report on unified profiles
+    - **Data Cloud Calculated Insight** — Report on computed metrics
+    - **Data Cloud Segment** — Report on segment membership
+    - **Custom report types** — Create custom report types for specific DMOs
+  </Step>
+  <Step title="Add Columns">
+    Drag DMO fields or calculated insight measures into the report columns.
+  </Step>
+  <Step title="Add Filters">
+    Apply filters to narrow the report scope (date ranges, field values, segment membership).
+  </Step>
+  <Step title="Group and Summarize">
+    Add groupings and summary formulas:
+    - Group by dimensions (region, segment, product category)
+    - Summarize by measures (SUM, COUNT, AVG, MIN, MAX)
+  </Step>
+  <Step title="Save and Run">
+    Save the report and run it. Schedule automatic refreshes if needed.
+  </Step>
+</Steps>
+
+### Reports on Calculated Insights
+
+Calculated insights are the most common source for Data 360 reports because they pre-aggregate data:
+
+```sql
+-- Example calculated insight that powers a dashboard
+SELECT
+    ssot__IndividualId__c AS IndividualId,
+    COUNT(DISTINCT ssot__Id__c) AS TotalOrders,
+    SUM(ssot__GrandTotalAmount__c) AS LifetimeValue,
+    AVG(ssot__GrandTotalAmount__c) AS AvgOrderValue,
+    MAX(ssot__OrderDate__c) AS LastOrderDate
+FROM ssot__SalesOrder__dlm
+GROUP BY ssot__IndividualId__c
+```
+
+This insight can then be used in a report with groupings by LTV tier, date ranges, or segment.
+
+## Creating Dashboards
+
+<Steps>
+  <Step title="Navigate to Dashboards">
+    Go to the **Dashboards** tab and click **New Dashboard**.
+  </Step>
+  <Step title="Add Components">
+    Drag report components onto the dashboard canvas. Available visualizations:
+    - **Charts** — Bar, line, donut, funnel, scatter
+    - **Metrics** — Single number KPIs
+    - **Tables** — Tabular data views
+    - **Gauges** — Progress toward goals
+  </Step>
+  <Step title="Configure Filters">
+    Add dashboard filters for interactive exploration (date range, segment, region).
+  </Step>
+  <Step title="Set Refresh Schedule">
+    Configure automatic refresh frequency to keep dashboards current.
+  </Step>
+</Steps>
+
+### Common Dashboard Patterns
+
+| Dashboard | Key Metrics | Report Sources |
+|-----------|------------|----------------|
+| **Customer 360 Overview** | Total profiles, match rate, segment sizes | Individual report, identity resolution stats |
+| **Segment Performance** | Segment size trends, overlap, activation rates | Segment membership report |
+| **Revenue Analytics** | LTV distribution, AOV, purchase frequency | Sales order calculated insight |
+| **Engagement Dashboard** | Email opens, web visits, app sessions | Engagement calculated insights |
+| **Data Quality** | Ingestion rates, error counts, match quality | Data stream stats, identity resolution |
+
+## Considerations and Limits
+
+| Limit | Value |
+|-------|-------|
+| **Report row limit** | Standard Salesforce report limits apply |
+| **Dashboard refresh** | Minimum 1 hour for scheduled refresh |
+| **Cross-object reports** | Limited to pre-defined report types and relationships |
+| **Real-time data** | Reports show data as of last DMO/CIO refresh, not live |
+| **Calculated insight reports** | Must use published calculated insights |
+
+### Known Considerations
+
+- Data Cloud reports access **harmonized data** (DMOs and CIOs), not raw DLOs
+- Report performance depends on data volume — use filters to narrow scope
+- Some standard report features (e.g., joined reports) may have limited DC support
+- For real-time or complex analytics, use [Tableau](/developer-guide/tableau-analytics) or [Query Editor](/developer-guide/profile-data-explorer)
+
+## CRM Analytics Integration
+
+For advanced analytics beyond standard reports, Data 360 integrates with **CRM Analytics** (formerly Tableau CRM / Einstein Analytics):
+
+- Create CRM Analytics datasets from Data 360 DMOs
+- Build interactive dashboards with advanced visualizations
+- Use Einstein Discovery for AI-powered insights
+- Embed analytics in Salesforce record pages
+
+## Sharing and Collaboration
+
+| Feature | Details |
+|---------|---------|
+| **Folders** | Organize reports and dashboards in folders with access control |
+| **Subscriptions** | Subscribe users to receive reports on a schedule via email |
+| **Embedding** | Embed dashboards in Lightning pages, Experience Cloud sites |
+| **Export** | Export report data as CSV or Excel for offline analysis |
+| **Snapshots** | Schedule report snapshots for historical trend analysis |
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Report Design">
+    - Build reports on calculated insights rather than raw DMOs — they're pre-aggregated and faster
+    - Use dashboard filters instead of creating multiple similar reports
+    - Include date filters to prevent reports from scanning unnecessary historical data
+    - Name reports consistently: `[Area] - [Metric] - [Frequency]` (e.g., "Revenue - LTV Distribution - Monthly")
+  </Accordion>
+
+  <Accordion title="Performance">
+    - Limit report scope with filters — avoid unfiltered reports on large DMOs
+    - Schedule dashboard refreshes during off-peak hours
+    - Use summary-level calculated insights instead of row-level DMO reports for large datasets
+    - Monitor report execution times and optimize slow queries
+  </Accordion>
+
+  <Accordion title="Governance">
+    - Use report folders with appropriate sharing settings
+    - Document which calculated insights power which dashboards
+    - Review and archive unused reports quarterly
+    - Set up report subscriptions for stakeholders instead of ad-hoc requests
+  </Accordion>
+</AccordionGroup>
+
+## Related Resources
+
+- [Calculated Insights API](/apis/query-api/calculated-insights-api) — Create the insights that power reports
+- [Profile & Data Explorer](/developer-guide/profile-data-explorer) — Ad-hoc data exploration
+- [Tableau & Analytics](/developer-guide/tableau-analytics) — Advanced BI integration
+- [SQL Reference](/apis/query-api/sql-reference) — SQL syntax for calculated insights
+- Salesforce Help: [Data 360 Reports and Dashboards](https://help.salesforce.com/s/articleView?id=analytics.data_cloud_reports_dashboards.htm&type=5)
+- Salesforce Help: [Analyze Data from Data Cloud](https://help.salesforce.com/s/articleView?id=sf.c360_a_business_intelligence_analytics.htm&type=5)

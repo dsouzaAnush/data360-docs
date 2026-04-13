@@ -208,6 +208,39 @@ Run tests for Data Cloud-triggered flows using the Flow test framework:
 | **Agent invocation** | Supported via invocable action | Not supported |
 | **Best for** | Complex orchestration | Event distribution |
 
+## Activation-Triggered Flows
+
+Activation-triggered flows are a distinct flow type that automates data delivery **after** a segment is activated. Unlike Data Cloud-triggered flows (which fire on DMO data changes), activation-triggered flows fire when segment data is sent to an activation target.
+
+### Use Cases
+
+- **Post-activation data enrichment** — Enrich activated records before delivery to the target
+- **Notification workflows** — Notify teams when a segment activation completes
+- **Conditional delivery** — Apply additional filtering or routing logic after activation
+- **Audit logging** — Log activation events for compliance tracking
+
+### Creating an Activation-Triggered Flow
+
+<Steps>
+  <Step title="Open Flow Builder">
+    Navigate to **Setup > Flows** and click **New Flow**.
+  </Step>
+  <Step title="Select Flow Type">
+    Choose **Activation-Triggered Flow**.
+  </Step>
+  <Step title="Configure Trigger">
+    Select the activation target and segment that should trigger the flow.
+  </Step>
+  <Step title="Build Logic">
+    Add flow elements to process the activated data — transform, enrich, route, or log.
+  </Step>
+  <Step title="Activate">
+    Save and activate. The flow runs each time the specified activation fires.
+  </Step>
+</Steps>
+
+See Salesforce Help: [Automate Data Delivery with Activation-Triggered Flows](https://help.salesforce.com/s/articleView?id=platform.automate_flow_build_create_activation_triggered_flow.htm&type=5).
+
 ## Best Practices
 
 <AccordionGroup>

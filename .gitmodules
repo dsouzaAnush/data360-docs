@@ -1,0 +1,3 @@
+[submodule ".salesforce-skills"]
+	path = .salesforce-skills
+	url = https://github.com/dsouzaAnush/salesforce-skills.git
