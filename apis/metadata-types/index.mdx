@@ -54,7 +54,7 @@ Data 360 metadata types represent the configuration artifacts that define how yo
 
 Use the Metadata API `retrieve()` call or Salesforce CLI to retrieve Data 360 metadata:
 
-```bash
+```bash icon=terminal
 # Using Salesforce CLI
 sf project retrieve start -m DataStreamDefinition
 
@@ -66,7 +66,7 @@ sf project retrieve start -m DataSource,DataStreamDefinition,CalculatedInsightDe
 
 Deploy Data 360 configurations to target orgs:
 
-```bash
+```bash icon=terminal
 # Deploy specific metadata
 sf project deploy start -m DataStreamDefinition:MyDataStream
 
@@ -156,7 +156,7 @@ Include Data 360 metadata types in your package manifest:
 
 Deploy a new data source with its schema and streams:
 
-```bash
+```bash icon=terminal
 # 1. Deploy data source configuration
 sf project deploy start -m DataSource:MyExternalSource
 
@@ -171,7 +171,7 @@ sf project deploy start -m DataCloudIngestionApiSchema:MyIngestionSchema
 
 Move calculated insights between environments:
 
-```bash
+```bash icon=terminal
 # Retrieve from source org
 sf project retrieve start -m CalculatedInsightDefinition:CustomerLTV -o source-org
 
@@ -183,7 +183,7 @@ sf project deploy start -m CalculatedInsightDefinition:CustomerLTV -o target-org
 
 Promote all Data 360 configurations to a new environment:
 
-```bash
+```bash icon=terminal
 # Create deployment package
 sf project retrieve start -x manifest/data360-package.xml -o source-org
 

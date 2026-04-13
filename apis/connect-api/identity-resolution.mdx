@@ -26,7 +26,7 @@ Retrieve all configured identity resolution rulesets.
 
 **Response:**
 
-```json
+```json icon=brackets-curly
 {
   "rules": [
     {
@@ -92,7 +92,7 @@ Retrieve detailed configuration for a specific identity resolution rule.
 
 **Response:**
 
-```json
+```json icon=brackets-curly
 {
   "id": "IR001",
   "name": "Email_Phone_Match",
@@ -152,7 +152,7 @@ Retrieve the history of identity resolution job runs.
 
 **Response:**
 
-```json
+```json icon=brackets-curly
 {
   "jobs": [
     {
@@ -200,7 +200,7 @@ Get detailed information about a specific identity resolution job.
 
 **Response:**
 
-```json
+```json icon=brackets-curly
 {
   "jobId": "JOB_001",
   "type": "FULL_RECONCILIATION",
@@ -246,7 +246,7 @@ Manually trigger an identity resolution job.
 
 **Request Body:**
 
-```json Request {2-4}
+```json Request highlight={2-4}
 {
   "type": "INCREMENTAL",
   "rules": ["IR001", "IR002"],
@@ -257,7 +257,7 @@ Manually trigger an identity resolution job.
 
 **Response:**
 
-```json Response {2-3}
+```json Response highlight={2-3}
 {
   "jobId": "JOB_003",
   "status": "QUEUED",
@@ -278,7 +278,7 @@ Retrieve the match history for a unified profile showing all contributing source
 
 **Response:**
 
-```json
+```json icon=brackets-curly
 {
   "unifiedId": "UI_001ABC",
   "profile": {
@@ -359,7 +359,7 @@ curl -X GET "https://{instance}.salesforce.com/services/data/v64.0/ssot/identity
   -H "Authorization: Bearer {access_token}"
 ```
 
-```python trigger_job.py icon=python lines {4-7,8-12,14-16}
+```python trigger_job.py icon=python lines highlight={4-7,8-12,14-16}
 import requests
 
 url = f"https://{instance}.salesforce.com/services/data/v64.0/ssot/identity-resolution/jobs"
@@ -378,7 +378,7 @@ job = response.json()
 print(f"Job {job['jobId']} queued with status: {job['status']}")
 ```
 
-```java GetJobStatus.java icon=java lines {3-7}
+```java GetJobStatus.java icon=java lines highlight={3-7}
 HttpClient client = HttpClient.newHttpClient();
 
 HttpRequest request = HttpRequest.newBuilder()

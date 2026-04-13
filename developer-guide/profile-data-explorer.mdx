@@ -121,7 +121,7 @@ For advanced analysis, use the Query Editor to write, execute, and save SQL quer
 
 ### Example Query
 
-```sql
+```sql icon=database
 -- Top 10 customers by lifetime value with segment membership
 SELECT
     ui.ssot__FirstName__c AS FirstName,
@@ -179,7 +179,7 @@ Data graphs define connections between DMOs and materialize them as hierarchical
 
 ### Querying Data Graphs via API
 
-```bash
+```bash icon=terminal
 # Get data graph metadata
 curl -X GET "https://{instance}.salesforce.com/api/v1/dataGraph/metadata?dataGraphName=UnifiedIndividual_DG" \
   -H "Authorization: Bearer {access_token}"

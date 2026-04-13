@@ -100,7 +100,7 @@ The `DataObjectDataChgEvent` (available in API v53.0+) includes:
 
 ### Subscribing in Apex
 
-```java
+```java icon=java
 trigger DataCloudChangeHandler on DataObjectDataChgEvent (after insert) {
     List<Task> followUps = new List<Task>();
 

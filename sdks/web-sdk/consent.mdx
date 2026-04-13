@@ -23,7 +23,7 @@ flowchart LR
 
 The recommended approach is to provide a `Promise` for the `consent` option in `init()`. The SDK waits for the promise to resolve before collecting data:
 
-```javascript
+```javascript icon=js
 function getConsentPromise() {
   return new Promise((resolve) => {
     // Integrate with your CMP (e.g., OneTrust, Cookiebot)
@@ -61,7 +61,7 @@ SalesforceInteractions.init({
 
 When a user changes their consent preferences mid-session:
 
-```javascript
+```javascript icon=js
 // Update a single consent
 SalesforceInteractions.updateConsents({
   provider: 'yourCMP',
@@ -80,7 +80,7 @@ When consent is revoked (`OptOut`), the SDK **immediately stops** collecting and
 
 ## Reading Current Consent State
 
-```javascript
+```javascript icon=js
 const consents = SalesforceInteractions.getConsents();
 // Returns: ConsentWithMetadata[]
 
@@ -113,7 +113,7 @@ consents.forEach((c) => {
 
 ### OneTrust
 
-```javascript
+```javascript icon=js
 SalesforceInteractions.init({
   consent: new Promise((resolve) => {
     window.OneTrust?.OnConsentChanged(() => {
@@ -129,7 +129,7 @@ SalesforceInteractions.init({
 
 ### Cookiebot
 
-```javascript
+```javascript icon=js
 SalesforceInteractions.init({
   consent: new Promise((resolve) => {
     window.addEventListener('CookiebotOnAccept', () => {

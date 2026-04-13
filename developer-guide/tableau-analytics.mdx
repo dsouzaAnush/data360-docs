@@ -72,7 +72,7 @@ The JWT token controls user identity and data access:
 
 ### LWC Embedding Example
 
-```javascript
+```javascript icon=js
 import { LightningElement, wire } from 'lwc';
 import generateJWT from '@salesforce/apex/TableauController.generateJWT';
 
@@ -94,7 +94,7 @@ export default class TableauDashboard extends LightningElement {
 }
 ```
 
-```java
+```java icon=java
 // Apex JWT Generator
 public class TableauController {
     @AuraEnabled(cacheable=true)
@@ -139,7 +139,7 @@ The Tableau Hyper API can execute Data 360 SQL directly, enabling:
 - Combining Data 360 data with other sources in Hyper format
 - Scheduled extract refreshes with custom SQL
 
-```sql
+```sql icon=database
 -- Example: Data 360 SQL query for Tableau Hyper API
 SELECT
     ui.ssot__FirstName__c || ' ' || ui.ssot__LastName__c AS FullName,

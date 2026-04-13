@@ -156,21 +156,21 @@ This is the step-by-step workflow for migrating Data 360 metadata from a sandbox
   </Step>
   <Step title="Retrieve Metadata">
     Pull the data kit metadata into your project:
-    ```bash
+    ```bash icon=terminal
     sf project retrieve start --manifest manifest/package.xml
     ```
     New folders appear in your project containing all data kit metadata.
   </Step>
   <Step title="Clean Up Key Qualifier Files">
     **Critical step**: Delete any key qualifier files generated during retrieval. These files can cause deployment failures.
-    ```bash
+    ```bash icon=terminal
     # Find and remove key qualifier files (Unix/macOS)
     find . -name "*KeyQualifier*" -type f -delete
     ```
   </Step>
   <Step title="Deploy to Production">
     Run the deployment command:
-    ```bash
+    ```bash icon=terminal
     sf project deploy start --manifest package.xml
     ```
   </Step>
@@ -186,7 +186,7 @@ This is the step-by-step workflow for migrating Data 360 metadata from a sandbox
 
 After retrieving metadata, upload your project to GitHub or another source control system:
 
-```bash
+```bash icon=terminal
 git add .
 git commit -m "Add Data 360 data kit metadata for deployment"
 git push origin main
@@ -200,7 +200,7 @@ For standard data kits (ISV distribution), use the **Deploy Data Kit Components 
 
 ### Triggering the Flow
 
-```bash
+```bash icon=terminal
 curl -X POST "https://{instance}.salesforce.com/services/data/v64.0/actions/custom/flow/Deploy_Data_Kit_Components" \
   -H "Authorization: Bearer {access_token}" \
   -H "Content-Type: application/json" \

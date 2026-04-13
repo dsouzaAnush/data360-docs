@@ -40,7 +40,7 @@ from salesforce_cdp_connector import SalesforceCDPConnection
 ### 2. Establish a Connection
 
 <CodeGroup>
-```python Client Credentials Flow icon=python lines {1-7}
+```python Client Credentials Flow icon=python lines highlight={1-7}
 connection = SalesforceCDPConnection(
     login_url='https://login.salesforce.com',
     client_id='YOUR_CONSUMER_KEY',
@@ -50,7 +50,7 @@ connection = SalesforceCDPConnection(
 )
 ```
 
-```python Token Flow icon=python lines {1-7}
+```python Token Flow icon=python lines highlight={1-7}
 connection = SalesforceCDPConnection(
     login_url='https://login.salesforce.com',
     client_id='YOUR_CONSUMER_KEY',
@@ -63,7 +63,7 @@ connection = SalesforceCDPConnection(
 
 ### 3. Execute a Query
 
-```python query_example.py icon=python lines {4-9,12}
+```python query_example.py icon=python lines highlight={4-9,12}
 # Create a cursor
 cursor = connection.cursor()
 

@@ -11,7 +11,7 @@ The Python SDK integrates seamlessly with Pandas, allowing you to fetch query re
 
 ### Basic DataFrame Fetch
 
-```python basic_dataframe.py icon=python lines {5-11,17-22,24}
+```python basic_dataframe.py icon=python lines highlight={5-11,17-22,24}
 from salesforce_cdp_connector import SalesforceCDPConnection
 import pandas as pd
 
@@ -58,7 +58,7 @@ Columns: ['Id__c', 'FirstName__c', 'LastName__c', 'Email__c', 'LifetimeValue__c'
 
 ### Descriptive Statistics
 
-```python statistics.py icon=python lines {11-12,14-15}
+```python statistics.py icon=python lines highlight={11-12,14-15}
 cursor.execute("""
     SELECT LifetimeValue__c, PurchaseCount__c, DaysSinceLastPurchase__c
     FROM UnifiedIndividual__dlm
@@ -76,7 +76,7 @@ print(df.corr())
 
 ### Grouping and Aggregation
 
-```python grouping.py icon=python lines {13-17,20-26}
+```python grouping.py icon=python lines highlight={13-17,20-26}
 cursor.execute("""
     SELECT
         Region__c,
@@ -108,7 +108,7 @@ print(pivot)
 
 ### Filtering and Transformation
 
-```python transformation.py icon=python lines {10-11,14-18,21}
+```python transformation.py icon=python lines highlight={10-11,14-18,21}
 cursor.execute("""
     SELECT *
     FROM UnifiedIndividual__dlm
@@ -136,7 +136,7 @@ print(df['ValueTier'].value_counts())
 
 ### With Matplotlib
 
-```python matplotlib_chart.py icon=python lines {12-19}
+```python matplotlib_chart.py icon=python lines highlight={12-19}
 import matplotlib.pyplot as plt
 
 cursor.execute("""
@@ -161,7 +161,7 @@ plt.show()
 
 ### With Seaborn
 
-```python seaborn_chart.py icon=python lines {12-17}
+```python seaborn_chart.py icon=python lines highlight={12-17}
 import seaborn as sns
 
 cursor.execute("""
@@ -185,7 +185,7 @@ plt.show()
 
 ### Feature Engineering
 
-```python feature_engineering.py icon=python lines expandable {17-21,24-31}
+```python feature_engineering.py icon=python lines expandable highlight={17-21,24-31}
 cursor.execute("""
     SELECT
         Id__c,
@@ -221,7 +221,7 @@ df['MonetaryScore'] = df['LifetimeValue__c'] / df['LifetimeValue__c'].max()
 
 ### Training a Model
 
-```python train_model.py icon=python lines expandable {8-10,17-19,22-24,27-28,31-32,35-38}
+```python train_model.py icon=python lines expandable highlight={8-10,17-19,22-24,27-28,31-32,35-38}
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
@@ -266,7 +266,7 @@ print(importance)
 
 ### Chunked Processing
 
-```python chunked_processing.py icon=python lines expandable {6-10,12-13,15-18,22-24,28-30}
+```python chunked_processing.py icon=python lines expandable highlight={6-10,12-13,15-18,22-24,28-30}
 def process_in_chunks(query, chunk_size=10000):
     """Process large datasets in chunks to manage memory."""
     offset = 0
@@ -300,7 +300,7 @@ result = process_in_chunks(
 
 ### Memory-Efficient Data Types
 
-```python optimize_dtypes.py icon=python lines expandable {6-23,27-28}
+```python optimize_dtypes.py icon=python lines expandable highlight={6-23,27-28}
 cursor.execute("SELECT * FROM UnifiedIndividual__dlm LIMIT 100000")
 df = cursor.fetch_dataframe()
 
@@ -335,7 +335,7 @@ print(f"Optimized memory: {df_optimized.memory_usage(deep=True).sum() / 1024**2:
 
 ### To CSV
 
-```python icon=python lines {4}
+```python icon=python lines highlight={4}
 cursor.execute("SELECT * FROM UnifiedIndividual__dlm LIMIT 10000")
 df = cursor.fetch_dataframe()
 
@@ -364,7 +364,7 @@ df.to_json('customers_export.json', orient='records', lines=True)
 
 ### Date/Time Columns
 
-```python datetime_handling.py icon=python lines {10-12,15-17}
+```python datetime_handling.py icon=python lines highlight={10-12,15-17}
 cursor.execute("""
     SELECT Id__c, CreatedDate__c, LastModifiedDate__c
     FROM UnifiedIndividual__dlm
@@ -385,7 +385,7 @@ df['DaysSinceCreated'] = (pd.Timestamp.now() - df['CreatedDate__c']).dt.days
 
 ### Numeric Columns
 
-```python numeric_handling.py icon=python lines {10-11}
+```python numeric_handling.py icon=python lines highlight={10-11}
 cursor.execute("""
     SELECT Id__c, Revenue__c, Quantity__c
     FROM SalesData__dlm

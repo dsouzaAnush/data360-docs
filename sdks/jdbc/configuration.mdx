@@ -65,7 +65,7 @@ jdbc:salesforce-datacloud://<Salesforce_Login_Domain>
 
 ### Basic Configuration
 
-```java BasicConfig.java icon=java lines {2-5,7-10}
+```java BasicConfig.java icon=java lines highlight={2-5,7-10}
 Properties props = new Properties();
 props.setProperty("user", "your.email@example.com");
 props.setProperty("password", "YourPassword123!");
@@ -80,7 +80,7 @@ Connection conn = DriverManager.getConnection(
 
 ### With Custom Dataspace
 
-```java DataspaceConfig.java icon=java lines {6}
+```java DataspaceConfig.java icon=java lines highlight={6}
 Properties props = new Properties();
 props.setProperty("user", "your.email@example.com");
 props.setProperty("password", "YourPassword123!");
@@ -93,7 +93,7 @@ Connection conn = DriverManager.getConnection(url, props);
 
 ### With Performance Tuning
 
-```java PerformanceConfig.java icon=java lines {9-12}
+```java PerformanceConfig.java icon=java lines highlight={9-12}
 Properties props = new Properties();
 // Authentication
 props.setProperty("user", "your.email@example.com");
@@ -112,7 +112,7 @@ Connection conn = DriverManager.getConnection(url, props);
 
 ### With Custom Trust Store
 
-```java SSLConfig.java icon=java lines {9-10}
+```java SSLConfig.java icon=java lines highlight={9-10}
 Properties props = new Properties();
 // Authentication
 props.setProperty("user", "your.email@example.com");
@@ -138,7 +138,7 @@ The private key for JWT Bearer authentication must be:
 
 ### Converting Key Formats
 
-```bash convert_keys.sh icon=terminal lines {2-4,7}
+```bash convert_keys.sh icon=terminal lines highlight={2-4,7}
 # Convert from RSA private key to PKCS#8
 openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt \
     -in rsa_private.key \
@@ -150,7 +150,7 @@ openssl pkcs12 -in certificate.p12 -out private.pem -nocerts -nodes
 
 ### Loading Key from File
 
-```java LoadKeyFile.java icon=java lines {4-6,9-11}
+```java LoadKeyFile.java icon=java lines highlight={4-6,9-11}
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -166,7 +166,7 @@ props.setProperty("user", "service.account@example.com");
 
 ### Loading Key from Environment Variable
 
-```java LoadKeyEnv.java icon=java lines {1-2,5-7}
+```java LoadKeyEnv.java icon=java lines highlight={1-2,5-7}
 String privateKey = System.getenv("SF_PRIVATE_KEY")
     .replace("\\n", "\n"); // Handle escaped newlines
 
@@ -180,7 +180,7 @@ props.setProperty("user", System.getenv("SF_USERNAME"));
 
 ### HikariCP Configuration
 
-```java HikariConfig.java icon=java lines expandable {6-8,11-13,16-20,22}
+```java HikariConfig.java icon=java lines expandable highlight={6-8,11-13,16-20,22}
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -210,7 +210,7 @@ try (Connection conn = dataSource.getConnection()) {
 
 ### Apache DBCP2 Configuration
 
-```java DBCP2Config.java icon=java lines expandable {4-7,10-12,15-17}
+```java DBCP2Config.java icon=java lines expandable highlight={4-7,10-12,15-17}
 import org.apache.commons.dbcp2.BasicDataSource;
 
 BasicDataSource dataSource = new BasicDataSource();
@@ -238,7 +238,7 @@ try (Connection conn = dataSource.getConnection()) {
 
 ### application.properties
 
-```properties application.properties icon=code lines {1-3,6-8,11-13}
+```properties application.properties icon=code lines highlight={1-3,6-8,11-13}
 spring.datasource.url=jdbc:salesforce-datacloud://login.salesforce.com
 spring.datasource.username=${SF_USERNAME}
 spring.datasource.driver-class-name=com.salesforce.datacloud.jdbc.DataCloudJDBCDriver
@@ -256,7 +256,7 @@ spring.datasource.hikari.connection-timeout=30000
 
 ### application.yml
 
-```yaml application.yml icon=code lines {3-5,7-13}
+```yaml application.yml icon=code lines highlight={3-5,7-13}
 spring:
   datasource:
     url: jdbc:salesforce-datacloud://login.salesforce.com
@@ -287,7 +287,7 @@ spring:
 
 Enable debug logging to troubleshoot:
 
-```java DebugConfig.java icon=java lines {5}
+```java DebugConfig.java icon=java lines highlight={5}
 // Add to your logging configuration (logback.xml example)
 // <logger name="com.salesforce.datacloud.jdbc" level="DEBUG"/>
 

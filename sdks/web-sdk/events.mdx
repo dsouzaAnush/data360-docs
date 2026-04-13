@@ -11,7 +11,7 @@ The Salesforce Interactions SDK supports several event types for capturing custo
 
 Every event contains system-set properties and optional custom properties:
 
-```javascript
+```javascript icon=js
 SalesforceInteractions.sendEvent({
   interaction: {
     name: 'Event Name',          // Required: descriptive name
@@ -36,7 +36,7 @@ SalesforceInteractions.sendEvent({
 
 Captures when a customer modifies their shopping cart — add, remove, or update items.
 
-```javascript
+```javascript icon=js
 SalesforceInteractions.sendEvent({
   interaction: {
     name: 'Add to Cart',
@@ -67,7 +67,7 @@ SalesforceInteractions.sendEvent({
 
 Captures when a customer views or interacts with catalog items — product pages, blog posts, search results.
 
-```javascript
+```javascript icon=js
 SalesforceInteractions.sendEvent({
   interaction: {
     name: 'Product Viewed',
@@ -92,7 +92,7 @@ SalesforceInteractions.sendEvent({
 
 Captures ecommerce order events — purchase completion, order status changes.
 
-```javascript
+```javascript icon=js
 SalesforceInteractions.sendEvent({
   interaction: {
     name: 'Order Completed',
@@ -119,7 +119,7 @@ SalesforceInteractions.sendEvent({
 
 Send profile data for a known or anonymous user, with or without an associated interaction:
 
-```javascript
+```javascript icon=js
 SalesforceInteractions.sendEvent({
   user: {
     identities: {
@@ -141,7 +141,7 @@ SalesforceInteractions.sendEvent({
 
 Capture account-level data for B2B scenarios:
 
-```javascript
+```javascript icon=js
 SalesforceInteractions.sendEvent({
   account: {
     id: 'ACCT-001',
@@ -164,7 +164,7 @@ See [Consent API](/sdks/web-sdk/consent) for the full consent event specificatio
 
 For events that don't fit standard types, use custom events:
 
-```javascript
+```javascript icon=js
 SalesforceInteractions.sendEvent({
   interaction: {
     name: 'Survey Completed',

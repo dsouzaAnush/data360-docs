@@ -36,7 +36,7 @@ flowchart TD
 
 To share identity across subdomains (e.g., `shop.example.com` and `blog.example.com`), set the cookie domain:
 
-```javascript
+```javascript icon=js
 // Option 1: During initialization
 SalesforceInteractions.init({
   cookieDomain: 'example.com',
@@ -65,7 +65,7 @@ SalesforceInteractions.setCookieDomain('example.com');
 
 When a user logs in or identifies themselves, link their session to a known identity:
 
-```javascript
+```javascript icon=js
 // Via sendEvent with user data
 SalesforceInteractions.sendEvent({
   user: {
@@ -94,7 +94,7 @@ SalesforceInteractions.sendEvent({
 
 On logout, clear the named identity to prevent cross-user data contamination:
 
-```javascript
+```javascript icon=js
 // Clear named identity (keeps anonymousId)
 SalesforceInteractions.clearIdentity();
 

@@ -36,7 +36,7 @@ Retrieve all segments in your org.
 
 **Response:**
 
-```json
+```json icon=brackets-curly
 {
   "segments": [
     {
@@ -82,7 +82,7 @@ Retrieve detailed information about a specific segment.
 
 **Response:**
 
-```json
+```json icon=brackets-curly
 {
   "id": "SEG_001",
   "name": "High_Value_Customers",
@@ -138,7 +138,7 @@ Create a new segment with specified criteria.
 
 **Request Body:**
 
-```json Request {2-4,6-22}
+```json Request highlight={2-4,6-22}
 {
   "name": "Loyal_Mobile_Users",
   "displayName": "Loyal Mobile App Users",
@@ -171,7 +171,7 @@ Create a new segment with specified criteria.
 
 **Response:**
 
-```json Response {2-3}
+```json Response highlight={2-3}
 {
   "id": "SEG_003",
   "name": "Loyal_Mobile_Users",
@@ -192,7 +192,7 @@ Update an existing segment's configuration.
 
 **Request Body:**
 
-```json
+```json icon=brackets-curly
 {
   "description": "Updated description for the segment",
   "criteria": {
@@ -213,7 +213,7 @@ Update an existing segment's configuration.
 
 **Response:**
 
-```json
+```json icon=brackets-curly
 {
   "id": "SEG_003",
   "status": "DRAFT",
@@ -233,7 +233,7 @@ Publish a segment to make it active and compute membership.
 
 **Response:**
 
-```json
+```json icon=brackets-curly
 {
   "id": "SEG_003",
   "status": "PUBLISHING",
@@ -263,7 +263,7 @@ Retrieve the members (unified profile IDs) of a segment.
 
 **Response:**
 
-```json
+```json icon=brackets-curly
 {
   "segmentId": "SEG_001",
   "memberCount": 45230,
@@ -307,7 +307,7 @@ Analyze overlap with other segments.
 
 **Response:**
 
-```json
+```json icon=brackets-curly
 {
   "segmentId": "SEG_001",
   "segmentName": "High Value Customers",
@@ -384,7 +384,7 @@ curl -X POST "https://{instance}.salesforce.com/services/data/v64.0/ssot/segment
   }'
 ```
 
-```python get_segment_members.py icon=python lines {4-6,8-9,11-13}
+```python get_segment_members.py icon=python lines highlight={4-6,8-9,11-13}
 import requests
 
 segment_id = "SEG_001"
@@ -400,7 +400,7 @@ for member in data['members']:
     print(f"  {member['email']}: ${member['lifetimeValue']:.2f}")
 ```
 
-```java PublishSegment.java icon=java lines {3-8}
+```java PublishSegment.java icon=java lines highlight={3-8}
 HttpClient client = HttpClient.newHttpClient();
 
 HttpRequest request = HttpRequest.newBuilder()

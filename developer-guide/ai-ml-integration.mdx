@@ -118,7 +118,7 @@ Import models trained on external platforms to score Data 360 records. Supported
 
 ### Example: SageMaker Model Configuration
 
-```json
+```json icon=brackets-curly
 {
   "modelName": "CustomerChurnPredictor",
   "platform": "AMAZON_SAGEMAKER",
@@ -184,7 +184,7 @@ Prediction job output is stored in a DMO, making it available for:
 - **Activations** — Activate scored segments to advertising or marketing platforms
 - **Reports** — Analyze prediction distributions and model effectiveness
 
-```java
+```java icon=java
 // Apex: Query prediction results from Data 360
 String query = 'SELECT IndividualId__c, ChurnProbability__c, ChurnLabel__c ' +
                'FROM ChurnPredictionResults__dlm ' +

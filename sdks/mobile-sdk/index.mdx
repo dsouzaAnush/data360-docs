@@ -34,7 +34,7 @@ The Mobile SDK:
   </Step>
 </Steps>
 
-```swift
+```swift icon=swift
 import SalesforceEngagementSDK
 import DataCloudModule
 
@@ -50,7 +50,7 @@ DataCloud.initialize(config: config)
 
 Add the dependency to your module-level `build.gradle`:
 
-```groovy
+```groovy icon=code
 dependencies {
     implementation 'com.salesforce.datacloud:engagement-mobile-sdk:latest'
 }
@@ -58,7 +58,7 @@ dependencies {
 
 Initialize in your Application class:
 
-```kotlin
+```kotlin icon=code
 import com.salesforce.datacloud.DataCloud
 import com.salesforce.datacloud.DataCloudConfig
 
@@ -107,7 +107,7 @@ The SDK automatically captures:
 
 Track custom engagement events:
 
-```swift
+```swift icon=swift
 // iOS: Track a product view
 DataCloud.trackEvent(
     name: "ProductView",
@@ -131,7 +131,7 @@ DataCloud.trackEvent(
 )
 ```
 
-```kotlin
+```kotlin icon=code
 // Android: Track a product view
 DataCloud.trackEvent(
     "ProductView",
@@ -159,7 +159,7 @@ DataCloud.trackEvent(
 
 Associate mobile events with known user identities:
 
-```swift
+```swift icon=swift
 // iOS: Set user identity
 DataCloud.setIdentity(
     userId: "user-123",
@@ -174,7 +174,7 @@ DataCloud.setIdentity(
 DataCloud.clearIdentity()
 ```
 
-```kotlin
+```kotlin icon=code
 // Android: Set user identity
 DataCloud.setIdentity(
     "user-123",
@@ -193,7 +193,7 @@ DataCloud.clearIdentity()
 
 The SDK provides managed consent handling for privacy regulation compliance:
 
-```swift
+```swift icon=swift
 // iOS: Grant consent
 DataCloud.setConsentStatus(.optedIn)
 
@@ -204,7 +204,7 @@ DataCloud.setConsentStatus(.optedOut)
 let status = DataCloud.getConsentStatus()
 ```
 
-```kotlin
+```kotlin icon=code
 // Android: Grant consent
 DataCloud.setConsentStatus(ConsentStatus.OPTED_IN)
 

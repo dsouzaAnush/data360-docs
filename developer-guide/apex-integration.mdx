@@ -25,7 +25,7 @@ Starting with API v61.0, you can use static and dynamic SOQL directly with Data 
 
 ### Static SOQL
 
-```java
+```java icon=java
 // Query unified individual profiles
 List<UnifiedIndividual__dlm> profiles = [
     SELECT ssot__Id__c, ssot__FirstName__c, ssot__LastName__c,
@@ -44,7 +44,7 @@ for (UnifiedIndividual__dlm profile : profiles) {
 
 ### Dynamic SOQL
 
-```java
+```java icon=java
 // Build query dynamically based on runtime conditions
 String objectName = 'UnifiedIndividual__dlm';
 String fields = 'ssot__Id__c, ssot__FirstName__c, ssot__Email__c';
@@ -58,7 +58,7 @@ List<SObject> results = Database.query(query);
 
 ### Database.QueryLocator (Batch Apex)
 
-```java
+```java icon=java
 public class DataCloudBatchProcessor implements Database.Batchable<SObject> {
 
     public Database.QueryLocator start(Database.BatchableContext bc) {
@@ -90,7 +90,7 @@ For complex queries that require joins, aggregations, window functions, or other
 
 ### Basic SQL Query
 
-```java
+```java icon=java
 String sql = 'SELECT ssot__Id__c, ssot__FirstName__c, ssot__LastName__c, ' +
              'ssot__Email__c ' +
              'FROM UnifiedIndividual__dlm ' +
@@ -110,7 +110,7 @@ for (ConnectApi.CdpQueryRow row : result.data) {
 
 ### SQL with Joins
 
-```java
+```java icon=java
 String sql =
     'SELECT ui.ssot__Id__c, ui.ssot__FirstName__c, ' +
     '       COUNT(so.ssot__Id__c) AS OrderCount, ' +
@@ -130,7 +130,7 @@ ConnectApi.CdpQueryOutput result = ConnectApi.CdpQuery.queryAnsiSql(sql);
 
 You can query Data 360 from any Salesforce org using named credentials and HTTP callouts:
 
-```java
+```java icon=java
 public class DataCloudExternalQuery {
 
     public static String queryDataCloud(String sql) {
@@ -163,7 +163,7 @@ The `ConnectApi` namespace provides Apex classes for interacting with Data 360 r
 
 ### Profile Lookup Example
 
-```java
+```java icon=java
 // Look up a unified profile by source record ID
 ConnectApi.CdpProfileOutput profile =
     ConnectApi.CdpProfile.getProfile(
@@ -180,7 +180,7 @@ Testing Data 360 Apex code requires special handling because ConnectApi methods 
 
 ### Using Test.setMock
 
-```java
+```java icon=java
 @isTest
 private class DataCloudQueryTest {
 

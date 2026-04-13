@@ -13,7 +13,7 @@ Complete reference for the Salesforce Interactions Web SDK's public API.
 
 Initializes the SDK. Must be called before any other method.
 
-```javascript
+```javascript icon=js
 SalesforceInteractions.init({
   cookieDomain: 'yourdomain.com',  // Optional
   consent: consentPromise           // Required: Promise<Consent[]>
@@ -30,7 +30,7 @@ Reinitializes the SDK with updated configuration. Use after changing cookie doma
 
 Sends an event to Data 360:
 
-```javascript
+```javascript icon=js
 SalesforceInteractions.sendEvent({
   interaction: { /* event data */ },
   user: { /* optional user data */ },
@@ -64,7 +64,7 @@ See [Consent API](/sdks/web-sdk/consent) for usage details.
 
 The Sitemap module extracts data during page navigation, shares capture logic across pages, and separates data capture from presentation:
 
-```javascript
+```javascript icon=js
 SalesforceInteractions.initSitemap({
   global: {
     onActionEvent: (actionEvent) => {
@@ -118,7 +118,7 @@ Each `pageType` can define:
 
 Enable console logging for development:
 
-```javascript
+```javascript icon=js
 // Set log level
 SalesforceInteractions.log.setLevel('debug');
 // Options: 'none' (default), 'error', 'warn', 'info', 'debug'
@@ -130,7 +130,7 @@ The logger wraps `console.log` and is accessible at `SalesforceInteractions.log`
 
 The SDK exposes `CustomEvents` for binding listeners to internal SDK events:
 
-```javascript
+```javascript icon=js
 document.addEventListener('sfInteractions:eventSent', (event) => {
   console.log('Event sent:', event.detail);
 });

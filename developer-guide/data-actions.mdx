@@ -72,7 +72,7 @@ Webhook targets send HTTP POST requests to external endpoints when data changes 
 
 Each webhook payload includes a signature in the HTTP header that you can use to verify the request originated from Salesforce:
 
-```python
+```python icon=python
 import hmac
 import hashlib
 
@@ -102,7 +102,7 @@ def handle_data_action():
 
 ### Webhook Payload Structure
 
-```json
+```json icon=brackets-curly
 {
   "actionName": "HighValueCustomerAlert",
   "objectName": "UnifiedIndividual__dlm",
@@ -159,7 +159,7 @@ When using a Salesforce Platform Event target, data changes are published to the
 
 ### Example: Apex Trigger on Data Action Event
 
-```java
+```java icon=java
 trigger DataActionHandler on CustomerChangeEvent__e (after insert) {
     List<Task> tasksToCreate = new List<Task>();
 

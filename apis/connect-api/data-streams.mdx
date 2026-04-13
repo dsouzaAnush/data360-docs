@@ -35,7 +35,7 @@ Retrieve all data streams configured in your org.
 
 **Response:**
 
-```json Response {3-12}
+```json Response highlight={3-12}
 {
   "dataStreams": [
     {
@@ -77,7 +77,7 @@ Retrieve detailed information about a specific data stream.
 
 **Response:**
 
-```json
+```json icon=brackets-curly
 {
   "name": "WebEngagement_Stream",
   "displayName": "Web Engagement Events",
@@ -127,7 +127,7 @@ Retrieve the full schema definition for a data stream.
 
 **Response:**
 
-```json
+```json icon=brackets-curly
 {
   "streamName": "WebEngagement_Stream",
   "version": "1.2",
@@ -211,7 +211,7 @@ Retrieve ingestion statistics and health metrics.
 
 **Response:**
 
-```json
+```json icon=brackets-curly
 {
   "streamName": "WebEngagement_Stream",
   "period": {
@@ -255,7 +255,7 @@ curl -X GET "https://{instance}.salesforce.com/services/data/v64.0/ssot/data-str
   -H "Authorization: Bearer {access_token}"
 ```
 
-```python get_stream_details.py icon=python lines {4-5,8-10}
+```python get_stream_details.py icon=python lines highlight={4-5,8-10}
 import requests
 
 url = f"https://{instance}.salesforce.com/services/data/v64.0/ssot/data-streams/WebEngagement_Stream"
@@ -269,7 +269,7 @@ print(f"Records: {stream['metrics']['recordCount']:,}")
 print(f"Error Rate: {stream['metrics']['errorRate']:.2%}")
 ```
 
-```java GetStreamSchema.java icon=java lines {3-7}
+```java GetStreamSchema.java icon=java lines highlight={3-7}
 HttpClient client = HttpClient.newHttpClient();
 
 HttpRequest request = HttpRequest.newBuilder()

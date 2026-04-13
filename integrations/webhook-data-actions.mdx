@@ -34,7 +34,7 @@ If no secret key is generated, payloads will **not** be delivered. Calls are mar
 
 Webhooks deliver a `DataObjectDataChgEvent` as a JSON payload via HTTP POST:
 
-```json
+```json icon=brackets-curly
 {
   "ActionName": "HighValueCustomerAlert",
   "ActionAPIName": "HighValueCustomerAlert",
@@ -82,7 +82,7 @@ Each webhook request includes an `x-signature` HTTP header containing a **Base64
 
 ### Node.js
 
-```javascript
+```javascript icon=js
 const crypto = require('crypto');
 
 function verifySignature(rawBody, signature, secretKey) {
@@ -114,7 +114,7 @@ app.post('/webhook/data-action', express.raw({ type: '*/*' }), (req, res) => {
 
 ### Python
 
-```python
+```python icon=python
 import hmac
 import hashlib
 import base64
@@ -147,7 +147,7 @@ def handle_webhook():
 
 ### Java
 
-```java
+```java icon=java
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;

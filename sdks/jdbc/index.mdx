@@ -41,7 +41,7 @@ jdbc:salesforce-datacloud://mycompany.my.salesforce.com
 ### 1. Add the Driver Dependency
 
 <CodeGroup>
-```xml pom.xml icon=code lines {2-4}
+```xml pom.xml icon=code lines highlight={2-4}
 <dependency>
     <groupId>com.salesforce.datacloud</groupId>
     <artifactId>salesforce-datacloud-jdbc</artifactId>
@@ -56,7 +56,7 @@ implementation 'com.salesforce.datacloud:salesforce-datacloud-jdbc:1.0.0'
 
 ### 2. Establish a Connection
 
-```java Connect.java icon=java lines {6-10,13-14}
+```java Connect.java icon=java lines highlight={6-10,13-14}
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.Properties;
@@ -75,7 +75,7 @@ Connection conn = DriverManager.getConnection(url, props);
 
 ### 3. Execute a Query
 
-```java Query.java icon=java lines {3-7,9-14}
+```java Query.java icon=java lines highlight={3-7,9-14}
 import java.sql.*;
 
 try (Statement stmt = conn.createStatement()) {

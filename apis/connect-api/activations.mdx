@@ -35,7 +35,7 @@ Retrieve all configured activation targets.
 
 **Response:**
 
-```json
+```json icon=brackets-curly
 {
   "activationTargets": [
     {
@@ -88,7 +88,7 @@ Retrieve detailed configuration for a specific activation target.
 
 **Response:**
 
-```json
+```json icon=brackets-curly
 {
   "id": "ACT_001",
   "name": "Google_Ads_Target",
@@ -152,7 +152,7 @@ Retrieve all segment-to-target activations.
 
 **Response:**
 
-```json
+```json icon=brackets-curly
 {
   "activations": [
     {
@@ -192,7 +192,7 @@ Create a new activation to sync a segment to a target.
 
 **Request Body:**
 
-```json Request {2-3,4-14,15-18}
+```json Request highlight={2-3,4-14,15-18}
 {
   "segmentId": "SEG_003",
   "targetId": "ACT_001",
@@ -219,7 +219,7 @@ Create a new activation to sync a segment to a target.
 
 **Response:**
 
-```json Response {2-3}
+```json Response highlight={2-3}
 {
   "id": "ACTV_003",
   "status": "PENDING",
@@ -239,7 +239,7 @@ Manually trigger an immediate sync for an activation.
 
 **Request Body (Optional):**
 
-```json
+```json icon=brackets-curly
 {
   "syncType": "FULL",
   "priority": "HIGH"
@@ -248,7 +248,7 @@ Manually trigger an immediate sync for an activation.
 
 **Response:**
 
-```json
+```json icon=brackets-curly
 {
   "activationId": "ACTV_001",
   "syncJobId": "SYNC_001",
@@ -277,7 +277,7 @@ Retrieve sync history for an activation.
 
 **Response:**
 
-```json
+```json icon=brackets-curly
 {
   "activationId": "ACTV_001",
   "history": [
@@ -325,7 +325,7 @@ Update activation status (pause or resume).
 
 **Request Body:**
 
-```json
+```json icon=brackets-curly
 {
   "status": "PAUSED"
 }
@@ -333,7 +333,7 @@ Update activation status (pause or resume).
 
 **Response:**
 
-```json
+```json icon=brackets-curly
 {
   "id": "ACTV_001",
   "status": "PAUSED",
@@ -390,7 +390,7 @@ curl -X POST "https://{instance}.salesforce.com/services/data/v64.0/ssot/activat
   }'
 ```
 
-```python trigger_sync.py icon=python lines {4-8,9,11-13}
+```python trigger_sync.py icon=python lines highlight={4-8,9,11-13}
 import requests
 
 activation_id = "ACTV_001"
@@ -406,7 +406,7 @@ result = response.json()
 print(f"Sync job {result['syncJobId']} started with status: {result['status']}")
 ```
 
-```java GetSyncHistory.java icon=java lines {5-9}
+```java GetSyncHistory.java icon=java lines highlight={5-9}
 HttpClient client = HttpClient.newHttpClient();
 
 String url = "https://{instance}.salesforce.com/services/data/v64.0/ssot/activations/ACTV_001/history?limit=10";

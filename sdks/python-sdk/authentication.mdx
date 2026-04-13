@@ -32,7 +32,7 @@ The Client Credentials flow is recommended for server-to-server integrations whe
 
 ### Configuration
 
-```python icon=python lines {3-8}
+```python icon=python lines highlight={3-8}
 from salesforce_cdp_connector import SalesforceCDPConnection
 
 connection = SalesforceCDPConnection(
@@ -56,7 +56,7 @@ connection = SalesforceCDPConnection(
 
 ### Example
 
-```python client_credentials_example.py icon=python lines {4-10,14-16}
+```python client_credentials_example.py icon=python lines highlight={4-10,14-16}
 from salesforce_cdp_connector import SalesforceCDPConnection
 
 # Production environment
@@ -89,7 +89,7 @@ The Token flow is useful when you already have access tokens or when implementin
 
 ### Configuration
 
-```python icon=python lines {3-8}
+```python icon=python lines highlight={3-8}
 from salesforce_cdp_connector import SalesforceCDPConnection
 
 connection = SalesforceCDPConnection(
@@ -115,7 +115,7 @@ connection = SalesforceCDPConnection(
 
 To use the Token flow, you first need to obtain tokens through the standard OAuth 2.0 web flow:
 
-```python obtain_tokens.py icon=python lines {7-13,16-24,27-28}
+```python obtain_tokens.py icon=python lines highlight={7-13,16-24,27-28}
 import requests
 
 # Step 1: Direct user to authorization URL
@@ -146,7 +146,7 @@ refresh_token = tokens['refresh_token']
 
 ### Example with Token Flow
 
-```python token_flow_example.py icon=python lines {4-10,14-16}
+```python token_flow_example.py icon=python lines highlight={4-10,14-16}
 from salesforce_cdp_connector import SalesforceCDPConnection
 
 # Using previously obtained tokens
@@ -169,7 +169,7 @@ print(df)
 
 For security, store credentials in environment variables:
 
-```python env_config.py icon=python lines {4-9}
+```python env_config.py icon=python lines highlight={4-9}
 import os
 from salesforce_cdp_connector import SalesforceCDPConnection
 
@@ -195,7 +195,7 @@ export SF_PASSWORD='your_password_and_token'
 
 Use a context manager to ensure connections are properly closed:
 
-```python context_manager.py icon=python lines {4-11,12-14}
+```python context_manager.py icon=python lines highlight={4-11,12-14}
 from salesforce_cdp_connector import SalesforceCDPConnection
 
 # Connection is automatically closed when exiting the block
@@ -215,7 +215,7 @@ with SalesforceCDPConnection(
 
 Handle authentication errors gracefully:
 
-```python error_handling.py icon=python lines {4-11,12-15}
+```python error_handling.py icon=python lines highlight={4-11,12-15}
 from salesforce_cdp_connector import SalesforceCDPConnection
 from salesforce_cdp_connector.exceptions import AuthenticationError
 
@@ -238,7 +238,7 @@ except Exception as e:
 
 For sandbox orgs, use the test login URL:
 
-```python sandbox_config.py icon=python lines {2,5}
+```python sandbox_config.py icon=python lines highlight={2,5}
 connection = SalesforceCDPConnection(
     login_url='https://test.salesforce.com',  # Sandbox URL
     client_id=client_id,

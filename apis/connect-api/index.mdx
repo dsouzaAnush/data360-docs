@@ -39,7 +39,7 @@ The Connect REST API provides endpoints across several functional areas:
 
 All Connect REST API requests require OAuth 2.0 authentication. Include your access token in the `Authorization` header:
 
-```bash
+```bash icon=terminal
 curl -X GET "https://{instance}.salesforce.com/services/data/v64.0/ssot/..." \
   -H "Authorization: Bearer {access_token}" \
   -H "Content-Type: application/json"
