@@ -59,46 +59,15 @@ In Partial Copy and Full sandboxes:
 
 Sandbox environments consume Data 360 credits at **80% of the production rate** (20% discount). Monitor usage in Setup > Data 360 > Usage.
 
-## DevOps Data Kit
+## Data Kits for Deployment
 
-The DevOps Data Kit helps you collect, sequence, and deploy Data 360 configuration metadata from sandboxes to production or between environments.
+All Data 360 metadata must be packaged through a **data kit** before it can be deployed between environments. Data kits handle dependency ordering automatically — critical because Data 360 components have complex interdependencies (e.g., segments depend on DMOs, which depend on data streams).
 
-### Why Use It
+For sandbox-to-production deployments, use a **DevOps Data Kit**. For ISV app distribution, use a **Standard Data Kit**.
 
-Data 360 metadata has complex dependencies (e.g., segments depend on DMOs, which depend on data streams). The DevOps Data Kit handles dependency ordering automatically.
-
-### What's Deployable
-
-| Component | Deployable | Notes |
-|-----------|-----------|-------|
-| **Data Streams** | Yes | Connector configs and mappings |
-| **DMO Mappings** | Yes | Field mappings to standard model |
-| **Identity Resolution Rulesets** | Yes | Match and reconciliation rules |
-| **Calculated Insights** | Yes | SQL-based insight definitions |
-| **Segments** | Yes | Segment criteria and SQL rules |
-| **Data Transforms** | Yes | Batch and streaming definitions |
-| **Data Actions** | Yes | Rules and target configurations |
-| **Activation Targets** | Partial | Target configs (credentials need reconfiguration) |
-
-### Deployment Process
-
-<Steps>
-  <Step title="Prepare the Data Kit">
-    In your sandbox, navigate to **Setup > DevOps Data Kit** and create a new kit. Select the components to include.
-  </Step>
-  <Step title="Review Dependencies">
-    The data kit automatically identifies and includes dependent components. Review the component list.
-  </Step>
-  <Step title="Export">
-    Export the data kit as a deployable package.
-  </Step>
-  <Step title="Deploy to Target">
-    Use one of the deployment methods to apply the kit to the target org.
-  </Step>
-  <Step title="Reconfigure Credentials">
-    Re-authenticate external connectors and update credentials in the target org.
-  </Step>
-</Steps>
+<Card title="Packages & Data Kits" icon="box" href="/developer-guide/packages-data-kits">
+  Complete guide to data kit types, packageable components, extensibility readiness matrix, CLI deployment walkthrough, and troubleshooting.
+</Card>
 
 ## Deployment Methods
 
@@ -278,6 +247,7 @@ private class DataCloudIntegrationTest {
 
 ## Related Resources
 
+- [Packages & Data Kits](/developer-guide/packages-data-kits) — Data kit types, packageable components, CLI deployment walkthrough
 - [Development Environments](/developer-guide/environments) — Dev environment types and setup
 - [2GP Workflow](/developer-guide/2gp-workflow) — ISV packaging for Data 360 apps
 - [Apex Integration](/developer-guide/apex-integration) — Testing Data 360 Apex code
