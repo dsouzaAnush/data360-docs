@@ -1,0 +1,268 @@
+---
+title: "Mobile SDK"
+description: "Integrate iOS and Android mobile applications with Data 360 to capture behavioral and demographic data."
+---
+
+# Data 360 Engagement Mobile SDK
+
+<Note>
+As of October 14, 2025, Data Cloud has been rebranded to **Data 360**. During this transition, you may see references to Data Cloud in our application and documentation.
+</Note>
+
+The Data 360 Module for the Engagement Mobile SDK enables you to capture rich behavioral and demographic data from your iOS and Android mobile applications, including app lifecycle events, screen navigation, and custom engagement events.
+
+## Overview
+
+The Mobile SDK:
+
+- **Captures behavioral data** — App lifecycle events, screen views, button taps, custom events
+- **Captures demographic data** — User profile attributes, device information
+- **Sends to Data 360** — All events are delivered to your configured Data 360 web connector
+- **Creates unified profiles** — Mobile data participates in identity resolution with web, CRM, and other sources
+
+## Installation
+
+### iOS (Swift Package Manager)
+
+<Steps>
+  <Step title="Add Package">
+    In Xcode, go to **File > Add Packages** and enter the package URL for the Data 360 Engagement Mobile SDK.
+  </Step>
+  <Step title="Select Module">
+    Choose the **Data Cloud Module** from the available products.
+  </Step>
+  <Step title="Configure">
+    Initialize the SDK with your tenant endpoint and app source ID.
+  </Step>
+</Steps>
+
+```swift
+import SalesforceEngagementSDK
+import DataCloudModule
+
+// Initialize the SDK
+let config = DataCloudConfig(
+    appSourceId: "your-app-source-id",
+    tenantEndpoint: "https://your-instance.salesforce.com"
+)
+DataCloud.initialize(config: config)
+```
+
+### Android (Gradle)
+
+Add the dependency to your module-level `build.gradle`:
+
+```groovy
+dependencies {
+    implementation 'com.salesforce.datacloud:engagement-mobile-sdk:latest'
+}
+```
+
+Initialize in your Application class:
+
+```kotlin
+import com.salesforce.datacloud.DataCloud
+import com.salesforce.datacloud.DataCloudConfig
+
+class MyApp : Application() {
+    override fun onCreate() {
+        super.onCreate()
+
+        val config = DataCloudConfig.Builder()
+            .setAppSourceId("your-app-source-id")
+            .setTenantEndpoint("https://your-instance.salesforce.com")
+            .build()
+
+        DataCloud.initialize(this, config)
+    }
+}
+```
+
+## Configuration
+
+### Prerequisites
+
+1. **Data Source Connector** — Create a "Websites and Mobile Apps" connector in Data 360 Setup
+2. **App Connector** — Configure the mobile app under the connector with an app source ID
+3. **Tenant Endpoint** — The Data 360 instance endpoint URL
+
+### Required Parameters
+
+| Parameter | Description | Where to Find |
+|-----------|-------------|---------------|
+| `appSourceId` | Unique identifier for your app | Data 360 Setup > Connectors > Your App |
+| `tenantEndpoint` | Data 360 instance URL | Data 360 Setup > Endpoints |
+
+## Tracking Events
+
+### Automatic Events
+
+The SDK automatically captures:
+
+| Event | iOS | Android | Description |
+|-------|-----|---------|-------------|
+| App Open | Auto | Auto | App launched or brought to foreground |
+| App Close | Auto | Auto | App sent to background |
+| Screen View | Auto (SwiftUI) | Auto (Activity) | Screen/view controller presented |
+
+### Custom Events
+
+Track custom engagement events:
+
+```swift
+// iOS: Track a product view
+DataCloud.trackEvent(
+    name: "ProductView",
+    attributes: [
+        "productId": "SKU-12345",
+        "productName": "Running Shoes",
+        "category": "Footwear",
+        "price": 129.99
+    ]
+)
+
+// iOS: Track a purchase
+DataCloud.trackEvent(
+    name: "Purchase",
+    attributes: [
+        "orderId": "ORD-67890",
+        "totalAmount": 259.98,
+        "itemCount": 2,
+        "paymentMethod": "Credit Card"
+    ]
+)
+```
+
+```kotlin
+// Android: Track a product view
+DataCloud.trackEvent(
+    "ProductView",
+    mapOf(
+        "productId" to "SKU-12345",
+        "productName" to "Running Shoes",
+        "category" to "Footwear",
+        "price" to 129.99
+    )
+)
+
+// Android: Track a purchase
+DataCloud.trackEvent(
+    "Purchase",
+    mapOf(
+        "orderId" to "ORD-67890",
+        "totalAmount" to 259.98,
+        "itemCount" to 2,
+        "paymentMethod" to "Credit Card"
+    )
+)
+```
+
+## Identity Management
+
+Associate mobile events with known user identities:
+
+```swift
+// iOS: Set user identity
+DataCloud.setIdentity(
+    userId: "user-123",
+    attributes: [
+        "email": "jane@example.com",
+        "firstName": "Jane",
+        "lastName": "Doe"
+    ]
+)
+
+// iOS: Clear identity on logout
+DataCloud.clearIdentity()
+```
+
+```kotlin
+// Android: Set user identity
+DataCloud.setIdentity(
+    "user-123",
+    mapOf(
+        "email" to "jane@example.com",
+        "firstName" to "Jane",
+        "lastName" to "Doe"
+    )
+)
+
+// Android: Clear identity on logout
+DataCloud.clearIdentity()
+```
+
+## Consent Management
+
+The SDK provides managed consent handling for privacy regulation compliance:
+
+```swift
+// iOS: Grant consent
+DataCloud.setConsentStatus(.optedIn)
+
+// iOS: Revoke consent
+DataCloud.setConsentStatus(.optedOut)
+
+// iOS: Check current consent
+let status = DataCloud.getConsentStatus()
+```
+
+```kotlin
+// Android: Grant consent
+DataCloud.setConsentStatus(ConsentStatus.OPTED_IN)
+
+// Android: Revoke consent
+DataCloud.setConsentStatus(ConsentStatus.OPTED_OUT)
+```
+
+<Warning>
+The SDK **does not collect or transmit** any data until explicit consent is granted. When consent is revoked, all event collection immediately stops.
+</Warning>
+
+## Standard Schema Mappings
+
+The Mobile SDK uses standard schema mappings for common ecommerce events:
+
+| Event Type | DMO Mapping | Description |
+|-----------|-------------|-------------|
+| Cart Interaction | Cart, Cart Product | Add to cart, remove from cart |
+| Catalog Interaction | Website Engagement | Product views, searches |
+| Order Interaction | Sales Order, Sales Order Product | Purchases, returns |
+| Identity Event | Individual, Contact Points | User identification |
+| Consent Event | Contact Point Consent | Consent changes |
+
+## Source Repositories
+
+- [Android SDK (GitHub)](https://github.com/nicholasgasior/salesforce-cdp-mobile-sdk-android)
+- [iOS SDK (GitHub)](https://github.com/nicholasgasior/salesforce-cdp-mobile-sdk-ios)
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Implementation">
+    - Initialize the SDK as early as possible in the app lifecycle (Application/AppDelegate)
+    - Set user identity immediately after authentication to link anonymous and known sessions
+    - Clear identity on logout to prevent data cross-contamination between users
+    - Use consistent event naming conventions across iOS and Android
+  </Accordion>
+
+  <Accordion title="Privacy">
+    - Always collect consent before enabling event tracking
+    - Implement a clear consent UI following platform guidelines (iOS App Tracking Transparency, Android consent dialogs)
+    - Honor consent revocation immediately — the SDK handles this automatically
+    - Test consent flows thoroughly — verify no events are sent when consent is not granted
+  </Accordion>
+
+  <Accordion title="Performance">
+    - The SDK batches events to minimize network usage and battery impact
+    - Avoid sending excessive custom events — focus on high-value interactions
+    - Keep event attribute payloads concise (under 64 KB per event)
+    - Test SDK integration on low-end devices to verify performance impact
+  </Accordion>
+</AccordionGroup>
+
+## Related Resources
+
+- [Web SDK](/sdks/web-sdk/index) — Browser-based event capture
+- [Mobile & Web Connector](/integrations/mobile-web-connector) — Connector setup
+- [Consent & Governance](/developer-guide/consent-governance) — Privacy compliance
+- Salesforce Docs: [Engagement Mobile SDK](https://developer.salesforce.com/docs/data/data-cloud-engagement-mobile-sdk/guide/c360a-api-engagement-mobile-sdk.html)

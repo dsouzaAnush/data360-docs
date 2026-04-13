@@ -1,0 +1,232 @@
+---
+title: "Profile & Data Explorer"
+description: "Explore unified customer profiles, browse data model objects, and run interactive queries in Data 360."
+---
+
+# Profile & Data Explorer
+
+<Note>
+As of October 14, 2025, Data Cloud has been rebranded to **Data 360**. During this transition, you may see references to Data Cloud in our application and documentation.
+</Note>
+
+Data 360 provides built-in tools for exploring unified customer profiles and browsing ingested data. These tools are essential for validating identity resolution, inspecting data quality, and building ad-hoc queries.
+
+## Profile Explorer
+
+Profile Explorer displays unified customer profiles created through identity resolution. It provides a single view of all data associated with an individual or account, consolidated from every source.
+
+### Accessing Profile Explorer
+
+Navigate to the **Profile Explorer** tab in Data 360. Search for profiles by:
+
+- Name (first name, last name)
+- Email address
+- Phone number
+- Unified Individual ID
+
+### Profile Composition
+
+Each unified profile is built from two key DMOs:
+
+| DMO | Purpose |
+|-----|---------|
+| **Unified Link Individual** | Joining point between source data and the unified profile. Contains source record IDs, data source names, and the unified ID. |
+| **Unified Individual** | Reconciled (golden record) data from all linked source records. Contains the reconciled first name, last name, email, phone, etc. |
+
+### What You See
+
+| Section | Content |
+|---------|---------|
+| **Profile Card** | Reconciled attributes (name, email, phone, address) |
+| **Source Records** | All linked source records with their origin system |
+| **Contact Points** | All known contact points (email addresses, phone numbers, mailing addresses, social handles) |
+| **Engagement History** | Website visits, email interactions, flow executions, message engagements |
+| **Related Records** | Linked DMO data (orders, cases, loyalty, subscriptions) |
+| **Segment Membership** | Segments the individual belongs to |
+| **Calculated Insights** | Computed metrics (lifetime value, engagement score) |
+
+### Customizing Profile Explorer
+
+Administrators can customize the Profile Explorer layout using Lightning App Builder:
+
+1. Navigate to **Setup > Lightning App Builder**
+2. Open or clone the Profile Explorer page
+3. Add, remove, or reorder components:
+   - **Profile Insights** — Calculated insight metrics
+   - **Engagements** — Engagement timeline
+   - **Related Records** — Related DMO data tables
+4. Save and assign to user profiles
+
+### Important Behaviors
+
+- Profiles are **mutable** — they update when source data changes, new sources process, or identity resolution rules are re-run
+- Unified IDs **can change** when new data causes profiles to merge or split
+- Source data lineage is always **preserved** — all original records remain accessible
+- Profile Explorer respects **data space** and **permission set** access controls
+
+## Data Explorer
+
+Data Explorer provides a visual interface for browsing all ingested data across DMOs, DLOs, and calculated insight objects.
+
+### Capabilities
+
+| Feature | Description |
+|---------|-------------|
+| **Browse Objects** | View all DMOs, DLOs, and CIOs in a searchable list |
+| **View Records** | Inspect record-level data with column selection |
+| **Filter Data** | Apply filters to narrow results by field values |
+| **Aggregate** | Summarize data by measures (count, sum, average) |
+| **Group** | Group records by dimension fields |
+| **Column Selection** | Choose which columns to display |
+
+### Three Query Actions
+
+Data Explorer supports three interactive query modes:
+
+1. **Aggregating** — Summarize data by selecting a measure and aggregation function
+2. **Grouping** — Group records by a dimension field to see distributions
+3. **Filtering** — Apply WHERE-style conditions to narrow results
+
+### Using Data Explorer
+
+<Steps>
+  <Step title="Select an Object">
+    From the Data Explorer tab, browse or search for a DMO, DLO, or CIO.
+  </Step>
+  <Step title="Explore Records">
+    View the first N records. Use column selection to show relevant fields.
+  </Step>
+  <Step title="Apply Filters">
+    Add filter conditions to isolate specific records (e.g., `LifetimeValue > 5000`).
+  </Step>
+  <Step title="Aggregate or Group">
+    Switch to aggregate view to see summarized metrics, or group by a dimension to see distributions.
+  </Step>
+</Steps>
+
+## Query Editor (Query Workspaces)
+
+For advanced analysis, use the Query Editor to write, execute, and save SQL queries directly against Data 360 data.
+
+### Features
+
+| Feature | Description |
+|---------|-------------|
+| **SQL Editor** | Write Data 360 SQL with syntax highlighting |
+| **Auto-completion** | Suggests object names, field names, and SQL keywords |
+| **Results Grid** | View query results in a tabular format |
+| **Visualization** | Basic chart visualizations from query results |
+| **Save & Share** | Save queries as workspaces for reuse and collaboration |
+| **Export** | Export results for further analysis |
+
+### Example Query
+
+```sql
+-- Top 10 customers by lifetime value with segment membership
+SELECT
+    ui.ssot__FirstName__c AS FirstName,
+    ui.ssot__LastName__c AS LastName,
+    ui.ssot__Email__c AS Email,
+    ci.LifetimeValue AS LTV,
+    ci.TotalOrders AS Orders
+FROM
+    UnifiedIndividual__dlm ui
+JOIN
+    CustomerLTV__cio ci ON ui.ssot__Id__c = ci.IndividualId
+ORDER BY
+    ci.LifetimeValue DESC
+LIMIT 10
+```
+
+### Permission Requirements
+
+| Feature | Required Permission |
+|---------|-------------------|
+| Data Explorer (browse) | Data Cloud User |
+| Query Editor | Data Cloud Data Aware Specialist + data space access |
+| Profile Explorer | Data Cloud User + Profile Explorer permission |
+
+## Data Graphs
+
+Data graphs define connections between DMOs and materialize them as hierarchical JSON views. They're useful for applications that need denormalized, pre-joined data.
+
+### Types
+
+| Type | Processing | Best For |
+|------|-----------|----------|
+| **Standard** | Batch (minutes to hours) | Reporting, synchronization, batch processing |
+| **Real-Time** | Instant updates | Live monitoring, fraud detection, instant personalization |
+
+### Creating a Data Graph
+
+<Steps>
+  <Step title="Start from Scratch or Data Kit">
+    Navigate to **Data Graphs** in Data 360 and click **New**. Choose to start from scratch or use a pre-built data kit template.
+  </Step>
+  <Step title="Select Primary DMO">
+    Choose the root object (e.g., Individual) and select fields to include.
+  </Step>
+  <Step title="Add Related Objects">
+    Click **+** to add related DMOs (e.g., Contact Point Address, Account Contact, Sales Orders). Configure fields for each.
+  </Step>
+  <Step title="Configure Refresh">
+    Set the refresh interval (weekly recommended for cost efficiency).
+  </Step>
+  <Step title="Build">
+    Save and build the data graph. Processing takes 15 minutes to several hours depending on data volume.
+  </Step>
+</Steps>
+
+### Querying Data Graphs via API
+
+```bash
+# Get data graph metadata
+curl -X GET "https://{instance}.salesforce.com/api/v1/dataGraph/metadata?dataGraphName=UnifiedIndividual_DG" \
+  -H "Authorization: Bearer {access_token}"
+
+# Look up a specific record
+curl -X GET "https://{instance}.salesforce.com/api/v1/dataGraph/UnifiedIndividual_DG/{recordId}" \
+  -H "Authorization: Bearer {access_token}"
+```
+
+### Query Types
+
+| Type | Performance | Data Freshness | Credit Cost |
+|------|------------|----------------|-------------|
+| **Precalculated** | Fast (near real-time response) | As of last build | Lower |
+| **Live** | Slower (real-time query) | Current | Higher |
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Profile Explorer">
+    - Use Profile Explorer to validate identity resolution results after ruleset changes
+    - Check that source records are correctly linked to unified profiles
+    - Review contact point consolidation to verify deduplication quality
+    - Customize the layout to show the most relevant data for your use case
+  </Accordion>
+
+  <Accordion title="Data Explorer">
+    - Use Data Explorer to spot-check data quality after ingestion
+    - Apply filters to investigate specific data issues
+    - Save commonly used queries as workspaces for the team
+    - Use aggregate views to quickly understand data distributions
+  </Accordion>
+
+  <Accordion title="Data Graphs">
+    - Use standard data graphs for batch reporting scenarios
+    - Reserve real-time data graphs for latency-sensitive applications
+    - Configure recency filters on engagement DMOs to manage data graph size
+    - Monitor build times and adjust refresh intervals based on data volume growth
+  </Accordion>
+</AccordionGroup>
+
+## Related Resources
+
+- [Query API](/apis/query-api/index) — Programmatic data querying
+- [SQL Reference](/apis/query-api/sql-reference) — Data 360 SQL syntax
+- [Data Graphs API](/apis/query-api/data-graphs) — Data graph query API reference
+- [Identity Resolution](/apis/connect-api/identity-resolution) — Profile unification configuration
+- Salesforce Help: [Profile Explorer](https://help.salesforce.com/s/articleView?id=sf.c360_a_profile_explorer.htm&type=5)
+- Salesforce Help: [Data Explorer](https://help.salesforce.com/s/articleView?id=sf.c360_a_data_explorer.htm&type=5)
+- Salesforce Help: [Data Graphs](https://help.salesforce.com/s/articleView?id=data.c360_a_data_graphs.htm&type=5)

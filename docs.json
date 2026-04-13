@@ -40,10 +40,33 @@
               "developer-guide/quick-start",
               "developer-guide/use-cases",
               "developer-guide/architecture",
-              "developer-guide/environments",
               "developer-guide/platform-comparison",
-              "developer-guide/2gp-workflow",
               "developer-guide/postman-collection"
+            ]
+          },
+          {
+            "group": "Platform Features",
+            "pages": [
+              "developer-guide/data-transforms",
+              "developer-guide/data-actions",
+              "developer-guide/flows-automation",
+              "developer-guide/platform-events",
+              "developer-guide/ai-ml-integration",
+              "developer-guide/unstructured-data-rag",
+              "developer-guide/profile-data-explorer",
+              "developer-guide/tableau-analytics"
+            ]
+          },
+          {
+            "group": "Development & Operations",
+            "pages": [
+              "developer-guide/apex-integration",
+              "developer-guide/identity-resolution-best-practices",
+              "developer-guide/security-permissions",
+              "developer-guide/consent-governance",
+              "developer-guide/environments",
+              "developer-guide/sandbox-devops",
+              "developer-guide/2gp-workflow"
             ]
           }
         ]
@@ -105,6 +128,12 @@
             ]
           },
           {
+            "group": "Mobile SDK",
+            "pages": [
+              "sdks/mobile-sdk/index"
+            ]
+          },
+          {
             "group": "Python SDK",
             "pages": [
               "sdks/python-sdk/index",
@@ -130,7 +159,8 @@
           {
             "group": "Data Model Objects",
             "pages": [
-              "data-models/index"
+              "data-models/index",
+              "data-models/categories"
             ]
           }
         ]
@@ -159,7 +189,14 @@
             "pages": [
               "integrations/web-sdk-setup",
               "integrations/mobile-web-connector",
-              "integrations/third-party-connectors"
+              "integrations/third-party-connectors",
+              "integrations/zero-copy-federation"
+            ]
+          },
+          {
+            "group": "Data Actions",
+            "pages": [
+              "integrations/webhook-data-actions"
             ]
           }
         ]
@@ -170,7 +207,11 @@
           {
             "group": "Reference",
             "pages": [
-              "reference/index"
+              "reference/index",
+              "reference/limits",
+              "reference/glossary",
+              "reference/troubleshooting",
+              "reference/whats-new"
             ]
           }
         ]

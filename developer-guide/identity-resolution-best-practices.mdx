@@ -1,0 +1,84 @@
+---
+title: "Identity Resolution Best Practices"
+description: "Strategies for creating trusted unified profiles and avoiding common pitfalls in identity resolution."
+---
+
+# Identity Resolution Best Practices
+
+The "Identity Crisis" is one of the most significant challenges for organizations managing complex data landscapes. Particularly in the Commercial (Mid-Market) segment, where data is often fragmented across multiple legacy systems, duplicate records are the norm rather than the exception.
+
+While the Data 360 Identity Resolution UI is powerful, its abstract nature can lead to misconfigurations that cause "over-merging" or "under-merging"—both of which can quickly destroy user trust in the system.
+
+## The "Golden Rule" of Data Cloud
+
+Before configuring a single match rule, remember: **Data Cloud is a mirror, not a magic wand.**
+
+It is a common misconception that Data 360 will "fix" your source data. If your ERP or CRM contains low-quality, uncleaned data (e.g., "John Doe" and "J. Doe" at the same address but with different IDs), Identity Resolution can only do so much. High-quality unified profiles begin with high-quality source data and rigorous normalization during ingestion.
+
+---
+
+## Strategy: Start Strict, Then Loosen
+
+The biggest risk in identity resolution is **over-merging** (combining two different people into one profile). This is much harder to fix than **under-merging** (keeping one person as two profiles). 
+
+Always start with high-confidence, exact match rules before introducing fuzzy logic.
+
+### 1. High-Confidence Matches (The Foundation)
+Use these to catch the "easy" duplicates where data is cleanly shared.
+*   **Exact Email + Exact First Name:** Very high confidence.
+*   **Exact Phone (Normalized) + Exact Last Name:** Reliable across different systems.
+*   **External ID (e.g., Loyalty ID, Customer Number):** The strongest possible link.
+
+### 2. Probabilistic Matches (The "Fuzzy" Layer)
+Once your foundation is set, add fuzzy rules to catch variations.
+*   **Fuzzy Name Match + Exact Email Match:** Useful for catching "Robert" vs "Bob" when the email is identical.
+*   **Fuzzy Name Match + Fuzzy Address Match:** Useful for householding or when contact info is missing, but requires high thresholds (e.g., 0.90+).
+
+---
+
+## Avoiding the Trust Killers
+
+### Over-Merging
+**The Cause:** Using rules that are too broad (e.g., "Exact Last Name + Exact Zip Code"). In a dense apartment building, this could merge dozens of unrelated people.
+**The Result:** A salesperson calls "John Smith" but sees "Jane Smith's" purchase history. Trust in the data is lost instantly.
+
+### Under-Merging
+**The Cause:** Being too restrictive or failing to normalize data (e.g., not stripping spaces or inconsistent phone formatting).
+**The Result:** Fragmented profiles where a customer's total value is hidden across three different "unified" IDs.
+
+---
+
+## Troubleshooting Framework: Validating "Golden Records"
+
+Don't wait for users to report errors. Proactively validate your unified profiles using this framework:
+
+### 1. The "Spot Check" Audit
+Select 50 unified profiles at random. Use the `match history` API to see which source records contributed to them.
+*   Are there records from different sources that obviously don't belong together?
+*   Are there records with the same name/email that *didn't* merge?
+
+### 2. Monitor Cluster Sizes
+Use the Job Details API to track `averageClusterSize`. 
+*   **Sudden Spikes:** If your average cluster size jumps from 2.1 to 4.5 after a rule change, you have likely over-merged.
+*   **Flat Trends:** If you know you have duplicates but the cluster size stays near 1.0, your rules are too strict.
+
+### 3. Source Priority Validation
+Review your **Survivorship Rules**. If your ERP has the "official" address but your Web SDK has the "most recent" (and potentially typo-ridden) address, ensure your rules prioritize the trusted source for that specific field.
+
+---
+
+## Match Rule Examples
+
+| Scenario | Match Rule Configuration | Why it works |
+| :--- | :--- | :--- |
+| **The Professional** | `Exact Email` + `Exact Last Name` | Standard for B2B. Catches different nicknames (Bob/Robert) using the same work email. |
+| **The Family Member** | `Fuzzy Name (0.85)` + `Exact Phone` | Useful when family members share a phone but have slightly different name spellings. |
+| **The Digital Native** | `Normalized Phone` + `Exact Email` | High confidence for mobile-first users who may change names (e.g., after marriage) but keep their devices and accounts. |
+| **The Household** | `Exact Address` + `Exact Last Name` | Good for physical mailers, but use with caution for digital marketing to avoid "John" seeing "Jane's" ads. |
+
+## Summary Checklist
+- [ ] Are all phone numbers and emails normalized during ingestion?
+- [ ] Have you defined source priority for critical fields like "Date of Birth"?
+- [ ] Did you start with at least two high-confidence exact-match rules?
+- [ ] Is your fuzzy threshold for names at least 0.85?
+- [ ] Have you run a "Full Reconciliation" job and audited the `splitProfiles` metric?

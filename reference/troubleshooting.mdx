@@ -1,0 +1,210 @@
+---
+title: "Troubleshooting"
+description: "Common issues, error messages, and solutions for Data 360 development."
+---
+
+# Troubleshooting
+
+<Note>
+As of October 14, 2025, Data Cloud has been rebranded to **Data 360**. During this transition, you may see references to Data Cloud in our application and documentation.
+</Note>
+
+This guide covers common issues encountered during Data 360 development with solutions and debugging strategies.
+
+## Data Ingestion Issues
+
+<AccordionGroup>
+  <Accordion title="Streaming ingestion data not appearing">
+    **Symptoms:** Data sent via Ingestion API streaming endpoint returns 200 OK but records don't appear in the DLO.
+
+    **Causes & Solutions:**
+    - **Processing delay** — Streaming ingestion processes data asynchronously (~3 minutes). Wait and check again.
+    - **Schema mismatch** — Verify your JSON payload matches the OpenAPI YAML schema exactly. Field names are case-sensitive.
+    - **Data stream not deployed** — Check that the data stream status is "Active" in Setup.
+    - **Payload too large** — Streaming payloads must be under 200 KB per request.
+    - **Authentication** — Verify your access token has the `cdp_ingest_api` scope.
+  </Accordion>
+
+  <Accordion title="Bulk ingestion job fails">
+    **Symptoms:** Bulk CSV upload returns an error or job status shows "Failed."
+
+    **Causes & Solutions:**
+    - **CSV format** — Verify CSV encoding (UTF-8), delimiter (comma), and line endings.
+    - **File size** — Bulk files must be under 200 MB.
+    - **Schema validation** — Column headers must match the data stream schema field names exactly.
+    - **Data types** — Verify date formats match the expected pattern (e.g., `YYYY-MM-DDTHH:MM:SSZ`).
+    - Check the job error details in the Data Streams tab for specific field-level errors.
+  </Accordion>
+
+  <Accordion title="Connector refresh failing">
+    **Symptoms:** CRM or third-party connector shows errors in refresh history.
+
+    **Causes & Solutions:**
+    - **Authentication expired** — Re-authenticate the connector in Setup.
+    - **Source schema changed** — If source fields were added/removed, update the data stream mapping.
+    - **Rate limits** — The source system may be throttling requests. Check refresh scheduling.
+    - See Salesforce Help: [Troubleshooting CRM Connections](https://help.salesforce.com/s/articleView?id=sf.c360_a_refresh_history.htm&type=5)
+  </Accordion>
+</AccordionGroup>
+
+## Query Issues
+
+<AccordionGroup>
+  <Accordion title="Query timeout errors">
+    **Symptoms:** SQL queries return a timeout error after 5 minutes.
+
+    **Solutions:**
+    - Add `WHERE` filters to reduce the data scanned
+    - Use `LIMIT` to cap the result set
+    - Avoid `SELECT *` — select only needed fields
+    - Use `EXPLAIN` to analyze the query execution plan
+    - Break complex queries into smaller, staged queries
+    - Consider using a calculated insight for frequently needed aggregations
+  </Accordion>
+
+  <Accordion title="SOQL: 'Object does not exist' error">
+    **Symptoms:** SOQL query returns "sObject type 'X__dlm' is not supported."
+
+    **Solutions:**
+    - Verify you're using API version 61.0 or later for SOQL with DMOs
+    - Check the object API name — DMOs use the `__dlm` suffix
+    - Ensure your user has the appropriate Data 360 permission set
+    - Verify the DMO exists in Data Explorer
+  </Accordion>
+
+  <Accordion title="CdpQuery returns empty results">
+    **Symptoms:** `ConnectApi.CdpQuery.queryAnsiSql()` returns no data.
+
+    **Solutions:**
+    - Verify the SQL syntax — CdpQuery uses ANSI SQL, not SOQL syntax
+    - Check that data has been ingested and mapped to the queried DMO
+    - Verify data space access — the user may not have access to the queried data space
+    - Test the same query in Data Explorer's Query Editor to isolate the issue
+  </Accordion>
+
+  <Accordion title="'Next batch ID expired' error">
+    **Symptoms:** Query pagination fails with an expiration error.
+
+    **Solutions:**
+    - Complete result set fetching within **1 hour** of the initial query
+    - Ensure time between batch calls doesn't exceed **3 minutes**
+    - For very large result sets, use more restrictive filters to reduce total results
+  </Accordion>
+</AccordionGroup>
+
+## Identity Resolution Issues
+
+<AccordionGroup>
+  <Accordion title="Too many profiles / under-matching">
+    **Symptoms:** Identity resolution creates separate unified profiles for records that should be merged.
+
+    **Solutions:**
+    - Review match rules — ensure they're not too strict
+    - Add fuzzy matching for name fields (handles typos, abbreviations)
+    - Verify contact point data is correctly mapped (email, phone)
+    - Check data quality — inconsistent formats can prevent matching
+    - Run identity resolution with debug logging to see match details
+  </Accordion>
+
+  <Accordion title="Too few profiles / over-matching">
+    **Symptoms:** Unrelated records are merged into the same unified profile.
+
+    **Solutions:**
+    - Review match rules — add additional match criteria to increase specificity
+    - Avoid matching on common values (e.g., company phone numbers shared by many employees)
+    - Add negative match conditions to prevent known false positives
+    - Review the Identity Resolution processing summary for match statistics
+  </Accordion>
+</AccordionGroup>
+
+## Activation Issues
+
+<AccordionGroup>
+  <Accordion title="Low match rates in activation targets">
+    **Symptoms:** Activation sync shows low match rates (e.g., 30% instead of expected 70%).
+
+    **Solutions:**
+    - Verify field mappings match the target platform's requirements exactly
+    - Ensure PII is hashed using the correct algorithm (SHA-256 for most ad platforms)
+    - Check phone number formatting (E.164 format: `+15551234567`)
+    - Verify email addresses are lowercase and trimmed
+    - Test with a small segment first to debug mapping issues
+  </Accordion>
+
+  <Accordion title="Activation sync fails">
+    **Symptoms:** Activation shows "Error" status in sync history.
+
+    **Solutions:**
+    - Check the activation target connection — re-authenticate if needed
+    - Review the sync error details for specific field-level errors
+    - Verify the segment has members (empty segments may cause errors on some platforms)
+    - Check target platform rate limits and quotas
+  </Accordion>
+</AccordionGroup>
+
+## Data Action & Webhook Issues
+
+<AccordionGroup>
+  <Accordion title="Webhook not receiving payloads">
+    **Symptoms:** Webhook endpoint never receives HTTP requests from Data 360.
+
+    **Solutions:**
+    - Verify a **secret key has been generated** — without it, payloads are not delivered
+    - Check that the data action is activated and conditions are being met
+    - Verify the webhook URL is HTTPS and publicly accessible
+    - Check your endpoint's firewall/security group allows traffic from Salesforce IPs
+    - New secret keys take up to **15 minutes** to propagate
+  </Accordion>
+
+  <Accordion title="Webhook signature verification failing">
+    **Symptoms:** Computed signature doesn't match the `x-signature` header.
+
+    **Solutions:**
+    - Verify you're using the **raw request body** (not parsed JSON) for signature computation
+    - Use HMAC-SHA256 with Base64 encoding (not hex encoding)
+    - Ensure the secret key hasn't been rotated — check Data Action Target configuration
+    - Use constant-time comparison to avoid timing-based false negatives
+  </Accordion>
+</AccordionGroup>
+
+## SDK Issues
+
+<AccordionGroup>
+  <Accordion title="Web SDK events not appearing in Data 360">
+    **Symptoms:** SDK is initialized but events don't appear in the data stream.
+
+    **Solutions:**
+    - Verify consent has been granted — the SDK does not transmit data without explicit consent
+    - Check the browser console for SDK errors
+    - Verify the web connector is configured and the data stream is deployed
+    - Confirm the SDK tenant endpoint and app source ID are correct
+    - Check that event names match the expected schema
+  </Accordion>
+
+  <Accordion title="JDBC connection failing">
+    **Symptoms:** BI tool can't connect via JDBC driver.
+
+    **Solutions:**
+    - Verify the JDBC connection string format and credentials
+    - Check that the connected app has appropriate OAuth scopes
+    - Test connectivity using a simple tool like DBeaver before configuring BI tools
+    - See [JDBC Authentication](/sdks/jdbc/authentication) for connection details
+  </Accordion>
+</AccordionGroup>
+
+## General Debugging Steps
+
+1. **Check Data Explorer** — Verify data exists in the expected DMOs/DLOs
+2. **Review Refresh History** — Check data stream refresh history for ingestion errors
+3. **Query Editor** — Run a direct SQL query to verify data availability
+4. **Setup Audit Trail** — Check for recent configuration changes that may have caused issues
+5. **Debug Logs** — Enable debug logging for flows and Apex code
+6. **Permission Verification** — Confirm the user has the correct Data 360 permission set and data space access
+7. **API Logs** — Check connected app usage and OAuth token validity
+
+## Related Resources
+
+- [Limits & Guidelines](/reference/limits) — Check if you're hitting platform limits
+- [Security & Permissions](/developer-guide/security-permissions) — Permission set requirements
+- [Status Codes](/apis/query-api/status-codes) — Query API error codes
+- Salesforce Help: [Troubleshooting CRM Connections](https://help.salesforce.com/s/articleView?id=sf.c360_a_refresh_history.htm&type=5)

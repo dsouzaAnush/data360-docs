@@ -1,0 +1,88 @@
+---
+title: "What's New"
+description: "Recent features, enhancements, and changes in Data 360 (formerly Data Cloud)."
+---
+
+# What's New
+
+<Note>
+As of October 14, 2025, Data Cloud has been rebranded to **Data 360**. During this transition, you may see references to Data Cloud in our application and documentation.
+</Note>
+
+This page highlights recent and significant features added to Data 360. For complete release notes, see the [official Salesforce Release Notes](https://help.salesforce.com/s/articleView?language=en_US&id=release-notes.salesforce_release_notes.htm).
+
+## Spring '26 (February 2026)
+
+- **Data 360 rebranding complete** — All UI references updated from Data Cloud to Data 360
+- **Enhanced Agentforce integration** — Data 360 search indexes natively available to Agentforce agents
+- **Improved Flow Builder integration** — Better support for Data 360 objects in Flow Builder
+
+## Winter '26 (October 2025)
+
+- **Data Cloud rebranded to Data 360** — Product renamed effective October 14, 2025
+- **Document AI** — Create schemas and extract data from unstructured documents (invoices, resumes, lab reports)
+- **Federated authentication for zero-copy connectors** — Google BigQuery, Databricks, and Snowflake now support federated auth
+- **Web Content Crawler connector** — Ingest website content for RAG directly from Data 360
+- **New permission sets** — Data Cloud AI Specialist and Data Cloud Data Governance Specialist permission sets
+
+## Summer '25 (June 2025)
+
+- **Related list enrichments** — Create related list enrichments for accounts, cases, contracts, and vehicles using direct DMO-to-sObject relationships
+- **Copy field enrichments** — Enrich cases, contracts, orders, products, and quotes with Data 360 field data
+- **Flow execution logging** — Log auto-launched and scheduled Flow executions directly to Data 360
+- **Enhanced SOQL support** — Improved SOQL with DMOs in Apex (Database.QueryLocator support)
+
+## Spring '25 (February 2025)
+
+- **Sandbox support GA** — Data 360 in Full and Partial Copy sandbox environments is now generally available
+- **DevOps Data Kit** — New deployment tool for sequencing Data 360 metadata across orgs
+- **Improved Data Cloud-triggered flows** — Enhanced debugging and test framework
+- **SoqlStubProvider** — New Apex test pattern for mocking DMO SOQL queries
+
+## Winter '25 (October 2024)
+
+- **Unstructured data support** — Ingest, chunk, embed, and search unstructured data (PDFs, documents)
+- **Vector search and hybrid search** — Built-in vector database with semantic search capabilities
+- **RAG support** — Retrieval Augmented Generation for Agentforce agents and Prompt Builder
+- **Zero-copy data sharing** — Share Data 360 data to Snowflake, BigQuery, and Databricks without copying
+- **Data Cloud-triggered flow testing** — New test framework for DC-triggered flows
+
+## Summer '24 (June 2024)
+
+- **Sandbox support (Beta)** — Initial beta support for Data 360 in sandbox environments
+- **Enhanced batch data transforms** — Multivalue data support in batch transforms
+- **Streaming ingestion improvements** — Improved latency and throughput
+- **Tableau accelerators** — Pre-built Tableau dashboards for Data 360 use cases
+- **Static SOQL with DMOs** — Use SOQL directly with Data 360 DMOs in Apex (v61.0+)
+
+## Spring '24 (February 2024)
+
+- **Data spaces enhanced security** — Granular feature permissions per data space
+- **Permission set migration** — Migrate to new Data 360 permission set structure
+- **Data Cloud-triggered flows** — Create flows that trigger on DMO data changes
+- **Improved calculated insights** — Enhanced SQL support for insight definitions
+
+## Key Migration Notes
+
+### Data Cloud → Data 360 (October 2025)
+
+- **Product name only** — Functionality, APIs, and endpoints remain unchanged
+- **API endpoints** — No changes to `ssot` or `cdp` prefixes in API paths
+- **Object suffixes** — `__dlm` suffix remains the same
+- **Field prefixes** — `ssot__` prefix remains the same
+- **Documentation** — References are being updated progressively; both names may appear
+
+### Permission Set Renaming (September 2025)
+
+| Old Name | New Name |
+|----------|----------|
+| Data Cloud Admin | Data Cloud Architect |
+| Data Cloud Marketing Manager | Data Cloud Activation Manager |
+| Data Cloud Marketing Specialist | Data Cloud Activation Specialist |
+
+## Related Resources
+
+- Salesforce Release Notes: [Data Cloud Features by Month](https://help.salesforce.com/s/articleView?id=release-notes.rn_cdp_data_cloud_features_released_by_month.htm&type=5)
+- Salesforce Blog: [Spring '26 Developer Guide](https://developer.salesforce.com/blogs/2026/01/developers-guide-to-the-spring-26-release)
+- Salesforce Blog: [Winter '26 Developer Guide](https://developer.salesforce.com/blogs/2025/09/winter26-developers)
+- Salesforce Blog: [Summer '25 Developer Guide](https://developer.salesforce.com/blogs/2025/05/summer25-developers)

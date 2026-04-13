@@ -1,0 +1,162 @@
+---
+title: "Limits & Guidelines"
+description: "API rate limits, storage quotas, query limits, and platform guidelines for Data 360 development."
+---
+
+# Limits & Guidelines
+
+<Note>
+As of October 14, 2025, Data Cloud has been rebranded to **Data 360**. During this transition, you may see references to Data Cloud in our application and documentation.
+</Note>
+
+This page provides a reference for the most important limits, quotas, and guidelines when developing with Data 360. Always check the [official Salesforce limits documentation](https://help.salesforce.com/s/articleView?id=sf.c360_a_limits_and_guidelines.htm&type=5) for the most current values.
+
+## API Rate Limits
+
+| API | Limit | Per |
+|-----|-------|-----|
+| **Query API** | 100 concurrent queries | Org |
+| **Query API response size** | 100 MB | Request |
+| **Ingestion API (Streaming)** | 10 requests/sec per data stream | Data Stream |
+| **Ingestion API (Bulk)** | 10 concurrent jobs | Org |
+| **Ingestion API payload** | 200 MB per bulk job | Job |
+| **Ingestion API streaming payload** | 200 KB per request | Request |
+| **Connect REST API** | Standard Salesforce API limits | Org |
+| **Metadata API** | Standard Salesforce limits | Org |
+
+## Query Limits
+
+| Limit | Value | Notes |
+|-------|-------|-------|
+| **Query timeout** | 5 minutes | For complex queries; optimize with filters |
+| **Result set rows** | No hard limit | Use LIMIT/OFFSET for pagination |
+| **Response size** | 100 MB | Per query response |
+| **Concurrent queries** | 100 | Per org |
+| **SOQL query rows (Apex)** | 50,000 | Standard Apex governor limit applies |
+| **CdpQuery result** | 100 MB | Per ConnectApi.CdpQuery call |
+| **Query columns** | 200 | Per SELECT statement |
+| **Subquery depth** | 5 levels | Nested subqueries |
+
+## Data Ingestion Limits
+
+| Limit | Value | Notes |
+|-------|-------|-------|
+| **Data streams per org** | 200 | Across all connectors |
+| **Fields per data stream** | 1,000 | Per data stream object |
+| **Ingestion API schema objects** | 100 | Per connector |
+| **Bulk CSV file size** | 200 MB | Per file upload |
+| **Streaming batch size** | 200 KB | Per HTTP request |
+| **Streaming ingestion latency** | ~3 minutes | Approximate processing time |
+| **Schema (YAML) file size** | 5 MB | Per OpenAPI schema file |
+| **Data retention** | Based on edition | Enterprise / Corporate / Developer |
+
+## Identity Resolution Limits
+
+| Limit | Value | Notes |
+|-------|-------|-------|
+| **Rulesets per org** | 25 | Active rulesets |
+| **Match rules per ruleset** | 10 | Per identity resolution ruleset |
+| **Reconciliation rules per ruleset** | 10 | Per identity resolution ruleset |
+| **Source objects per ruleset** | 20 | DMOs included in matching |
+
+## Segmentation Limits
+
+| Limit | Value | Notes |
+|-------|-------|-------|
+| **Segments per org** | 200 | Active segments |
+| **SQL segment rules** | Complex SQL supported | Standard SQL query limits apply |
+| **Segment refresh frequency** | Configurable | Minimum 1 hour for scheduled |
+| **Nested segment criteria** | 10 levels | Depth of condition nesting |
+
+## Activation Limits
+
+| Limit | Value | Notes |
+|-------|-------|-------|
+| **Activation targets per org** | 50 | Across all types |
+| **Activations per segment** | 20 | Per segment |
+| **Concurrent activation syncs** | 10 | Per org |
+| **Activation record limit** | Based on edition | Per sync job |
+
+## Calculated Insights Limits
+
+| Limit | Value | Notes |
+|-------|-------|-------|
+| **Calculated insights per org** | 100 | Active insights |
+| **Dimensions per insight** | 20 | Grouping fields |
+| **Measures per insight** | 20 | Aggregate calculations |
+| **Source DMOs per insight** | 10 | Joined objects |
+
+## Data Transform Limits
+
+| Limit | Value | Notes |
+|-------|-------|-------|
+| **Batch transforms per org** | 100 | Active transforms |
+| **Streaming transforms per org** | 50 | Active transforms |
+| **Batch transform timeout** | 24 hours | Per execution |
+| **Batch transform SQL size** | 100,000 characters | Per transform definition |
+
+## Storage & Processing
+
+| Resource | Details |
+|----------|---------|
+| **Data storage** | Based on Data 360 edition and purchased credits |
+| **Processing credits** | Consumed by queries, transforms, activations, and prediction jobs |
+| **Credit tracking** | Monitor in Setup > Data 360 > Usage |
+
+See [Data 360 Billable Usage Types](https://help.salesforce.com/s/articleView?id=data.c360_a_data_usage_types.htm&type=5) for detailed credit consumption information.
+
+## Web & Mobile SDK Limits
+
+| Limit | Value | Notes |
+|-------|-------|-------|
+| **Events per page load** | 100 | Web SDK throttle |
+| **Payload size per event** | 64 KB | Per SDK event |
+| **Custom event types** | 50 | Per connector |
+| **Identity attributes** | 20 | Per identity event |
+
+## Platform Edition Requirements
+
+| Feature | Enterprise | Corporate | Developer |
+|---------|-----------|-----------|-----------|
+| **Data 360 APIs** | Yes | Yes | Yes |
+| **Ingestion API** | Yes | Yes | Yes |
+| **Identity Resolution** | Yes | Yes | Yes |
+| **Calculated Insights** | Yes | Yes | Yes |
+| **Segmentation** | Yes | Yes | Yes |
+| **Activations** | Yes | Yes | Yes |
+| **Einstein Studio** | Add-on | Add-on | Yes |
+| **Unstructured Data** | Add-on | Add-on | Yes |
+
+## Performance Guidelines
+
+<AccordionGroup>
+  <Accordion title="Query Optimization">
+    - Always include a `LIMIT` clause to prevent unbounded result sets
+    - Use `WHERE` filters early to reduce data scanned
+    - Avoid `SELECT *` — specify only the fields you need
+    - Use `EXPLAIN` to analyze query execution plans
+    - Partition large queries using time-based filters
+  </Accordion>
+
+  <Accordion title="Ingestion Optimization">
+    - Use streaming ingestion for real-time use cases, bulk for large historical loads
+    - Keep individual streaming payloads under 200 KB
+    - Batch related records together to reduce API call overhead
+    - Monitor ingestion latency and error rates
+  </Accordion>
+
+  <Accordion title="Activation Optimization">
+    - Use incremental syncs instead of full refreshes where possible
+    - Schedule activations during off-peak hours
+    - Monitor match rates and optimize identifier mappings
+    - Avoid activating the same segment to too many targets simultaneously
+  </Accordion>
+</AccordionGroup>
+
+## Related Resources
+
+- [Query API](/apis/query-api/index) — Query API documentation
+- [Data Ingestion API](/apis/connect-api/data-ingestion) — Ingestion API documentation
+- [Security & Permissions](/developer-guide/security-permissions) — Access control configuration
+- Salesforce Help: [Data 360 Limits and Guidelines](https://help.salesforce.com/s/articleView?id=sf.c360_a_limits_and_guidelines.htm&type=5)
+- Salesforce Help: [Billable Usage Types](https://help.salesforce.com/s/articleView?id=data.c360_a_data_usage_types.htm&type=5)

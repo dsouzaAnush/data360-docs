@@ -1,0 +1,263 @@
+---
+title: "Apex Integration"
+description: "Query Data 360 data model objects from Apex using SOQL, CdpQuery, and ConnectApi. Build and test custom integrations."
+---
+
+# Apex Integration
+
+<Note>
+As of October 14, 2025, Data Cloud has been rebranded to **Data 360**. During this transition, you may see references to Data Cloud in our application and documentation.
+</Note>
+
+Data 360 integrates with the Salesforce Platform through Apex, allowing you to query data model objects (DMOs) using SOQL and SQL, build custom integrations with ConnectApi, and subscribe to data change events.
+
+## Query Methods
+
+| Method | API Version | Syntax | Use Case |
+|--------|-------------|--------|----------|
+| **Static SOQL** | v61.0+ | Standard SOQL on `__dlm` objects | Simple queries, strongly typed |
+| **Dynamic SOQL** | v61.0+ | `Database.query()` on `__dlm` objects | Runtime-constructed queries |
+| **CdpQuery (SQL)** | v55.0+ | `ConnectApi.CdpQuery.queryAnsiSql()` | Complex SQL, joins, aggregations |
+| **ConnectApi** | v55.0+ | `ConnectApi.CdpQuery.*` | Full API access, metadata, profiles |
+
+## SOQL with Data Model Objects
+
+Starting with API v61.0, you can use static and dynamic SOQL directly with Data 360 DMOs. DMOs use the `__dlm` suffix (Data Lake Managed).
+
+### Static SOQL
+
+```java
+// Query unified individual profiles
+List<UnifiedIndividual__dlm> profiles = [
+    SELECT ssot__Id__c, ssot__FirstName__c, ssot__LastName__c,
+           ssot__Email__c, LifetimeValue__c
+    FROM UnifiedIndividual__dlm
+    WHERE LifetimeValue__c > 5000
+    LIMIT 100
+];
+
+for (UnifiedIndividual__dlm profile : profiles) {
+    System.debug('Customer: ' + profile.ssot__FirstName__c +
+                 ' ' + profile.ssot__LastName__c +
+                 ' LTV: ' + profile.LifetimeValue__c);
+}
+```
+
+### Dynamic SOQL
+
+```java
+// Build query dynamically based on runtime conditions
+String objectName = 'UnifiedIndividual__dlm';
+String fields = 'ssot__Id__c, ssot__FirstName__c, ssot__Email__c';
+String conditions = 'ssot__Email__c != NULL';
+
+String query = 'SELECT ' + fields + ' FROM ' + objectName +
+               ' WHERE ' + conditions + ' LIMIT 200';
+
+List<SObject> results = Database.query(query);
+```
+
+### Database.QueryLocator (Batch Apex)
+
+```java
+public class DataCloudBatchProcessor implements Database.Batchable<SObject> {
+
+    public Database.QueryLocator start(Database.BatchableContext bc) {
+        return Database.getQueryLocator([
+            SELECT ssot__Id__c, ssot__FirstName__c, ssot__Email__c
+            FROM UnifiedIndividual__dlm
+            WHERE ssot__Email__c != NULL
+        ]);
+    }
+
+    public void execute(Database.BatchableContext bc, List<SObject> scope) {
+        List<Contact> contactsToUpdate = new List<Contact>();
+        for (SObject record : scope) {
+            // Process each Data Cloud record
+            UnifiedIndividual__dlm profile = (UnifiedIndividual__dlm) record;
+            // Create or update CRM contacts based on unified profiles
+        }
+    }
+
+    public void finish(Database.BatchableContext bc) {
+        System.debug('Batch processing complete');
+    }
+}
+```
+
+## CdpQuery (ANSI SQL)
+
+For complex queries that require joins, aggregations, window functions, or other SQL capabilities beyond SOQL, use `ConnectApi.CdpQuery`:
+
+### Basic SQL Query
+
+```java
+String sql = 'SELECT ssot__Id__c, ssot__FirstName__c, ssot__LastName__c, ' +
+             'ssot__Email__c ' +
+             'FROM UnifiedIndividual__dlm ' +
+             'WHERE ssot__Email__c IS NOT NULL ' +
+             'LIMIT 100';
+
+ConnectApi.CdpQueryOutput result = ConnectApi.CdpQuery.queryAnsiSql(sql);
+
+// Access metadata
+System.debug('Columns: ' + result.metadata);
+
+// Iterate rows
+for (ConnectApi.CdpQueryRow row : result.data) {
+    System.debug('Row: ' + row.dataCells);
+}
+```
+
+### SQL with Joins
+
+```java
+String sql =
+    'SELECT ui.ssot__Id__c, ui.ssot__FirstName__c, ' +
+    '       COUNT(so.ssot__Id__c) AS OrderCount, ' +
+    '       SUM(so.ssot__GrandTotalAmount__c) AS TotalSpend ' +
+    'FROM UnifiedIndividual__dlm ui ' +
+    'JOIN ssot__SalesOrder__dlm so ' +
+    '  ON ui.ssot__Id__c = so.ssot__IndividualId__c ' +
+    'GROUP BY ui.ssot__Id__c, ui.ssot__FirstName__c ' +
+    'HAVING SUM(so.ssot__GrandTotalAmount__c) > 1000 ' +
+    'ORDER BY TotalSpend DESC ' +
+    'LIMIT 50';
+
+ConnectApi.CdpQueryOutput result = ConnectApi.CdpQuery.queryAnsiSql(sql);
+```
+
+### Querying from External Orgs
+
+You can query Data 360 from any Salesforce org using named credentials and HTTP callouts:
+
+```java
+public class DataCloudExternalQuery {
+
+    public static String queryDataCloud(String sql) {
+        HttpRequest req = new HttpRequest();
+        req.setEndpoint('callout:DataCloudOrg/services/data/v64.0/ssot/query-sql');
+        req.setMethod('POST');
+        req.setHeader('Content-Type', 'application/json');
+        req.setBody(JSON.serialize(new Map<String, String>{
+            'sql' => sql
+        }));
+
+        Http http = new Http();
+        HttpResponse res = http.send(req);
+        return res.getBody();
+    }
+}
+```
+
+## ConnectApi for Data 360
+
+The `ConnectApi` namespace provides Apex classes for interacting with Data 360 resources:
+
+| Class | Purpose |
+|-------|---------|
+| `ConnectApi.CdpQuery` | Execute SQL queries against DMOs |
+| `ConnectApi.CdpProfile` | Retrieve unified customer profiles |
+| `ConnectApi.CdpCalculatedInsight` | Query calculated insight metrics |
+| `ConnectApi.CdpIdentityResolution` | Manage identity resolution rulesets |
+| `ConnectApi.CdpSegment` | Create and manage segments |
+
+### Profile Lookup Example
+
+```java
+// Look up a unified profile by source record ID
+ConnectApi.CdpProfileOutput profile =
+    ConnectApi.CdpProfile.getProfile(
+        'UnifiedIndividual__dlm',
+        'sourceRecordId123'
+    );
+
+System.debug('Unified Profile: ' + profile);
+```
+
+## Testing ConnectApi Code
+
+Testing Data 360 Apex code requires special handling because ConnectApi methods can't be called directly in test context.
+
+### Using Test.setMock
+
+```java
+@isTest
+private class DataCloudQueryTest {
+
+    @isTest
+    static void testQueryExecution() {
+        // ConnectApi methods require special test setup
+        // Use Test.startTest/stopTest boundaries
+        Test.startTest();
+
+        // For ConnectApi testing, use the setTestFactory pattern
+        // to mock API responses
+        ConnectApi.CdpQueryOutput mockOutput = new ConnectApi.CdpQueryOutput();
+        // Configure mock output...
+
+        Test.stopTest();
+    }
+}
+```
+
+### Testing Best Practices
+
+- Use `@TestSetup` to create DMO test data where supported
+- Mock external callouts with `Test.setMock()` for cross-org queries
+- Use `ConnectApi.setTestFactory()` for mocking ConnectApi responses
+- Test both success paths and error handling (invalid queries, permissions)
+
+## SOQL Limitations with DMOs
+
+| Feature | Supported | Notes |
+|---------|-----------|-------|
+| `SELECT` fields | Yes | Standard field selection |
+| `WHERE` clause | Yes | Standard filtering |
+| `ORDER BY` | Yes | Sorting results |
+| `LIMIT` / `OFFSET` | Yes | Pagination |
+| `GROUP BY` | Yes | Aggregations |
+| `HAVING` | Yes | Filter aggregated results |
+| Relationship queries | Limited | Not all relationships traversable |
+| `FOR UPDATE` | No | DMOs are read-only from SOQL |
+| DML operations | No | Cannot INSERT/UPDATE/DELETE DMOs via SOQL |
+| Apex triggers | No | Synchronous Apex triggers not supported on DMOs |
+| `Database.QueryLocator` | Yes | v61.0+ in FOR loops |
+
+<Note>
+Data 360 DMOs are **read-only** in SOQL context. To write data to Data 360, use the Ingestion API or Connect REST API.
+</Note>
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Query Optimization">
+    - Always include a `LIMIT` clause — DMOs can contain billions of records
+    - Use `WHERE` filters to narrow results before aggregation
+    - Prefer static SOQL for simple queries (compile-time validation, better performance)
+    - Use CdpQuery for complex joins and SQL-specific features
+  </Accordion>
+
+  <Accordion title="Error Handling">
+    - Wrap CdpQuery calls in try-catch blocks for `ConnectApi.ConnectApiException`
+    - Handle query timeout errors for large result sets
+    - Validate query syntax before execution in dynamic SOQL scenarios
+    - Log query performance metrics for optimization
+  </Accordion>
+
+  <Accordion title="Architecture">
+    - Use Data Cloud-triggered flows instead of Apex triggers for responding to DMO changes
+    - Use Platform Events and CDC for event-driven architectures (Apex triggers not supported on DMOs)
+    - Consider governor limits when querying large DMO datasets from Apex
+    - Cache frequently accessed Data 360 data in Platform Cache for performance
+  </Accordion>
+</AccordionGroup>
+
+## Related Resources
+
+- [SQL Reference](/apis/query-api/sql-reference) — Full Data 360 SQL syntax reference
+- [Query API](/apis/query-api/index) — REST API for querying Data 360
+- [Flows & Automation](/developer-guide/flows-automation) — Event-driven automation alternatives
+- Salesforce Docs: [SOQL with Apex for Data 360](https://developer.salesforce.com/docs/data/data-cloud-query-guide/guide/dc-soql.html)
+- Salesforce Blog: [Query Data Cloud from Any Org with Apex](https://developer.salesforce.com/blogs/2024/09/how-to-query-data-cloud-from-any-salesforce-org-with-apex)
+- Salesforce Docs: [Testing ConnectApi Code](https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/connectAPI_TestingApex.htm)

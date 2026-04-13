@@ -1,0 +1,140 @@
+---
+title: "Glossary"
+description: "Definitions of key terms and concepts used in Data 360 development."
+---
+
+# Glossary
+
+<Note>
+As of October 14, 2025, Data Cloud has been rebranded to **Data 360**. During this transition, you may see references to Data Cloud in our application and documentation.
+</Note>
+
+## A
+
+**Activation**
+The process of sending segment membership data to an external platform (advertising, marketing, analytics, or cloud storage) for downstream use.
+
+**Activation Target**
+A configured destination for activation data, such as Google Ads, Meta, Snowflake, or Marketing Cloud.
+
+## B
+
+**Batch Data Transform**
+A scheduled data transformation that uses SQL and a visual node editor to join, filter, aggregate, and derive data across multiple data sources.
+
+**BYOM (Bring Your Own Model)**
+The ability to register and use machine learning models trained on external platforms (SageMaker, Vertex AI, Databricks) within Data 360's Einstein Studio.
+
+## C
+
+**Calculated Insight (CI)**
+A derived metric or aggregation computed from DMO data using SQL. Stored as a Calculated Insight Object (CIO) and available for segmentation, activation, and querying.
+
+**CdpQuery**
+The `ConnectApi.CdpQuery` Apex class used to execute ANSI SQL queries against Data 360 DMOs from Apex code.
+
+**Chunking**
+The process of breaking unstructured documents into smaller, semantically meaningful segments for vector embedding and search indexing.
+
+**Connector**
+A pre-built integration component that ingests data into Data 360 from external sources (Salesforce CRM, third-party platforms, APIs, SDKs).
+
+## D
+
+**Data Action**
+An automation that monitors data changes in DMOs or CIOs and sends change events to configured targets (Platform Events, webhooks, Marketing Cloud).
+
+**Data Graph**
+A pre-built, denormalized view that combines data from multiple related DMOs into a single hierarchical JSON structure.
+
+**Data Lake Object (DLO)**
+A storage container in Data 360's data lake that holds raw ingested data in its original schema before mapping to the unified data model.
+
+**Data Model Object (DMO)**
+A standardized data object in the Customer 360 Data Model schema. DMOs represent harmonized data mapped from DLOs and use the `__dlm` suffix.
+
+**Data Space**
+A logical partition within Data 360 that isolates data, segments, and insights for multi-tenant access control.
+
+**Data Stream**
+A configured pipeline that ingests data from a connector into a Data Lake Object, with defined schema, refresh schedule, and field mappings.
+
+**DevOps Data Kit**
+A tool that collects and sequences Data 360 configuration metadata for deployment between environments, handling dependency ordering automatically.
+
+## E
+
+**Einstein Studio**
+The central hub for managing AI and machine learning models in Data 360, supporting both AutoML model building and BYOM registration.
+
+**Embedding**
+Converting text chunks into high-dimensional vector representations for similarity search in the vector database.
+
+**External Data Lake Object**
+A DLO that contains metadata references to data physically stored in an external platform (Snowflake, Databricks, BigQuery), created through zero-copy federation.
+
+## H
+
+**Hybrid Search**
+A search index type that combines vector similarity scoring with BM25 keyword matching for improved retrieval precision.
+
+## I
+
+**Identity Resolution**
+The process of matching and reconciling data from multiple sources to create unified customer profiles, using match rules and reconciliation rules.
+
+**Ingestion API**
+A REST API for pushing data into Data 360 from external systems, supporting both streaming (JSON micro-batches) and bulk (CSV file upload) patterns.
+
+## M
+
+**Match Rule**
+A rule within an identity resolution ruleset that defines how to identify records that belong to the same individual (e.g., exact email match, fuzzy name match).
+
+## P
+
+**Platform Event**
+A Salesforce event bus message used for real-time, event-driven communication between Data 360 and the Salesforce Platform.
+
+**Prediction Job**
+A process that scores DMO records using a trained AI model, available in batch (scheduled) and streaming (continuous) modes.
+
+**Profile Explorer**
+A built-in UI for viewing unified customer profiles, source record linkage, contact points, and engagement history.
+
+## R
+
+**RAG (Retrieval Augmented Generation)**
+A pattern where relevant data chunks are retrieved from a search index and provided as context to an LLM, grounding responses in enterprise data.
+
+**Reconciliation Rule**
+A rule within an identity resolution ruleset that defines how to merge data from matched records into a single unified profile (e.g., "most recent value wins").
+
+## S
+
+**Segment**
+A defined subset of unified profiles based on criteria (SQL rules, calculated insights, or visual filters), used for activation and analytics.
+
+**Streaming Data Transform**
+A near real-time transformation that processes data as it arrives through data streams, using SQL queries against a single DLO source.
+
+## U
+
+**UDLO (Unstructured Data Lake Object)**
+A storage container for unstructured data (PDFs, documents, transcripts) that goes through chunking, embedding, and indexing for vector search.
+
+**Unified Individual**
+The golden record profile created through identity resolution, containing reconciled attributes from all matched source records.
+
+## V
+
+**Vector Database**
+Data 360's built-in database that stores and indexes vector embeddings for semantic similarity search.
+
+**Vector Search**
+A search index type that converts queries to embeddings and finds nearest neighbors in vector space for semantic retrieval.
+
+## Z
+
+**Zero-Copy Federation**
+Accessing data from external platforms (Snowflake, Databricks, BigQuery) without physically copying it into Data 360, using metadata references and federated queries.
