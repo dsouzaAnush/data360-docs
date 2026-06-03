@@ -1,0 +1,276 @@
+---
+title: "Data 360 MCP Server"
+description: "Run the Data 360 MCP server and connect it to Claude, OpenAI Codex, Cursor, VS Code, Windsurf, and other AI agents for live, authenticated access to Data 360 APIs."
+icon: "plug"
+---
+
+# Data 360 MCP Server
+
+<Snippet file="/snippets/note-rebranding.mdx" />
+
+The **Data 360 MCP server** ([`datacloud-code-mcp`](https://github.com/dsouzaAnush/datacloud-code-mcp)) is a [Model Context Protocol](https://modelcontextprotocol.io) server that gives AI agents live, authenticated access to Data 360. It follows the **"Code Mode"** pattern: instead of exposing one tool per endpoint, it exposes a small, fixed set of tools that run agent‑written JavaScript against the Data 360 OpenAPI spec — covering **~185 operations across 25 API families** with a tiny tool footprint.
+
+## Tools
+
+The server exposes three tools:
+
+| Tool | Description |
+|---|---|
+| `search` | Explore the Data 360 OpenAPI spec to discover endpoints, parameters, and shapes before calling them. |
+| `execute` | Run an authenticated Data 360 API call (query, ingest, configure) via a sandboxed `salesforce.request(...)` client. |
+| `auth_status` | Report the current OAuth status — whether the caller is authenticated, with which scopes, and the instance URL. |
+
+<Note>
+Transport is **Streamable HTTP** at the `/mcp` endpoint — this is a remote/HTTP MCP server, not a stdio `npx` package. Your agent connects to a **URL** (local or deployed), not a command.
+</Note>
+
+## Prerequisites
+
+- A Salesforce org with **Data 360 enabled** and a connected app / external client app (see [Set Up Data 360](/getting-started/setup)).
+- **Node.js 20+** to run the server locally, or a **Heroku** account to deploy it.
+- An AI agent that supports remote MCP servers (Claude, Codex, Cursor, VS Code, Windsurf, etc.).
+
+## Step 1: Get the server running
+
+You can run the server locally for development or deploy it so your whole team (and hosted agents) can reach it.
+
+<Tabs>
+  <Tab title="Run locally">
+    ```bash
+    # Clone and install
+    git clone https://github.com/dsouzaAnush/datacloud-code-mcp
+    cd datacloud-code-mcp
+    npm install
+
+    # Build and start (defaults to http://127.0.0.1:3000)
+    npm run build
+    npm start
+
+    # ...or run in watch mode for development
+    npm run dev
+    ```
+
+    Verify it's up:
+
+    ```bash
+    curl -sS http://127.0.0.1:3000/healthz
+    ```
+
+    The MCP endpoint is `http://127.0.0.1:3000/mcp`.
+  </Tab>
+  <Tab title="Deploy to Heroku">
+    The repo ships with an `app.json` and `Procfile`, so it deploys to Heroku as a standard Node.js app.
+
+    ```bash
+    git clone https://github.com/dsouzaAnush/datacloud-code-mcp
+    cd datacloud-code-mcp
+    heroku create your-data360-mcp
+    git push heroku main
+    ```
+
+    Set the auth config (see [Step 2](#step-2-configure-authentication)) with `heroku config:set`, then point your MCP client at:
+
+    ```text
+    https://your-data360-mcp.herokuapp.com/mcp
+    ```
+  </Tab>
+</Tabs>
+
+## Step 2: Configure authentication
+
+The server authenticates to your Salesforce org using `CDP_*` environment variables. Pick the flow that matches your setup and set the variables in `.env` (local) or via `heroku config:set` (deployed). `CDP_AUTH_FLOW=auto` (the default) selects the first available option below.
+
+<AccordionGroup>
+  <Accordion title="Option 1 — Direct access token">
+    Fastest for testing. Provide a token you already have (for example from the Salesforce CLI).
+
+    ```bash
+    CDP_ACCESS_TOKEN=<your-access-token>
+    CDP_INSTANCE_URL=https://<your-instance>.my.salesforce.com
+    ```
+  </Accordion>
+  <Accordion title="Option 2 — OAuth client credentials">
+    Best for server‑to‑server use with a connected app configured for the client credentials flow.
+
+    ```bash
+    CDP_CLIENT_ID=<consumer-key>
+    CDP_CLIENT_SECRET=<consumer-secret>
+    CDP_LOGIN_URL=https://login.salesforce.com
+    ```
+  </Accordion>
+  <Accordion title="Option 3 — Username / password">
+    ```bash
+    CDP_CLIENT_ID=<consumer-key>
+    CDP_CLIENT_SECRET=<consumer-secret>
+    CDP_USERNAME=<username>
+    CDP_PASSWORD=<password>
+    CDP_LOGIN_URL=https://login.salesforce.com
+    ```
+  </Accordion>
+  <Accordion title="Option 4 — OAuth web flow">
+    Set the `SALESFORCE_OAUTH_CLIENT_ID`, `SALESFORCE_OAUTH_CLIENT_SECRET`, and `SALESFORCE_OAUTH_REDIRECT_URI` variables, start the server, then complete the browser login at `/oauth/start?user_id=default`. Tokens are persisted in an encrypted token store.
+  </Accordion>
+</AccordionGroup>
+
+<Warning>
+By default the server runs in **read‑only** mode — mutating API calls (POST/PUT/PATCH/DELETE) are blocked. Set `ALLOW_WRITES=true` only when you intend to let the agent modify data in your org. For production, also set a 32‑byte base64 `TOKEN_ENCRYPTION_KEY_BASE64`.
+</Warning>
+
+## Step 3: Connect your agent
+
+Point your agent at the server's `/mcp` URL. Replace the URL below with your local (`http://127.0.0.1:3000/mcp`) or Heroku (`https://your-data360-mcp.herokuapp.com/mcp`) endpoint. The `x-user-id` header identifies the caller's auth session. (See [Step 2](#step-2-configure-authentication) for auth setup.)
+
+<Tabs>
+  <Tab title="Claude Code">
+    Add the server from the CLI:
+
+    ```bash
+    claude mcp add --transport http data360 \
+      https://your-data360-mcp.herokuapp.com/mcp \
+      --header "x-user-id: default"
+    ```
+
+    Or add it manually to `.mcp.json` (project) or `~/.claude.json` (user):
+
+    ```json
+    {
+      "mcpServers": {
+        "data360": {
+          "type": "http",
+          "url": "https://your-data360-mcp.herokuapp.com/mcp",
+          "headers": { "x-user-id": "default" }
+        }
+      }
+    }
+    ```
+
+    Run `/mcp` inside Claude Code to confirm the connection.
+  </Tab>
+  <Tab title="Cursor">
+    Add to `~/.cursor/mcp.json` (global) or `.cursor/mcp.json` (project):
+
+    ```json
+    {
+      "mcpServers": {
+        "data360": {
+          "url": "https://your-data360-mcp.herokuapp.com/mcp",
+          "headers": { "x-user-id": "default" }
+        }
+      }
+    }
+    ```
+
+    Then open **Settings → Tools & MCP** and confirm `data360` shows as connected.
+  </Tab>
+  <Tab title="VS Code (Copilot)">
+    VS Code uses a top‑level `servers` key. Add to `.vscode/mcp.json` (workspace) or your user `mcp.json`:
+
+    ```json
+    {
+      "servers": {
+        "data360": {
+          "type": "http",
+          "url": "https://your-data360-mcp.herokuapp.com/mcp",
+          "headers": { "x-user-id": "default" }
+        }
+      }
+    }
+    ```
+
+    Start it from the gutter control in `mcp.json`, or run **MCP: List Servers**.
+  </Tab>
+  <Tab title="OpenAI Codex">
+    Add a streamable‑HTTP server to `~/.codex/config.toml`. The top‑level table must be `mcp_servers` (with an underscore):
+
+    ```toml
+    [mcp_servers.data360]
+    url = "https://your-data360-mcp.herokuapp.com/mcp"
+
+    [mcp_servers.data360.http_headers]
+    x-user-id = "default"
+    ```
+
+    Restart your Codex session, then run `codex mcp list` to verify.
+  </Tab>
+  <Tab title="Claude Desktop">
+    Claude Desktop reaches HTTP MCP servers through the `mcp-remote` bridge. Edit `claude_desktop_config.json` (macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`):
+
+    ```json
+    {
+      "mcpServers": {
+        "data360": {
+          "command": "npx",
+          "args": [
+            "-y", "mcp-remote",
+            "https://your-data360-mcp.herokuapp.com/mcp",
+            "--header", "x-user-id:default"
+          ]
+        }
+      }
+    }
+    ```
+
+    Fully quit and reopen Claude Desktop. (Alternatively, add it as a **Custom Connector** under **Settings → Connectors**.)
+  </Tab>
+  <Tab title="Windsurf">
+    Add to `~/.codeium/windsurf/mcp_config.json`. Windsurf uses `serverUrl` for remote servers:
+
+    ```json
+    {
+      "mcpServers": {
+        "data360": {
+          "serverUrl": "https://your-data360-mcp.herokuapp.com/mcp",
+          "headers": { "x-user-id": "default" }
+        }
+      }
+    }
+    ```
+
+    Restart Windsurf so Cascade reloads the server list.
+  </Tab>
+</Tabs>
+
+## Step 4: Try it
+
+Once connected, ask your agent to use the tools. For example:
+
+> Use the `data360` MCP server to run this SQL query and summarize the results:
+> `SELECT FirstName__c FROM UnifiedIndividual__dlm LIMIT 5`
+
+Behind the scenes the agent calls `execute` with code like:
+
+```js
+async () => {
+  return await salesforce.request({
+    method: "POST",
+    path: "/services/data/v64.0/ssot/query-sql",
+    body: { sql: "SELECT FirstName__c FROM UnifiedIndividual__dlm LIMIT 5" }
+  });
+}
+```
+
+You can also ask it to check connectivity ("what's my Data 360 auth status?" → `auth_status`) or discover endpoints ("find the Data 360 ingestion endpoints" → `search`).
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Agent shows the server but no tools / not authenticated">
+    Call `auth_status`. If it returns `authenticated: false`, your `CDP_*` variables aren't set correctly or the token expired. Re‑check [Step 2](#step-2-configure-authentication) and restart the server.
+  </Accordion>
+  <Accordion title="Writes are rejected">
+    The server blocks mutating calls unless `ALLOW_WRITES=true`. Set it intentionally and restart.
+  </Accordion>
+  <Accordion title="Connection refused (local)">
+    Make sure the server is running (`curl http://127.0.0.1:3000/healthz`) and that the port matches the `url` in your agent config.
+  </Accordion>
+  <Accordion title="Codex doesn't load the server">
+    The TOML table must be `mcp_servers` (underscore), not `mcpServers`. Restart the session after editing `config.toml`.
+  </Accordion>
+</AccordionGroup>
+
+## Related resources
+
+- [Salesforce Skills](/ai-tools/skills) — teach your agent the Data Cloud workflows to pair with this server
+- [Set Up Data 360](/getting-started/setup) — create the connected app and OAuth scopes the server needs
+- [Query API](/apis/query-api/index) — the API surface the `execute` tool calls into
+- [`datacloud-code-mcp` on GitHub](https://github.com/dsouzaAnush/datacloud-code-mcp)

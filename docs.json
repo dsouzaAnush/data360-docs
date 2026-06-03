@@ -79,6 +79,19 @@
         ]
       },
       {
+        "tab": "AI Tools",
+        "groups": [
+          {
+            "group": "AI Tools",
+            "pages": [
+              "ai-tools/index",
+              "ai-tools/mcp-server",
+              "ai-tools/skills"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "API Reference",
         "groups": [
           {

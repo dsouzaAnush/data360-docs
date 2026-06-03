@@ -1,0 +1,63 @@
+---
+title: "AI Tools for Data 360"
+description: "Connect AI coding agents to Salesforce Data 360 with the Data 360 MCP server and the Salesforce skills library — works with Claude, Codex, Cursor, VS Code, and more."
+icon: "robot"
+---
+
+# AI Tools for Data 360
+
+<Snippet file="/snippets/note-rebranding.mdx" />
+
+Bring Data 360 into your AI coding agent. Two complementary building blocks let agents like **Claude, OpenAI Codex, Cursor, and VS Code (GitHub Copilot)** discover and call Data 360 APIs, and follow Salesforce best practices:
+
+<CardGroup cols={2}>
+  <Card
+    title="Data 360 MCP Server"
+    icon="plug"
+    href="/ai-tools/mcp-server"
+  >
+    A Model Context Protocol server that gives agents live, authenticated access to ~185 Data 360 API operations through three tools.
+  </Card>
+  <Card
+    title="Salesforce Skills"
+    icon="wand-magic-sparkles"
+    href="/ai-tools/skills"
+  >
+    A library of `SKILL.md` Agent Skills covering the full Data Cloud pipeline — connect, prepare, harmonize, segment, and act.
+  </Card>
+</CardGroup>
+
+## MCP server vs. skills — what's the difference?
+
+They solve different problems and are designed to be used together.
+
+| | Data 360 MCP Server | Salesforce Skills |
+|---|---|---|
+| **What it is** | A running server that exposes Data 360 APIs as agent **tools** | Markdown playbooks (`SKILL.md`) that teach the agent **how** to do Data 360 tasks |
+| **Gives the agent** | The ability to *call* Data 360 (query, ingest, configure) | The know‑how and step‑by‑step workflows to do it correctly |
+| **Runtime** | Node.js HTTP service (run locally or on Heroku) | Static files installed into your agent's skills directory |
+| **Auth** | Connects to your Salesforce org with OAuth / tokens | No auth (guides the agent; calls go through the MCP server or CLI) |
+| **Best for** | Letting an agent execute real API calls against your org | Encoding correct, repeatable Data Cloud procedures |
+
+<Tip>
+Install **both** for the best experience: the skills tell the agent *what* to do and the MCP server lets it *do* it against your Data 360 org.
+</Tip>
+
+## Choose your path
+
+<CardGroup cols={2}>
+  <Card
+    title="Set up the MCP server"
+    icon="server"
+    href="/ai-tools/mcp-server"
+  >
+    Run or deploy the server, then connect Claude, Codex, Cursor, VS Code, and other agents.
+  </Card>
+  <Card
+    title="Install the skills"
+    icon="download"
+    href="/ai-tools/skills"
+  >
+    One command installs the Salesforce skill library into any supported agent.
+  </Card>
+</CardGroup>

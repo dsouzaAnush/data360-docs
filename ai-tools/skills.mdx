@@ -1,0 +1,103 @@
+---
+title: "Salesforce Skills"
+description: "Install the Salesforce skills library so AI agents like Claude, Codex, Cursor, and VS Code follow proven Data 360 workflows — connect, prepare, harmonize, segment, and act."
+icon: "wand-magic-sparkles"
+---
+
+# Salesforce Skills
+
+<Snippet file="/snippets/note-rebranding.mdx" />
+
+[Agent Skills](https://agentskills.io) are reusable `SKILL.md` playbooks that teach an AI agent *how* to perform a task correctly. The [`salesforce-skills`](https://github.com/dsouzaAnush/salesforce-skills) library bundles skills for the full Data 360 pipeline plus broader Salesforce development, and installs into any agent that supports the open Agent Skills standard.
+
+<Tip>
+Pair these skills with the [Data 360 MCP Server](/ai-tools/mcp-server): the skills encode the *workflow*, and the MCP server lets the agent *execute* it against your org.
+</Tip>
+
+## Install
+
+The library is published to the [Agent Skills](https://agentskills.io) registry. One command installs it into your current agent (requires **Node.js 18+**):
+
+<CodeGroup>
+```bash All skills
+npx skills add dsouzaAnush/salesforce-skills
+```
+
+```bash A single skill
+npx skills add dsouzaAnush/salesforce-skills --skill sf-datacloud
+```
+
+```bash List available skills
+npx skills add dsouzaAnush/salesforce-skills --list
+```
+</CodeGroup>
+
+This works across Claude Code, OpenAI Codex, Cursor, GitHub Copilot, Gemini CLI, and 40+ other agents — the installer writes the skill files into the right directory for your agent automatically.
+
+### Claude Code — full experience
+
+For Claude Code, an installer adds the skills plus specialist agents, hooks, and guardrails:
+
+```bash
+curl -sSL https://raw.githubusercontent.com/dsouzaAnush/salesforce-skills/main/extras/claude-code/tools/install.sh | bash
+```
+
+<Note>
+The Data Cloud skills (`sf-datacloud-*`) call out to the community **`sf data360` CLI plugin** at runtime. After installing the skills, follow `skills/sf-datacloud/references/plugin-setup.md` in the repo, or run the installer with `--with-datacloud-runtime`.
+</Note>
+
+## Where skills are installed
+
+Skills are auto‑discovered from agent‑specific directories. The `npx skills add` command picks the right one; you can also drop a skill folder in manually.
+
+| Agent | Skills directory |
+|---|---|
+| Claude Code | `.claude/skills/` (project) · `~/.claude/skills/` (user) |
+| OpenAI Codex | `.agents/skills/` (repo) · `~/.agents/skills/` or `~/.codex/skills/` (user) |
+| Cursor | `.cursor/skills/` · `~/.cursor/skills/` (also loads `.claude/skills/` and `.codex/skills/`) |
+| GitHub Copilot | `.github/skills/` · `.agents/skills/` · `~/.copilot/skills/` |
+
+<Note>
+The most portable **personal** location is `~/.agents/skills/` — Claude Code, Codex, Cursor, and Copilot all read from the shared `.agents/skills/` and `.claude/skills/` paths, so one install can serve several agents.
+</Note>
+
+Once installed, skills surface as slash commands (for example `/sf-datacloud`) and can also auto‑activate when your request matches a skill's description.
+
+## Available Data 360 skills
+
+The library follows the Data Cloud lifecycle — **connect → prepare → harmonize → segment → act** — with an orchestrator that ties the phases together.
+
+| Skill | Phase | Use it for |
+|---|---|---|
+| `sf-datacloud` | Orchestrator | End‑to‑end pipeline orchestration across all phases, data spaces, and data kits |
+| `sf-datacloud-connect` | Connect | Connections, connectors, source discovery, testing connections |
+| `sf-datacloud-prepare` | Prepare | Data streams, data lake objects (DLOs), transforms, document ingestion |
+| `sf-datacloud-harmonize` | Harmonize | Data model objects, mappings, identity resolution, unified profiles, data graphs |
+| `sf-datacloud-segment` | Segment | Segments, calculated insights, membership counts, audience SQL |
+| `sf-datacloud-act` | Act | Activations, activation targets, data actions, downstream delivery |
+| `sf-datacloud-retrieve` | Retrieve | Data Cloud SQL, describe, async queries, vector/search indexes, metadata |
+| `sf-datacloud-unify` | Unify | Plan and execute customer‑data unification across sources |
+| `sf-datacloud-mce-unify` | Unify | Connect Marketing Cloud Engagement and unify email engagement data |
+| `sf-datacloud-snowflake-salesforce-segment` | Segment | Build segments joining Snowflake data with Salesforce‑synced objects |
+
+### Cross-cutting Salesforce skills
+
+| Skill | Use it for |
+|---|---|
+| `sf-soql` | SOQL query authoring, optimization, and analysis |
+| `sf-metadata` | Salesforce metadata generation and querying |
+| `sf-deploy` | DevOps automation with the `sf` CLI — deployments, scratch orgs, CI/CD |
+
+<Tip>
+The full library includes 60+ skills spanning Apex, LWC, Flow, Agentforce, Heroku, and more. Run `npx skills add dsouzaAnush/salesforce-skills --list` to see everything available.
+</Tip>
+
+## Skills vs. rules
+
+Skills are on‑demand, multi‑step workflows triggered by name or by matching your request. For always‑on coding conventions (style, naming, guardrails), most agents use **rules** (`.cursor/rules/`, `.windsurf/rules/`) or an **`AGENTS.md`** file instead. Agents without a first‑class `SKILL.md` system — such as Windsurf, Cline, Zed, and JetBrains — rely on those rules/instructions primitives rather than skills.
+
+## Related resources
+
+- [Data 360 MCP Server](/ai-tools/mcp-server) — give the agent the tools to execute these workflows
+- [Developer Guide](/developer-guide/index) — the underlying Data 360 concepts the skills automate
+- [`salesforce-skills` on GitHub](https://github.com/dsouzaAnush/salesforce-skills)
