@@ -1,35 +1,39 @@
 ---
 title: "Query Services"
-description: "Execute ANSI SQL queries against Data 360 data model objects via the Query API."
-openapi: "POST /services/data/v64.0/ssot/query-sql"
+description: "Data 360 REST API Reference"
+source_url: "https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-queryservices-overview.html"
+source_hash: "6708fcf207a2a3807710ae120f1286771dc933f760c9f93ed5ae96ab6e91f150"
+source_etag: "W/\"7b8deeb6aaf7cd61486a310c6461dc7d\""
+source_last_modified: "Wed, 01 Jul 2026 01:38:24 GMT"
+sync_status: "official-salesforce-doc"
 ---
 
-# Query Data using Query API
+# Query Data 360 Data using Query API
 
-The Data 360 Query API provides a powerful way to execute SQL queries against your Data 360 data using Connect REST endpoints and Apex methods. This API supports Data 360 SQL syntax and is optimized for all Data 360 use cases, from simple data retrieval to complex analytics and integration scenarios.
+Use the Data 360 Query API to execute SQL queries against your Data 360 data using Connect REST endpoints and Apex methods. This API supports Data 360 SQL syntax and is optimized for all Data 360 use cases, from simple data retrieval to complex analytics and integration scenarios.
 
 The Query API enables you to:
 
--   Execute SQL queries against data streams, profile, engagement, and unified data model objects
+-   Execute SQL queries against unified data model, data lake, profile, and engagement objects
 -   Process large result sets with built-in pagination
 -   Access data through REST endpoints or Apex methods
 -   Integrate Data 360 data into external applications and workflows
 
+Choose the method that best fits your integration scenario.
+
 Use the Connect REST API for most integration scenarios. It provides comprehensive features and integrates seamlessly with Salesforce Platform capabilities.
 
-**Base URL**: `https://{dne_cdpInstanceUrl}/services/data/v64.0/ssot/query-sql`
-
--   [**Create SQL Query**](https://developer.salesforce.com/docs/data/connectapi/references/spec?meta=createSqlQuery)
+-   [**Submit SQL Query**](https://developer.salesforce.com/docs/data/connectapi/references/spec?meta=createSqlQuery)
 
     -   **POST** `https://{dne_cdpInstanceUrl}/services/data/v64.0/ssot/query-sql`
     -   Execute SQL queries synchronously and asynchronously
-    -   Returns query ID for tracking and result retrieval
+    -   Returns query ID for tracking and result retrieval. You can pass this `queryId` to [`result_scan`](https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/dc-sql-reference/result-scan.html) to query the cached results in a subsequent SQL statement.
 -   [**Get SQL Query Status**](https://developer.salesforce.com/docs/data/connectapi/references/spec?meta=getSqlQuery)
 
     -   **GET** `https://{dne_cdpInstanceUrl}/services/data/v64.0/ssot/query-sql/{queryId}`
     -   Check query execution status and metadata
     -   Monitor progress for long-running queries
--   [**Get SQL Query Results**](https://developer.salesforce.com/docs/data/connectapi/references/spec?meta=getSqlQueryRows)
+-   [**Get SQL Query Rows**](https://developer.salesforce.com/docs/data/connectapi/references/spec?meta=getSqlQueryRows)
 
     -   **GET** `https://{dne_cdpInstanceUrl}/services/data/v64.0/ssot/query-sql/{queryId}/rows`
     -   Retrieve query results with pagination support
@@ -40,28 +44,77 @@ Use the Connect REST API for most integration scenarios. It provides comprehensi
     -   Cancel running queries to free up resources
     -   Useful for query timeout management
 
-For server-side integration within your Salesforce org, use the Apex ConnectAPI methods:
+The Data 360 REST API is an HTTP interface for executing SQL queries directly against your Data 360 data. It includes improved asynchronous execution, richer schema introspection, and consistent error reporting.
 
--   [**Query SQL**](https://developer.salesforce.com/docs/atlas.en-us.apexref.meta/apexref/apex_ConnectAPI_CdpQuery_static_methods.htm#apex_ConnectAPI_CdpQuery_querySql_1) - Execute SQL queries
--   [**Query SQL Rows**](https://developer.salesforce.com/docs/atlas.en-us.apexref.meta/apexref/apex_ConnectAPI_CdpQuery_static_methods.htm#apex_ConnectAPI_CdpQuery_querySqlRows_1) - Retrieve paginated results
--   [**Cancel SQL Query**](https://developer.salesforce.com/docs/atlas.en-us.apexref.meta/apexref/apex_ConnectAPI_CdpQuery_static_methods.htm#apex_ConnectAPI_CdpQuery_cancelQuerySql_1) - Cancel running queries
+> **Note:**
+> This API uses the `dne_cdpInstanceUrl`, which is separate from your standard Salesforce org URL. See [Data Cloud API (also known as Direct API)](https://developer.salesforce.com/docs/data/data-cloud-dev/guide/custom-app-dev.html#data-cloud-api-also-known-as-direct-api) for instructions on obtaining the instance URL and access token.
+
+-   [**Submit SQL Query**](https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/query-api-v3-post.html)
+
+    -   **POST** `/api/v3/query`
+    -   Execute queries in ASYNC or ADAPTIVE mode
+    -   Returns a `queryId` in the `status` response header for polling.
+-   [**Get SQL Query Status**](https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/query-api-v3-get-query.html)
+
+    -   **GET** `/api/v3/query/{queryId}`
+    -   Poll for query completion status
+    -   Returns status, row count, chunk count, and execution statistics.
+-   [**Get SQL Query Rows**](https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/query-api-v3-get-rows.html)
+
+    -   **GET** `/api/v3/query/{queryId}/rows`
+    -   Retrieve results using offset-based pagination.
+-   [**Get SQL Query Chunks**](https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/query-api-v3-get-chunk.html)
+
+    -   **GET** `/api/v3/query/{queryId}/chunks/{chunkId}`
+    -   Retrieve results by chunk ID (preferred for large result sets).
+-   [**Get SQL Query Metadata**](https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/query-api-v3-get-metadata.html)
+
+    -   **GET** `/api/v3/query/{queryId}/metadata`
+    -   Retrieve output schema without fetching data rows.
+-   [**Cancel SQL Query**](https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/query-api-v3-delete.html)
+
+    -   **DELETE** `/api/v3/query/{queryId}`
+    -   Cancel a running query and free server resources.
+
+All Data 360 REST API endpoints return JSON by default. [Apache Arrow IPC streaming format](https://arrow.apache.org/docs/format/IPC.html) is also supported as a columnar binary format that reduces payload size and deserialization overhead, making it the better choice for large result sets. These endpoints support Apache Arrow as an alternative to JSON.
+
+-   Submit SQL Query
+-   Get SQL Query Rows
+-   Get SQL Query Chunks
+-   Get SQL Query Metadata.
+
+To request an Arrow response, set the `Accept` header to `application/vnd.apache.arrow.stream`. The response body is a binary Arrow IPC stream rather than JSON. Use an Arrow-compatible client library (such as [PyArrow](https://arrow.apache.org/docs/python/) or the [Apache Arrow Java library](https://arrow.apache.org/docs/java/)) to read the stream.
+
+For server-side integration within your Salesforce org, use Apex methods to query Data 360 data.
+
+The [`sfsqlquery` namespace](https://developer.salesforce.com/docs/atlas.en-us.apexref.meta/apexref/apex_namespace_sfsqlquery.htm) provides object-oriented Apex classes for managing Data 360 SQL query execution with iterators and asynchronous queueables. It includes classes like `SqlStatement`, `SqlRowIterator`, `Row`, `QueryHandle`, and `SqlQueueable` for structured query lifecycle management. This namespace is the recommended approach for querying Data 360 data with Apex.
+
+For workflows and usage patterns, see [Query Data 360 Data with Apex](https://developer.salesforce.com/docs/data/data-cloud-query-guide/guide/dc-apex-query.html).
+
+The `ConnectApi.CdpQuery` class provides Apex methods that mirror the Connect REST API endpoints:
+
+-   [**Submit SQL Query**](https://developer.salesforce.com/docs/atlas.en-us.apexref.meta/apexref/apex_ConnectAPI_CdpQuery_static_methods.htm#apex_ConnectAPI_CdpQuery_querySql_1) - Execute SQL queries
 -   [**Get SQL Query Status**](https://developer.salesforce.com/docs/atlas.en-us.apexref.meta/apexref/apex_ConnectAPI_CdpQuery_static_methods.htm#apex_ConnectAPI_CdpQuery_querySqlStatus_1) - Check query status
+-   [**Get SQL Query Rows**](https://developer.salesforce.com/docs/atlas.en-us.apexref.meta/apexref/apex_ConnectAPI_CdpQuery_static_methods.htm#apex_ConnectAPI_CdpQuery_querySqlRows_1) - Retrieve paginated results
+-   [**Cancel SQL Query**](https://developer.salesforce.com/docs/atlas.en-us.apexref.meta/apexref/apex_ConnectAPI_CdpQuery_static_methods.htm#apex_ConnectAPI_CdpQuery_cancelQuerySql_1) - Cancel running queries
 
-See [OAuth 2.0 Client Credentials Flow for Server-to-Server Integration](https://help.salesforce.com/s/articleView?id=xcloud.remoteaccess_oauth_client_credentials_flow.htm&type=5) in the Salesforce Help Guide. All REST API calls require a valid OAuth 2.0 access token:
+Authentication requirements vary by access method.
 
-Apex methods use the current user's session context and permissions automatically. See [Getting Started with Apex](https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_intro_get_started.htm) in the Apex Developer Guide.
+See [OAuth 2.0 Client Credentials Flow for Server-to-Server Integration](https://help.salesforce.com/s/articleView?id=xcloud.remoteaccess_oauth_client_credentials_flow.htm&type=5) in Salesforce Help. All REST API calls require a valid OAuth 2.0 access token:
+
+Apex methods use the current user’s session context and permissions automatically. See [Getting Started with Apex](https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_intro_get_started.htm) in the Apex Developer Guide.
 
 -   **Filter early**: Use WHERE clauses to reduce data scanned
 -   **Select specific columns**: Avoid `SELECT *` statements
 -   **Limit results**: Use `LIMIT` for large datasets
 -   **Optimize joins**: Include key qualifiers and proper indexing
 -   **Consider your data’s indexed field**: Use the DMOs primary index or consider using a [secondary index](https://help.salesforce.com/s/articleView?language=en_US&id=data.c360_a_query_secondary_indexes.htm&type=5)
--   **Implement async handling**: Data 360 queries use both asynchronous and synchronous responses to optimize performance. Setup your application to handle both sync and async responses.
+-   **Implement asynchronous handling**: Data 360 queries use both asynchronous and synchronous responses to optimize performance. Set up your application to handle both synchronous and asynchronous responses.
 -   **Paginate result sets**: Use the Connect API `getSqlQueryRows` endpoint with `offset` and `rowLimit`. You can query your `createSqlQuery` results for 24 hours without incurring more consumption charges. Because Data 360 stores results, `getSqlQueryRows` returns data faster than calls to `createSqlQuery`.
 
 Include key qualifier fields in table joins for optimal performance:
 
-When key qualifiers aren't configured on data lake object fields, the value is null. Use `IS NOT DISTINCT FROM` for null-safe joins.
+When key qualifiers aren’t configured on data lake object fields, the value is null. Use `IS NOT DISTINCT FROM` for null-safe joins.
 
 -   [Query Services Status Codes](https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-queryservices-statuscodes.html) - Error handling reference
 -   [Get Started With Data 360 SQL](https://developer.salesforce.com/docs/data/data-cloud-query-guide/guide/dc-query-section.html) - SQL tutorial and examples

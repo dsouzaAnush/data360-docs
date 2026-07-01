@@ -1,0 +1,30 @@
+---
+title: "Data Graphs"
+description: "Connect REST API endpoints for Data 360 data graphs:"
+openapi: "POST /ssot/data-graphs"
+---
+
+# Data Graphs
+
+<Note>
+Generated from the official Salesforce Data 360 Connect REST API spec (67.0). Run `npm run sync:apis` to refresh this page and `openapi/data360-api.yaml`.
+</Note>
+
+Connect REST API endpoints for Data 360 data graphs:
+
+## Operations
+
+| Method | Path | Summary | Available Version |
+| --- | --- | --- | --- |
+| `POST` | `/ssot/data-graphs` | Create data graph | 59.0 |
+| `GET` | `/ssot/data-graphs/data/{dataGraphEntityName}` | Get data graph data by entity name | 59.0 |
+| `GET` | `/ssot/data-graphs/data/{dataGraphEntityName}/{id}` | Get data graph data by ID | 59.0 |
+| `GET` | `/ssot/data-graphs/metadata` | Get data graph metadata | 59.0 |
+| `DELETE` | `/ssot/data-graphs/{dataGraphName}` | Delete data graph | 59.0 |
+| `GET` | `/ssot/data-graphs/{dataGraphName}` | Get data graph | 59.0 |
+| `POST` | `/ssot/data-graphs/{dataGraphName}/actions/activate` | Activate data graph | 67.0 |
+| `POST` | `/ssot/data-graphs/{dataGraphName}/actions/refresh` | Refresh data graph | 64.0 |
+
+## Source
+
+- [Official Data 360 Connect REST API reference](https://developer.salesforce.com/docs/data/connectapi/references/spec)

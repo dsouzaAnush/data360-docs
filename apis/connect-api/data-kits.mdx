@@ -1,0 +1,32 @@
+---
+title: "Data Kits"
+description: "Connect REST API endpoints for Data 360 data kits:"
+openapi: "GET /ssot/data-kits"
+---
+
+# Data Kits
+
+<Note>
+Generated from the official Salesforce Data 360 Connect REST API spec (67.0). Run `npm run sync:apis` to refresh this page and `openapi/data360-api.yaml`.
+</Note>
+
+Connect REST API endpoints for Data 360 data kits:
+
+## Operations
+
+| Method | Path | Summary | Available Version |
+| --- | --- | --- | --- |
+| `GET` | `/ssot/data-kits` | Get data kits | 63.0 |
+| `POST` | `/ssot/data-kits` | Create data kit | 63.0 |
+| `GET` | `/ssot/data-kits/available-components` | Get data kit available components | 63.0 |
+| `DELETE` | `/ssot/data-kits/{dataKitDevName}` | Delete data kit | 64.0 |
+| `PATCH` | `/ssot/data-kits/{dataKitDevName}` | Update data kit components | 64.0 |
+| `POST` | `/ssot/data-kits/{dataKitDevName}` | Deploy data kit components | 64.0 |
+| `GET` | `/ssot/datakit/{dataKitDevName}/manifest` | Get data kit manifest | 63.0 |
+| `POST` | `/ssot/data-kits/{dataKitName}/undeploy` | Undeploy data kit component | 63.0 |
+| `GET` | `/ssot/data-kits/{dataKitName}/components/{componentName}/dependencies` | Get data kit component dependency | 63.0 |
+| `GET` | `/ssot/data-kits/{dataKitName}/components/{componentName}/deployment-status` | Get data kit component status | 62.0 |
+
+## Source
+
+- [Official Data 360 Connect REST API reference](https://developer.salesforce.com/docs/data/connectapi/references/spec)

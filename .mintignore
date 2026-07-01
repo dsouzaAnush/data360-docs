@@ -8,6 +8,8 @@ drafts/
 
 # Crawler scripts
 scripts/
+openapi/data360-api.yaml
+reports/
 
 # Salesforce skills submodule (consumed via .mintlify/skills/ symlinks)
 .salesforce-skills/

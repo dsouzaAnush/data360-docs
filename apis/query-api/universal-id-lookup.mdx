@@ -1,7 +1,11 @@
 ---
 title: "Universal ID Lookup"
-description: "Look up unified customer records by source system IDs across data sources."
-openapi: "GET /api/v1/universalIdLookup/{entityName}/{dataSourceId}/{dataSourceObjectId}/{sourceRecordId}"
+description: "Data 360 REST API Reference"
+source_url: "https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-universal-id-lookup.html"
+source_hash: "cdacd8a01c6b41ee2420765baefd53a2c7c5a9923b7fb399e29a2e721d355b00"
+source_etag: "W/\"aca95052908f42c0f4a845dbe8b8d031\""
+source_last_modified: "Wed, 01 Jul 2026 01:38:24 GMT"
+sync_status: "official-salesforce-doc"
 ---
 
 # Query Unified Record ID
@@ -24,9 +28,7 @@ The Universal ID Lookup API provides a powerful way to retrieve all individual r
 -   No limit on the number of filters in a query
 -   Date/time fields must use the format: `YYYY-MM-DD HH:MM:SS`
 
--   **GET** `/api/v1/universalIdLookup/{entity_name}/{DataSourceId__c}/{DataSourceObjectId__c}/{SourceRecordId__c}`
-
-    [View API Reference](https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-universalidlookup-entity-name-datasourceid.html)
+-   [**GET /api/v1/universalIdLookup/\{entity\_name\}/\{DataSourceId\_\_c\}/\{DataSourceObjectId\_\_c\}/\{SourceRecordId\_\_c\}**](https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-universalidlookup-entity-name-datasourceid.html)
 
     Retrieve all individual records associated with a unified record across all data sources.
 

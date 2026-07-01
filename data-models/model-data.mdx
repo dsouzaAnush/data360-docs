@@ -1,0 +1,48 @@
+---
+title: "Model Data in Data 360"
+description: ":::important This documentation is available as a developer preview. Documentation isn’t generally available unless or until Salesforce announces its"
+source_url: "https://developer.salesforce.com/docs/data/data-cloud-dmo-mapping/guide/c360dm-model-data.html"
+source_hash: "e70c7026a8ed4d31b0709f20418004f9daf665dd6e4d119e973b007efd54daef"
+source_etag: "W/\"dfe54c1b383235b93d23cc04bc4bc226\""
+source_last_modified: "Wed, 01 Jul 2026 01:38:14 GMT"
+sync_status: "official-salesforce-doc"
+---
+
+# Model Data in Data 360
+
+> **Important:**
+> This documentation is available as a developer preview. Documentation isn’t generally available unless or until Salesforce announces its general availability in documentation or in press releases or public statements. All commands, parameters, and other information is subject to change or deprecation at any time, with or without notice. Don’t implement functionality in production with these commands or tools.
+
+> **Note:**
+> As of October 14, 2025, Data Cloud has been rebranded to Data 360. During this transition, you may see references to Data 360 in our application and documentation. While the name is new, the functionality and content remains unchanged.
+
+Learn about the key terms and concepts related to data ingestion and modeling in Data 360. Find reference material on standard data model objects (DMOs), including fields, descriptions, and relationships, along with mappings associated with data bundles.
+
+-   [**Standard DMOs**](https://developer.salesforce.com/docs/data/data-cloud-dmo-mapping/guide/c360dm-si-entity-interface-dmos-introduction.html)
+-   [**Standard DLO to DMO Mappings**](https://developer.salesforce.com/docs/data/data-cloud-dmo-mapping/guide/c360dm-standard_mappings.html)
+-   [**Standard Data Bundles**](https://developer.salesforce.com/docs/data/data-cloud-dmo-mapping/guide/file-based-data-kits-introduction.html)
+-   [**Data 360 Extensibility Readiness Matrix**](https://developer.salesforce.com/docs/data/data-cloud-dmo-mapping/guide/c360a-api-isv-readiness-data.html)
+-   [**Legacy DMOs**](https://developer.salesforce.com/docs/data/data-cloud-dmo-mapping/guide/c360dm-datamodelobjects.html)
+-   [**Legacy Data Bundles**](https://developer.salesforce.com/docs/data/data-cloud-dmo-mapping/guide/c360a-starter-data-bundles.html)
+
+The Customer 360 Data Model is the standard data model used by Data 360 to aid in data modeling and extensibility across platforms. It serves as the framework for unifying raw data into a single, actionable view.
+
+Data lake objects (DLOs) are the foundational storage containers where ingested or federated data is first held. They act as the raw building blocks of the data lake, capturing the initial state of information brought into the system. Data model objects (DMOs) are created by mapping DLOs into standardized groupings. These objects provide physical or virtual views of the underlying data, allowing for either standard or custom configurations.
+
+A data bundle is a Salesforce-defined data stream definition that includes mapping to Data 360 DMOs. After a data stream is deployed, the data bundle automatically maps source objects from the source to a DMO in Data 360. You can add or customize the data mappings to meet your business needs.
+
+![link icon](https://a.sfdcstatic.com/developer-website/sfdocs/data-cloud/media/landing_link.png) [_Salesforce Developer_: Standard Objects](https://developer.salesforce.com/docs/atlas.en-us.object_reference.meta/object_reference/sforce_api_objects_list.htm)
+
+![link icon](https://a.sfdcstatic.com/developer-website/sfdocs/data-cloud/media/landing_link.png) [_Salesforce Developers_: Data Model Diagrams for Salesforce Objects](https://developer.salesforce.com/docs/atlas.en-us.object_reference.meta/object_reference/data_model.htm)
+
+![Help icon](https://a.sfdcstatic.com/developer-website/sfdocs/data-cloud/media/landing_knowledge_base.png) [_Salesforce Help_: Data Model Concepts](https://help.salesforce.com/s/articleView?id=data.c360_a_understanding_and_using_the_data_model.htm)
+
+![link icon](https://a.sfdcstatic.com/developer-website/sfdocs/data-cloud/media/landing_link.png) [_Salesforce Developers_: Data Model Gallery for Data 360](https://developer.salesforce.com/docs/platform/data-models/guide/data-cloud-category.html)
+
+![trailhead icon](https://a.sfdcstatic.com/developer-website/sfdocs/data-cloud/media/landing_trailhead_alt.png) [_Trailhead_: Customer 360 Data Model for Data 360](https://trailhead.salesforce.com/en/content/learn/modules/customer-360-data-model-for-customer-data-platform)
+
+![Help icon](https://a.sfdcstatic.com/developer-website/sfdocs/data-cloud/media/landing_knowledge_base.png) [_Salesforce Help_: Customer 360 Data Model](https://help.salesforce.com/s/articleView?id=data.c360_a_c360datamodel.htm&type=5)
+
+![Help icon](https://a.sfdcstatic.com/developer-website/sfdocs/data-cloud/media/landing_knowledge_base.png) [_Salesforce Help_: Data Mapping](https://help.salesforce.com/s/articleView?id=data.c360_a_data_mapping.htm&type=5)
+
+![Help icon](https://a.sfdcstatic.com/developer-website/sfdocs/data-cloud/media/landing_knowledge_base.png) [_Salesforce Help_: Data Types and Date Formats](https://help.salesforce.com/s/articleView?language=en_US&type=5&id=sf.c360_a_data_types_and_date_formats.htm)

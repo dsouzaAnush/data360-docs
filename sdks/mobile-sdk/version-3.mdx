@@ -1,0 +1,61 @@
+---
+title: "Mobile SDK Version 3.x"
+description: ":::note As of October 14, 2025, Data Cloud has been rebranded to Data 360. During this transition, you may see references to Data Cloud in our applica"
+source_url: "https://developer.salesforce.com/docs/data/data-cloud-engagement-mobile-sdk/guide/c360a-api-engagement-mobile-sdk-v3.html"
+source_hash: "95425ec4c38fd659e2d9bf5c9165565c8197ae3af1eaf3a6c47d62251d241518"
+source_etag: "W/\"6ef8ec2a23a0f2f606909a58bd25d53f\""
+source_last_modified: "Wed, 01 Jul 2026 01:38:42 GMT"
+sync_status: "official-salesforce-doc"
+---
+
+# Integrate Your Mobile Applications (Version 3.x)
+
+> **Note:**
+> As of October 14, 2025, Data Cloud has been rebranded to Data 360. During this transition, you may see references to Data Cloud in our application and documentation. While the name is new, the functionality and content remains unchanged.
+
+Data 360 Module for the Engagement Mobile SDK enables seamless integration of your mobile applications with Data 360. This integration captures rich behavioral and demographic data from customers, along with app lifecycle and screen navigation events. By collecting these events, Data 360 creates a unified customer profile that enables hyper-personalized engagement across multiple Salesforce clouds, including Marketing, Commerce, and Service.
+
+To use the Data 360 Module, create a Salesforce data source connector and copy your tenant-specific endpoint. Start by logging into Data 360 and navigating to Websites and Mobile Apps. Create an [app connector](https://help.salesforce.com/s/articleView?id=data.c360_a_web_mobile_app_connector.htm) to configure your data sources.
+
+To initialize the Data 360 Module, you’ll need the `appSourceId` and tenant-specific endpoint from your web data connector.
+
+Use Swift Package Manager to install and manage the Data 360 Module for the Engagement Mobile SDK.
+
+1.  In Xcode, with your app project open, navigate to **File** > **Add Packages**.
+
+2.  Enter the package URL for the Engagement Mobile SDK repository.
+
+3.  Select the SDK version that you want to use. The latest version is recommended.
+
+4.  Enter the package URL for the Data 360 Module:
+
+5.  Select the module version that you want to use. The latest version is recommended.
+
+Xcode automatically resolves and downloads the dependencies in the background.
+
+Add the following to your Podfile:
+
+The `MarketingCloud-SFMCSdk` dependency is pulled in transitively with `MarketingCloud-Cdp` — you don’t need to add it separately. Then run `pod install` and open the generated `.xcworkspace`.
+
+1.  Update the module-level `build.gradle` file with the required repositories.
+
+2.  Add the SDK dependencies.
+
+    The `sfmcsdk` dependency is brought in transitively — you don’t need to add it separately unless you need a specific version.
+
+Download the binaries for the Data 360 Module from the official repositories.
+
+-   [Android SDK](https://github.com/salesforce-marketingcloud/mobile-sdk-cdp-android)
+-   [iOS SDK](https://github.com/salesforce-marketingcloud/mobile-sdk-cdp-ios)
+
+[**API Reference**](https://developer.salesforce.com/docs/data/data-cloud-engagement-mobile-sdk/guide/c360a-api-engagement-mobile-sdk-api-reference.html)
+
+Complete API documentation and reference guide for the Engagement Mobile SDK.
+
+[**Event Specifications**](https://developer.salesforce.com/docs/data/data-cloud-engagement-mobile-sdk/guide/c360a-api-engagement-mobile-sdk-event-specifications.html)
+
+Detailed specifications for all supported events in the Engagement Mobile SDK.
+
+[**Schema Mappings**](https://developer.salesforce.com/docs/data/data-cloud-engagement-mobile-sdk/guide/c360a-api-engagement-mobile-sdk-schema-mappings.html)
+
+Standard scheme mappings for ecommerce use cases, including comprehensive descriptions of each event definition.

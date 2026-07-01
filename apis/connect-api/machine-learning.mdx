@@ -1,0 +1,48 @@
+---
+title: "Machine Learning"
+description: "Connect REST API endpoints for Data 360 machine learning:"
+openapi: "POST /ssot/machine-learning/alerts"
+---
+
+# Machine Learning
+
+<Note>
+Generated from the official Salesforce Data 360 Connect REST API spec (67.0). Run `npm run sync:apis` to refresh this page and `openapi/data360-api.yaml`.
+</Note>
+
+Connect REST API endpoints for Data 360 machine learning:
+
+## Operations
+
+| Method | Path | Summary | Available Version |
+| --- | --- | --- | --- |
+| `POST` | `/ssot/machine-learning/alerts` | Create data alert | 61.0 |
+| `PATCH` | `/ssot/machine-learning/alerts/{alertId}` | Update data alert | 61.0 |
+| `GET` | `/ssot/machine-learning/configured-models` | Get configured models | 61.0 |
+| `DELETE` | `/ssot/machine-learning/configured-models/{configuredModelIdOrName}` | Delete configured model | 61.0 |
+| `GET` | `/ssot/machine-learning/configured-models/{configuredModelIdOrName}` | Get configured model | 61.0 |
+| `PATCH` | `/ssot/machine-learning/configured-models/{configuredModelIdOrName}` | Update configured model | 61.0 |
+| `GET` | `/ssot/machine-learning/jobs` | Get predict jobs | 59.0 |
+| `GET` | `/ssot/machine-learning/jobs/{jobId}` | Get a predict job | 59.0 |
+| `GET` | `/ssot/machine-learning/jobs/{jobId}/tasks` | Get predict job tasks | 59.0 |
+| `GET` | `/ssot/machine-learning/jobs/{jobId}/tasks/{taskId}` | Get a predict job task | 59.0 |
+| `GET` | `/ssot/machine-learning/model-artifacts` | Get model artifacts | 61.0 |
+| `DELETE` | `/ssot/machine-learning/model-artifacts/{modelArtifactIdOrName}` | Delete model artifact | 61.0 |
+| `GET` | `/ssot/machine-learning/model-artifacts/{modelArtifactIdOrName}` | Get model artifact | 61.0 |
+| `PATCH` | `/ssot/machine-learning/model-artifacts/{modelArtifactIdOrName}` | Update model artifact | 61.0 |
+| `GET` | `/ssot/machine-learning/model-setups/{modelSetupIdOrName}/setup-versions` | Get model setup versions | 59.0 |
+| `POST` | `/ssot/machine-learning/model-setups/{modelSetupIdOrName}/setup-versions` | Create model setup version | 59.0 |
+| `GET` | `/ssot/machine-learning/model-setups/{modelSetupIdOrName}/setup-versions/{modelSetupVersionId}` | Get model setup version | 59.0 |
+| `PATCH` | `/ssot/machine-learning/model-setups/{modelSetupIdOrName}/setup-versions/{modelSetupVersionId}` | Update model setup version | 59.0 |
+| `GET` | `/ssot/machine-learning/model-setups/{modelSetupIdOrName}/setup-versions/{modelSetupVersionId}/partitions` | Get model setup version partitions | 59.0 |
+| `GET` | `/ssot/machine-learning/model-setups/{modelSetupIdOrName}/setup-versions/{modelSetupVersionId}/partitions/{modelSetupPartitionId}` | Get model setup version partition | 59.0 |
+| `POST` | `/ssot/machine-learning/predict` | Get prediction | 61.0 |
+| `GET` | `/ssot/machine-learning/prediction-job-definitions` | Get prediction job definitions | 59.0 |
+| `POST` | `/ssot/machine-learning/prediction-job-definitions` | Create a prediction job definition | 59.0 |
+| `DELETE` | `/ssot/machine-learning/prediction-job-definitions/{predictionJobDefIdOrName}` | Delete a prediction job definition | 59.0 |
+| `GET` | `/ssot/machine-learning/prediction-job-definitions/{predictionJobDefIdOrName}` | Get a prediction job definition | 59.0 |
+| `PATCH` | `/ssot/machine-learning/prediction-job-definitions/{predictionJobDefIdOrName}` | Update a prediction job definition | 59.0 |
+
+## Source
+
+- [Official Data 360 Connect REST API reference](https://developer.salesforce.com/docs/data/connectapi/references/spec)

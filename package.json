@@ -4,7 +4,16 @@
   "description": "Use the starter kit to get your docs deployed and ready to customize.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "sync:connect-api": "node scripts/sync-connect-api-spec.js",
+    "generate:connect-api-pages": "node scripts/generate-connect-api-pages.js",
+    "sync:content": "node scripts/crawl-docs.js",
+    "sync:apis": "node scripts/sync-connect-api-spec.js --generate-pages",
+    "sync:all": "npm run sync:content && npm run sync:apis",
+    "check:content": "node scripts/crawl-docs.js --check",
+    "check:connect-api": "node scripts/sync-connect-api-spec.js --check",
+    "check:openapi-bindings": "node scripts/check-openapi-bindings.js",
+    "check:navigation": "node scripts/check-navigation.js",
+    "test": "npm run check:content && npm run check:connect-api && npm run check:openapi-bindings && npm run check:navigation"
   },
   "repository": {
     "type": "git",
@@ -21,6 +30,7 @@
   "dependencies": {
     "axios": "^1.13.4",
     "cheerio": "^1.2.0",
-    "turndown": "^7.2.2"
+    "turndown": "^7.2.2",
+    "yaml": "^2.9.0"
   }
 }

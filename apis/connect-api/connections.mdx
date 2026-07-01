@@ -1,0 +1,45 @@
+---
+title: "Connections"
+description: "Connect REST API endpoints for Data 360 connections:"
+openapi: "GET /ssot/connections"
+---
+
+# Connections
+
+<Note>
+Generated from the official Salesforce Data 360 Connect REST API spec (67.0). Run `npm run sync:apis` to refresh this page and `openapi/data360-api.yaml`.
+</Note>
+
+Connect REST API endpoints for Data 360 connections:
+
+## Operations
+
+| Method | Path | Summary | Available Version |
+| --- | --- | --- | --- |
+| `GET` | `/ssot/connections` | Get connections | 60.0 |
+| `POST` | `/ssot/connections` | Create connection | 64.0 |
+| `DELETE` | `/ssot/connections/{connectionId}` | Delete connection | 60.0 |
+| `GET` | `/ssot/connections/{connectionId}` | Get connection | 60.0 |
+| `PATCH` | `/ssot/connections/{connectionId}` | Update connection | 63.0 |
+| `PUT` | `/ssot/connections/{connectionId}` | Replace connection | 61.0 |
+| `POST` | `/ssot/connections/{connectionId}/database-schemas` | Get connection database schemas | 63.0 |
+| `POST` | `/ssot/connections/{connectionId}/databases` | Get connection databases | 63.0 |
+| `GET` | `/ssot/connections/{connectionId}/endpoints` | Get connection endpoints | 61.0 |
+| `POST` | `/ssot/connections/{connectionId}/objects/{resourceName}/fields` | Get connection fields | 62.0 |
+| `POST` | `/ssot/connections/{connectionId}/objects` | Get connection objects | 62.0 |
+| `POST` | `/ssot/connections/{connectionId}/objects/{resourceName}/preview` | Get connection preview | 62.0 |
+| `GET` | `/ssot/connections/{connectionId}/schema` | Get connection schema | 60.0 |
+| `PUT` | `/ssot/connections/{connectionId}/schema` | Upsert connection schema | 60.0 |
+| `GET` | `/ssot/connections/{connectionId}/sitemap` | Get connection site map | 60.0 |
+| `PUT` | `/ssot/connections/{connectionId}/sitemap` | Upsert connection site map | 60.0 |
+| `POST` | `/ssot/connections/actions/test` | Test connection action | 62.0 |
+| `POST` | `/ssot/connections/actions/{command}` | Run connection action | 64.0 |
+| `POST` | `/ssot/connections/{connectionId}/actions/test` | Test existing connection action | 62.0 |
+| `POST` | `/ssot/connections/{connectionId}/actions/{command}` | Run existing connection action | 64.0 |
+| `POST` | `/ssot/connections/{connectionId}/schema/actions/test` | Test existing connection schema action | 62.0 |
+| `GET` | `/ssot/connectors` | Get connectors | 62.0 |
+| `GET` | `/ssot/connectors/{connectorType}` | Get connector metadata | 59.0 |
+
+## Source
+
+- [Official Data 360 Connect REST API reference](https://developer.salesforce.com/docs/data/connectapi/references/spec)

@@ -1,7 +1,11 @@
 ---
 title: "Metadata API"
-description: "Discover available data model objects, fields, and relationships in your Data 360 org."
-openapi: "GET /api/v1/metadata/"
+description: "Data 360 REST API Reference"
+source_url: "https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-metadata-api.html"
+source_hash: "e5557ff6308bf9094474d5708cb0eb22710d8f5c1177e98a60bcd4e9d9a95fe0"
+source_etag: "W/\"cf6573b3896ccc2b2bb874b2c3f6cf09\""
+source_last_modified: "Wed, 01 Jul 2026 01:38:24 GMT"
+sync_status: "official-salesforce-doc"
 ---
 
 # GET /api/v1/metadata
@@ -16,7 +20,7 @@ Retrieves metadata about all entities, including Calculated Insights, Engagement
 | Parameter | Type | Description |
 | --- | --- | --- |
 | entityType | string | The requested metadata entity type. By default, this parameter includes all of the available types. Acceptable values: DataLakeObject, DataModelObject, and CalculatedInsight |
-| entityCategory | string | The requested metadata entity category. By default, this parameter includes all of the available categories. It isn't applicable for Calculated Insight entities. Acceptable values: Profile, Engagement, and Related |
+| entityCategory | string | The requested metadata entity category. By default, this parameter includes all of the available categories. It isn’t applicable for Calculated Insight entities. Acceptable values: Profile, Engagement, and Related |
 | entityName | string | The name of the requested metadata entity. By default, this parameter includes all of the available categories and an exhaustive list of entities. Example: UnifiedIndividual__dlm |
 
 The response includes:

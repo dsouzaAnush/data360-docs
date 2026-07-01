@@ -1,0 +1,294 @@
+{
+  "source": "official-salesforce-docs",
+  "pageCount": 36,
+  "pages": [
+    {
+      "area": "developer-guide",
+      "output": "developer-guide/index.mdx",
+      "sourceUrl": "https://developer.salesforce.com/docs/data/data-cloud-dev/guide/dc-get-started.html",
+      "title": "Getting Started with Data Cloud",
+      "sourceHash": "e37282ecc416255d1d93dbeaf87ddfc1185adf34aac85e483458004c3b09c903",
+      "bytes": 7142
+    },
+    {
+      "area": "developer-guide",
+      "output": "developer-guide/quick-start.mdx",
+      "sourceUrl": "https://developer.salesforce.com/docs/data/data-cloud-dev/guide/dc-quick-start.html",
+      "title": "Quick Start Tutorial",
+      "sourceHash": "2a1eb132e284a176406e47dfed7c68d3f82725085236505fe5eb6987bc012278",
+      "bytes": 7402
+    },
+    {
+      "area": "developer-guide",
+      "output": "developer-guide/architecture.mdx",
+      "sourceUrl": "https://developer.salesforce.com/docs/data/data-cloud-dev/guide/dc-architecture.html",
+      "title": "Data Cloud Architecture",
+      "sourceHash": "903eb86e1f31989da423e735dc38d9a66043150d8e1fc4360b53459528fa9ee6",
+      "bytes": 7932
+    },
+    {
+      "area": "developer-guide",
+      "output": "developer-guide/environments.mdx",
+      "sourceUrl": "https://developer.salesforce.com/docs/data/data-cloud-dev/guide/dc-dev-env.html",
+      "title": "Development Environments",
+      "sourceHash": "d2f6d387adb4c8f038dba1066d73c9a88794929f3ee6ecb6fbc8bd97332b439a",
+      "bytes": 1840
+    },
+    {
+      "area": "developer-guide",
+      "output": "developer-guide/platform-comparison.mdx",
+      "sourceUrl": "https://developer.salesforce.com/docs/data/data-cloud-dev/guide/app-dev-comparison.html",
+      "title": "Data Cloud vs Salesforce Platform",
+      "sourceHash": "0334b6cbe51e64a389057e58d53ae0fa2b4a2bdaf9b0b11a6956422d6e61ad2a",
+      "bytes": 2810
+    },
+    {
+      "area": "developer-guide",
+      "output": "developer-guide/2gp-workflow.mdx",
+      "sourceUrl": "https://developer.salesforce.com/docs/data/data-cloud-dev/guide/data-cloud-2gp-workflow.html",
+      "title": "Second-Generation Managed Packages",
+      "sourceHash": "b2a58277c9e0cac135e522efe7ae9de962b79854474c7233c2cfccf3284e805a",
+      "bytes": 11196
+    },
+    {
+      "area": "developer-guide",
+      "output": "developer-guide/postman-collection.mdx",
+      "sourceUrl": "https://developer.salesforce.com/docs/data/data-cloud-dev/guide/dc-apis-postman.html",
+      "title": "Postman Collection",
+      "sourceHash": "5de782fa3303be24b7b188daa24fa63894cca4ea090615a51c0392f51295df45",
+      "bytes": 1163
+    },
+    {
+      "area": "getting-started",
+      "output": "getting-started/introduction.mdx",
+      "sourceUrl": "https://developer.salesforce.com/docs/data/data-cloud-dev/guide/dc-get-started.html",
+      "title": "Introduction to Data 360",
+      "sourceHash": "e37282ecc416255d1d93dbeaf87ddfc1185adf34aac85e483458004c3b09c903",
+      "bytes": 7135
+    },
+    {
+      "area": "getting-started",
+      "output": "getting-started/quickstart.mdx",
+      "sourceUrl": "https://developer.salesforce.com/docs/data/data-cloud-dev/guide/dc-quick-start.html",
+      "title": "Quick Start",
+      "sourceHash": "2a1eb132e284a176406e47dfed7c68d3f82725085236505fe5eb6987bc012278",
+      "bytes": 7393
+    },
+    {
+      "area": "getting-started",
+      "output": "getting-started/architecture.mdx",
+      "sourceUrl": "https://developer.salesforce.com/docs/data/data-cloud-dev/guide/dc-architecture.html",
+      "title": "Architecture Overview",
+      "sourceHash": "903eb86e1f31989da423e735dc38d9a66043150d8e1fc4360b53459528fa9ee6",
+      "bytes": 7930
+    },
+    {
+      "area": "connect-api",
+      "output": "developer-guide/connect-api/overview.mdx",
+      "sourceUrl": "https://developer.salesforce.com/docs/data/connectapi/overview",
+      "title": "Data 360 Connect REST API Overview",
+      "sourceHash": "aec37371d26fb7bb84ea22cda82c5bf3effd209c5394304eae7642ba7cb4092f",
+      "bytes": 1455
+    },
+    {
+      "area": "connect-api",
+      "output": "developer-guide/connect-api/index.mdx",
+      "sourceUrl": "https://developer.salesforce.com/docs/data/connectapi/guide/get-started.html",
+      "title": "Connect REST API Overview",
+      "sourceHash": "5f8614623b3d388ff9ab2d4bfadd716c3c0aff29a15c8419e5823f2bdf620b27",
+      "bytes": 1588
+    },
+    {
+      "area": "query-api",
+      "output": "apis/query-api/index.mdx",
+      "sourceUrl": "https://developer.salesforce.com/docs/data/data-cloud-query-guide/guide/query-guide-get-started.html",
+      "title": "Query API Overview",
+      "sourceHash": "d35765038d5eaf967069c61bd3a9f13845514094c8b3719621245619b1fe86ec",
+      "bytes": 7404
+    },
+    {
+      "area": "query-api",
+      "output": "apis/query-api/query-services.mdx",
+      "sourceUrl": "https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-queryservices-overview.html",
+      "title": "Query Services",
+      "sourceHash": "6708fcf207a2a3807710ae120f1286771dc933f760c9f93ed5ae96ab6e91f150",
+      "bytes": 10279
+    },
+    {
+      "area": "query-api",
+      "output": "apis/query-api/profile-api.mdx",
+      "sourceUrl": "https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-profile-call-overview.html",
+      "title": "Profile API",
+      "sourceHash": "5c3c4c45a48dcd882259fef0d355d0819885608ac09f27e32cde26e493366c6e",
+      "bytes": 4518
+    },
+    {
+      "area": "query-api",
+      "output": "apis/query-api/metadata-api.mdx",
+      "sourceUrl": "https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-metadata-api.html",
+      "title": "Metadata API",
+      "sourceHash": "e5557ff6308bf9094474d5708cb0eb22710d8f5c1177e98a60bcd4e9d9a95fe0",
+      "bytes": 2564
+    },
+    {
+      "area": "query-api",
+      "output": "apis/query-api/calculated-insights-api.mdx",
+      "sourceUrl": "https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-ci-call-overview.html",
+      "title": "Calculated Insights API",
+      "sourceHash": "01b5e0de39c8f2b8bbe63069e1963bb37da2fdcabc378c756f3cd361ea1c366c",
+      "bytes": 2861
+    },
+    {
+      "area": "query-api",
+      "output": "apis/query-api/universal-id-lookup.mdx",
+      "sourceUrl": "https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-universal-id-lookup.html",
+      "title": "Universal ID Lookup",
+      "sourceHash": "cdacd8a01c6b41ee2420765baefd53a2c7c5a9923b7fb399e29a2e721d355b00",
+      "bytes": 3437
+    },
+    {
+      "area": "query-api",
+      "output": "apis/query-api/data-graphs.mdx",
+      "sourceUrl": "https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-data-graphs-overview.html",
+      "title": "Data Graph API",
+      "sourceHash": "75bdbca8972587c123026a7dfd9f6de25b7725711e0cf881d5450b4a061aeff9",
+      "bytes": 2972
+    },
+    {
+      "area": "query-api",
+      "output": "apis/query-api/status-codes.mdx",
+      "sourceUrl": "https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-queryservices-statuscodes.html",
+      "title": "Query Services Status Codes",
+      "sourceHash": "dc31a0b63edc18be3ad97cde7835a719c935728e8d1a844d50d0c5177f132dbd",
+      "bytes": 2459
+    },
+    {
+      "area": "query-api",
+      "output": "apis/query-api/sql-reference.mdx",
+      "sourceUrl": "https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/dc-sql-reference/data-cloud-sql-context.html",
+      "title": "SQL Reference",
+      "sourceHash": "378fd0a8059e67ca4bbabb8c7d572ecc44b14bb80069cdcb10e659235a2ba780",
+      "bytes": 1900
+    },
+    {
+      "area": "web-sdk",
+      "output": "sdks/web-sdk/index.mdx",
+      "sourceUrl": "https://developer.salesforce.com/docs/data/salesforce-interactions-sdk/guide/c360a-api-salesforce-cdp-module-of-the-salesforce-web-sdk.html",
+      "title": "Web SDK Overview",
+      "sourceHash": "e47e41d50cb2fd13ca3f845157fb9dae39284d4b37c9f4716c5e49b24ff92e59",
+      "bytes": 2357
+    },
+    {
+      "area": "web-sdk",
+      "output": "sdks/web-sdk/events.mdx",
+      "sourceUrl": "https://developer.salesforce.com/docs/data/salesforce-interactions-sdk/guide/c360a-api-event-specifications.html",
+      "title": "Event Specifications",
+      "sourceHash": "0c1e1e97b4bee2a3745b9fbd99b5da8ecb352d21220800382034690d68f471a3",
+      "bytes": 2680
+    },
+    {
+      "area": "web-sdk",
+      "output": "sdks/web-sdk/api-reference.mdx",
+      "sourceUrl": "https://developer.salesforce.com/docs/data/salesforce-interactions-sdk/guide/c360a-api-api-reference.html",
+      "title": "API Reference",
+      "sourceHash": "337b8281b56c12b60afec227459ddd570ac285e719169e3fe577712fa0b95f5b",
+      "bytes": 3098
+    },
+    {
+      "area": "web-sdk",
+      "output": "sdks/web-sdk/identity.mdx",
+      "sourceUrl": "https://developer.salesforce.com/docs/data/salesforce-interactions-sdk/guide/c360a-api-identity.html",
+      "title": "Identity APIs",
+      "sourceHash": "1002088743adb3aa1160cb77813b82fb12474717e4dc0ccfae99cd1f914a45c4",
+      "bytes": 2573
+    },
+    {
+      "area": "web-sdk",
+      "output": "sdks/web-sdk/consent.mdx",
+      "sourceUrl": "https://developer.salesforce.com/docs/data/salesforce-interactions-sdk/guide/c360a-api-consent.html",
+      "title": "Consent API",
+      "sourceHash": "009115bbe9d89d09daeeadc7eeeddde638999c8b835a0d7ad8bd20360dbad339",
+      "bytes": 2705
+    },
+    {
+      "area": "mobile-sdk",
+      "output": "sdks/mobile-sdk/index.mdx",
+      "sourceUrl": "https://developer.salesforce.com/docs/data/data-cloud-engagement-mobile-sdk/guide/c360a-api-engagement-mobile-sdk.html",
+      "title": "Mobile SDK Overview",
+      "sourceHash": "ea16bfefe8ba2f6c55bddc7962417cd5e0e82695d8c4b39d611990e7c63537fc",
+      "bytes": 3180
+    },
+    {
+      "area": "mobile-sdk",
+      "output": "sdks/mobile-sdk/version-3.mdx",
+      "sourceUrl": "https://developer.salesforce.com/docs/data/data-cloud-engagement-mobile-sdk/guide/c360a-api-engagement-mobile-sdk-v3.html",
+      "title": "Mobile SDK Version 3.x",
+      "sourceHash": "95425ec4c38fd659e2d9bf5c9165565c8197ae3af1eaf3a6c47d62251d241518",
+      "bytes": 3820
+    },
+    {
+      "area": "mobile-sdk",
+      "output": "sdks/mobile-sdk/api-reference.mdx",
+      "sourceUrl": "https://developer.salesforce.com/docs/data/data-cloud-engagement-mobile-sdk/guide/c360a-api-engagement-mobile-sdk-api-reference.html",
+      "title": "Mobile SDK API Reference",
+      "sourceHash": "f81ccd650ea9cea762fef3191abd19beaf36424f8d2c5f4628a37978bd34f301",
+      "bytes": 4100
+    },
+    {
+      "area": "mobile-sdk",
+      "output": "sdks/mobile-sdk/events.mdx",
+      "sourceUrl": "https://developer.salesforce.com/docs/data/data-cloud-engagement-mobile-sdk/guide/c360a-api-engagement-mobile-sdk-event-specifications.html",
+      "title": "Mobile SDK Event Specifications",
+      "sourceHash": "1d63c8fe44997a2fed0215b94330e017b32344cdf60a1e1c3af438915b91add1",
+      "bytes": 2324
+    },
+    {
+      "area": "mobile-sdk",
+      "output": "sdks/mobile-sdk/schema-mappings.mdx",
+      "sourceUrl": "https://developer.salesforce.com/docs/data/data-cloud-engagement-mobile-sdk/guide/c360a-api-engagement-mobile-sdk-schema-mappings.html",
+      "title": "Mobile SDK Schema Mappings",
+      "sourceHash": "43958e3ea06d51e7cf3d39ef0d692e40503b4a96f7fcb8515888dc16c21d2862",
+      "bytes": 1717
+    },
+    {
+      "area": "data-models",
+      "output": "data-models/index.mdx",
+      "sourceUrl": "https://developer.salesforce.com/docs/data/data-cloud-dmo-mapping/guide/c360dm-datamodelobjects.htm",
+      "title": "Data Model Objects Overview",
+      "sourceHash": "81a5d7865cf0fbc783d87bd99260894e13e22af29de2271d153117dea68cdd06",
+      "bytes": 23744
+    },
+    {
+      "area": "data-models",
+      "output": "data-models/model-data.mdx",
+      "sourceUrl": "https://developer.salesforce.com/docs/data/data-cloud-dmo-mapping/guide/c360dm-model-data.html",
+      "title": "Model Data in Data 360",
+      "sourceHash": "e70c7026a8ed4d31b0709f20418004f9daf665dd6e4d119e973b007efd54daef",
+      "bytes": 5357
+    },
+    {
+      "area": "integrations",
+      "output": "integrations/index.mdx",
+      "sourceUrl": "https://developer.salesforce.com/docs/data/data-cloud-int/guide/c360-a-data-cloud-integrations.html",
+      "title": "Integrations Overview",
+      "sourceHash": "74b292fb1b658175f425cc66138b78765d177e768509ed97f504e10f5c4a1c7f",
+      "bytes": 2025
+    },
+    {
+      "area": "integrations",
+      "output": "integrations/web-sdk-setup.mdx",
+      "sourceUrl": "https://developer.salesforce.com/docs/data/data-cloud-int/guide/c360-a-admin-web-sdk-setup.html",
+      "title": "Web SDK Setup",
+      "sourceHash": "1180cab452eafec864e6b453c18784083347ebed95e85692dfa18c11c96eb587",
+      "bytes": 2759
+    },
+    {
+      "area": "reference",
+      "output": "reference/index.mdx",
+      "sourceUrl": "https://developer.salesforce.com/docs/data/data-cloud-ref/guide/c360a-api-intro-cdpapis.html",
+      "title": "API Reference Overview",
+      "sourceHash": "e37282ecc416255d1d93dbeaf87ddfc1185adf34aac85e483458004c3b09c903",
+      "bytes": 7142
+    }
+  ]
+}

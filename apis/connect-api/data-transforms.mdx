@@ -1,0 +1,35 @@
+---
+title: "Data Transforms"
+description: "Connect REST API endpoints for Data 360 data transforms:"
+openapi: "GET /ssot/data-transforms"
+---
+
+# Data Transforms
+
+<Note>
+Generated from the official Salesforce Data 360 Connect REST API spec (67.0). Run `npm run sync:apis` to refresh this page and `openapi/data360-api.yaml`.
+</Note>
+
+Connect REST API endpoints for Data 360 data transforms:
+
+## Operations
+
+| Method | Path | Summary | Available Version |
+| --- | --- | --- | --- |
+| `GET` | `/ssot/data-transforms` | Get data transforms | 60.0 |
+| `POST` | `/ssot/data-transforms` | Create data transform | 60.0 |
+| `DELETE` | `/ssot/data-transforms/{dataTransformNameOrId}` | Delete data transform | 60.0 |
+| `GET` | `/ssot/data-transforms/{dataTransformNameOrId}` | Get data transform | 60.0 |
+| `PUT` | `/ssot/data-transforms/{dataTransformNameOrId}` | Update data transform | 60.0 |
+| `POST` | `/ssot/data-transforms/{dataTransformNameOrId}/actions/cancel` | Cancel data transform | 60.0 |
+| `POST` | `/ssot/data-transforms/{dataTransformNameOrId}/actions/refresh-status` | Refresh data transform status | 60.0 |
+| `POST` | `/ssot/data-transforms/{dataTransformNameOrId}/actions/retry` | Retry data transform | 60.0 |
+| `POST` | `/ssot/data-transforms/{dataTransformNameOrId}/actions/run` | Run data transform | 60.0 |
+| `GET` | `/ssot/data-transforms/{dataTransformNameOrId}/run-history` | Get data transform run history | 62.0 |
+| `GET` | `/ssot/data-transforms/{dataTransformNameOrId}/schedule` | Get data transform schedule | 60.0 |
+| `PUT` | `/ssot/data-transforms/{dataTransformNameOrId}/schedule` | Update data transform schedule | 60.0 |
+| `POST` | `/ssot/data-transforms-validation` | Validate data transform | 62.0 |
+
+## Source
+
+- [Official Data 360 Connect REST API reference](https://developer.salesforce.com/docs/data/connectapi/references/spec)

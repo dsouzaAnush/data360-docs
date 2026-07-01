@@ -1,37 +1,21 @@
 ---
 title: "Development Environments"
 description: "Learn about the development environments that are available for Salesforce partners and customer developers."
+source_url: "https://developer.salesforce.com/docs/data/data-cloud-dev/guide/dc-dev-env.html"
+source_hash: "d2f6d387adb4c8f038dba1066d73c9a88794929f3ee6ecb6fbc8bd97332b439a"
+source_etag: "W/\"365d4358702ad81d3be8894b59459a21\""
+source_last_modified: "Wed, 01 Jul 2026 01:38:14 GMT"
+sync_status: "official-salesforce-doc"
 ---
 
 # Data 360 Development Environments
 
 Learn about the development environments that are available for Salesforce partners and customer developers.
 
-Salesforce ISV Partners create apps for sale and distribution to Salesforce customers. If you're an ISV Partner, create a Partner Developer edition org from your Environment Hub, then log a case with [Partner Support](https://partners.salesforce.com) to enable Data 360 on it.
+Salesforce ISV Partners create apps for sale and distribution to Salesforce customers. If you’re an ISV Partner, create a Partner Developer edition org from your Environment Hub, then log a case with [Partner Support](https://partners.salesforce.com) to enable Data 360 on it.
 
-If you're a Salesforce Consulting Partner, you can get information about setting up a Data 360 development environment by contacting your Partner Account Manager.
+If you’re a Salesforce Consulting Partner, you can get information about setting up a Data 360 development environment by contacting your Partner Account Manager.
 
-Customer developers create apps in-house for their own Data 360 instance. Sandboxes are now generally available for creating and testing your apps for Data 360. Both Partial Copy and Full sandboxes are supported, and your CRM data is automatically replicated so it's immediately available for use with Data 360. See [Create a Data Cloud Sandbox](https://help.salesforce.com/s/articleView?id=data.c360_a_data_cloud_sandbox_create.htm).
+Customer developers create apps in-house for their own Data 360 instance. Currently, sandboxes are available in beta to create and test your apps for Data 360. See [Create a Data Cloud Sandbox (Beta)](https://help.salesforce.com/s/articleView?id=data.c360_a_data_cloud_sandbox_create.htm).
 
-## Sandbox Environments
-
-With Data 360 sandbox support (GA), you can:
-
-- **Test integrations** — Validate data streams, connectors, and API integrations in an isolated environment
-- **Develop automations** — Build and test Data Cloud-triggered flows and invocable actions
-- **Validate configurations** — Test identity resolution rulesets, calculated insights, and segments before promoting to production
-
-### Deploying Changes
-
-Once testing is complete, promote changes from sandbox to production using:
-
-- **DevOps Data Kit** — Collects and sequences Data 360 configuration for deployment
-- **Change Sets** — Standard Salesforce deployment mechanism
-- **Salesforce CLI** — Command-line deployment for CI/CD workflows
-- **Metadata API** — Programmatic deployment for automated pipelines
-
-See [Deploy Data 360 Changes Across Orgs](https://help.salesforce.com/s/articleView?id=data.c360_a_data_cloud_sandbox_deploy.htm) for detailed deployment instructions.
-
-## Alternative: Second Org
-
-If you prefer not to use a sandbox, you can get access to a second org. To find out how to get access to a Data 360 test org, contact your Account team. The org used for testing is separate from the production org. This second org is another production org, and service usage is metered and results in billing charges the same way it is on the production org. See [Cost and Usage](https://help.salesforce.com/s/articleView?id=data.c360_a_data_usage_types.htm&type=5).
+If you don’t want to use a sandbox, you can get access to a second org. To find out how to get access to a Data 360 test org, contact your Account team. The org used for testing is separate from the production org. This second org is another production org, and service usage is metered and results in billing charges the same way it is on the production org. See [Cost and Usage](https://developer.salesforce.com/docs/data/data-cloud-dev/guide/dc-cost-usage.html).

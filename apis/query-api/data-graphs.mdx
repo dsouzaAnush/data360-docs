@@ -1,7 +1,11 @@
 ---
 title: "Data Graph API"
-description: "Query pre-built hierarchical JSON views combining data from multiple related DMOs."
-openapi: "GET /api/v1/dataGraph/metadata"
+description: "Data 360 REST API Reference"
+source_url: "https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-data-graphs-overview.html"
+source_hash: "75bdbca8972587c123026a7dfd9f6de25b7725711e0cf881d5450b4a061aeff9"
+source_etag: "W/\"3e7ecfecdd6b38af9a9220d48190fa34\""
+source_last_modified: "Wed, 01 Jul 2026 01:38:24 GMT"
+sync_status: "official-salesforce-doc"
 ---
 
 # Query Data Graph Data
@@ -19,11 +23,11 @@ A data graph combines and transforms normalized table data from data model objec
     -   Returns primary data model objects, related objects, and their fields
     -   Supports filtering by specific data graph name
 
--   [**GET /api/v1/dataGraph/{dataGraphEntityName}/{id}**](https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-v1-data-graphs-name-id.html)
+-   [**GET /api/v1/dataGraph/\{dataGraphEntityName\}/\{id\}**](https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-v1-data-graphs-name-id.html)
 
     -   Retrieves specific records from a data graph by their unique identifier
     -   Returns complete record data including all related fields
--   [**GET /api/v1/dataGraph/{dataGraphEntityName}?lookupKeys=\[\]**](https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-v1-data-graphs-lookup.html)
+-   [**GET /api/v1/dataGraph/\{dataGraphEntityName\}?lookupKeys=\[\]**](https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-v1-data-graphs-lookup.html)
 
     -   Queries data using lookup keys from primary or participating data model objects
     -   Supports flexible data retrieval based on various key fields

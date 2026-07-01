@@ -1,0 +1,41 @@
+---
+title: "Clean Rooms"
+description: "Connect REST API endpoints for Data 360 clean rooms:"
+openapi: "GET /ssot/data-clean-room/collaborations"
+---
+
+# Clean Rooms
+
+<Note>
+Generated from the official Salesforce Data 360 Connect REST API spec (67.0). Run `npm run sync:apis` to refresh this page and `openapi/data360-api.yaml`.
+</Note>
+
+Connect REST API endpoints for Data 360 clean rooms:
+
+## Operations
+
+| Method | Path | Summary | Available Version |
+| --- | --- | --- | --- |
+| `GET` | `/ssot/data-clean-room/collaborations` | Get collaborations | 63.0 |
+| `POST` | `/ssot/data-clean-room/collaborations` | Create a collaboration | 63.0 |
+| `POST` | `/ssot/data-clean-room/collaborations/{collaborationIdOrApiName}/actions/accept-invitation` | Accept a collaboration invitation | 63.0 |
+| `POST` | `/ssot/data-clean-room/collaborations/{collaborationIdOrApiName}/actions/disable` | Disable a collaboration | 66.0 |
+| `PUT` | `/ssot/data-clean-room/collaborations/{collaborationIdOrApiName}/actions/refresh-metadata` | Refresh collaboration metadata | 66.0 |
+| `POST` | `/ssot/data-clean-room/collaborations/{collaborationIdOrApiName}/actions/reject-invitation` | Reject a collaboration invitation | 63.0 |
+| `POST` | `/ssot/data-clean-room/collaborations/{collaborationIdOrApiName}/actions/run` | Run a query | 63.0 |
+| `GET` | `/ssot/data-clean-room/collaborations/{collaborationIdOrApiName}/jobs` | Get query jobs | 63.0 |
+| `GET` | `/ssot/data-clean-room/collaborations/{collaborationIdOrApiName}/result-data-objects` | Get collaboration result objects | 66.0 |
+| `GET` | `/ssot/data-clean-room/providers` | Get providers | 63.0 |
+| `POST` | `/ssot/data-clean-room/providers` | Create a provider | 63.0 |
+| `GET` | `/ssot/data-clean-room/providers/{providerIdOrName}` | Get a provider | 63.0 |
+| `GET` | `/ssot/data-clean-room/providers/{providerIdOrName}/templates` | Get provider templates | 63.0 |
+| `GET` | `/ssot/data-clean-room/specifications` | Get specifications | 63.0 |
+| `POST` | `/ssot/data-clean-room/specifications` | Create a specification | 63.0 |
+| `DELETE` | `/ssot/data-clean-room/specifications/{specificationIdOrApiName}` | Delete a specification | 66.0 |
+| `GET` | `/ssot/data-clean-room/templates` | Get templates | 63.0 |
+| `GET` | `/ssot/data-clean-room/templates/{useCaseTemplateType}/collaborations` | Get template collaborations | 66.0 |
+| `POST` | `/ssot/data-clean-room/test-connection` | Test connection | 66.0 |
+
+## Source
+
+- [Official Data 360 Connect REST API reference](https://developer.salesforce.com/docs/data/connectapi/references/spec)

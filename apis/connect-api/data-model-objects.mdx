@@ -1,0 +1,36 @@
+---
+title: "Data Model Objects"
+description: "Connect REST API endpoints for Data 360 data model objects (DMOs):"
+openapi: "GET /ssot/data-model-objects"
+---
+
+# Data Model Objects
+
+<Note>
+Generated from the official Salesforce Data 360 Connect REST API spec (67.0). Run `npm run sync:apis` to refresh this page and `openapi/data360-api.yaml`.
+</Note>
+
+Connect REST API endpoints for Data 360 data model objects (DMOs):
+
+## Operations
+
+| Method | Path | Summary | Available Version |
+| --- | --- | --- | --- |
+| `GET` | `/ssot/data-model-objects` | Get data model objects | 61.0 |
+| `POST` | `/ssot/data-model-objects` | Create data model object | 61.0 |
+| `DELETE` | `/ssot/data-model-objects/{dataModelObjectName}` | Delete data model object | 61.0 |
+| `GET` | `/ssot/data-model-objects/{dataModelObjectName}` | Get data model object | 61.0 |
+| `PATCH` | `/ssot/data-model-objects/{dataModelObjectName}` | Update data model object | 61.0 |
+| `GET` | `/ssot/data-model-object-mappings` | Get data model object mappings | 61.0 |
+| `POST` | `/ssot/data-model-object-mappings` | Create data model object mapping | 61.0 |
+| `DELETE` | `/ssot/data-model-object-mappings/{objectSourceTargetMapDeveloperName}` | Delete data model object mapping | 61.0 |
+| `GET` | `/ssot/data-model-object-mappings/{objectSourceTargetMapDeveloperName}` | Get data model object mapping | 61.0 |
+| `DELETE` | `/ssot/data-model-object-mappings/{objectSourceTargetMapDeveloperName}/field-mappings` | Delete data model object field mapping | 61.0 |
+| `PATCH` | `/ssot/data-model-object-mappings/{objectSourceTargetMapDeveloperName}/field-mappings/{fieldSourceTargetMapDeveloperName}` | Delete data model object field mapping | 61.0 |
+| `DELETE` | `/ssot/data-model-objects/relationships/{name}` | Delete field source target relationship | 64.0 |
+| `GET` | `/ssot/data-model-objects/{dataModelObjectName}/relationships` | Get field source target relationships | 64.0 |
+| `POST` | `/ssot/data-model-objects/{dataModelObjectName}/relationships` | Create field source target relationships | 64.0 |
+
+## Source
+
+- [Official Data 360 Connect REST API reference](https://developer.salesforce.com/docs/data/connectapi/references/spec)

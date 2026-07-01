@@ -62,42 +62,17 @@
       ]
     },
     "connect-api": {
-      "outputDir": "apis/connect-api",
+      "outputDir": "developer-guide/connect-api",
       "pages": [
+        {
+          "url": "/docs/data/connectapi/overview",
+          "outputFile": "overview.mdx",
+          "title": "Data 360 Connect REST API Overview"
+        },
         {
           "url": "/docs/data/connectapi/guide/get-started.html",
           "outputFile": "index.mdx",
           "title": "Connect REST API Overview"
-        },
-        {
-          "url": "/docs/data/connectapi/guide/dc-connect-api-authentication.html",
-          "outputFile": "authentication.mdx",
-          "title": "Authentication"
-        },
-        {
-          "url": "/docs/data/connectapi/guide/dc-data-ingestion.html",
-          "outputFile": "data-ingestion.mdx",
-          "title": "Data Ingestion"
-        },
-        {
-          "url": "/docs/data/connectapi/guide/dc-calculated-insights.html",
-          "outputFile": "calculated-insights.mdx",
-          "title": "Calculated Insights"
-        },
-        {
-          "url": "/docs/data/connectapi/guide/dc-connect-api-datacloudidentityresolutionjob.html",
-          "outputFile": "identity-resolution.mdx",
-          "title": "Identity Resolution"
-        },
-        {
-          "url": "/docs/data/connectapi/guide/dc-connect-api-datastreams.html",
-          "outputFile": "data-streams.mdx",
-          "title": "Data Streams"
-        },
-        {
-          "url": "/docs/data/connectapi/guide/dc-connect-api-dataspace.html",
-          "outputFile": "data-space.mdx",
-          "title": "Data Spaces"
         }
       ]
     },
@@ -185,19 +160,29 @@
       "outputDir": "sdks/mobile-sdk",
       "pages": [
         {
-          "url": "/docs/data/data-cloud-engagement-mobile-sdk/guide/dc-mobile-sdk-overview.html",
+          "url": "/docs/data/data-cloud-engagement-mobile-sdk/guide/c360a-api-engagement-mobile-sdk.html",
           "outputFile": "index.mdx",
           "title": "Mobile SDK Overview"
         },
         {
-          "url": "/docs/data/data-cloud-engagement-mobile-sdk/guide/dc-mobile-sdk-ios.html",
-          "outputFile": "ios.mdx",
-          "title": "iOS SDK"
+          "url": "/docs/data/data-cloud-engagement-mobile-sdk/guide/c360a-api-engagement-mobile-sdk-v3.html",
+          "outputFile": "version-3.mdx",
+          "title": "Mobile SDK Version 3.x"
         },
         {
-          "url": "/docs/data/data-cloud-engagement-mobile-sdk/guide/dc-mobile-sdk-android.html",
-          "outputFile": "android.mdx",
-          "title": "Android SDK"
+          "url": "/docs/data/data-cloud-engagement-mobile-sdk/guide/c360a-api-engagement-mobile-sdk-api-reference.html",
+          "outputFile": "api-reference.mdx",
+          "title": "Mobile SDK API Reference"
+        },
+        {
+          "url": "/docs/data/data-cloud-engagement-mobile-sdk/guide/c360a-api-engagement-mobile-sdk-event-specifications.html",
+          "outputFile": "events.mdx",
+          "title": "Mobile SDK Event Specifications"
+        },
+        {
+          "url": "/docs/data/data-cloud-engagement-mobile-sdk/guide/c360a-api-engagement-mobile-sdk-schema-mappings.html",
+          "outputFile": "schema-mappings.mdx",
+          "title": "Mobile SDK Schema Mappings"
         }
       ]
     },
@@ -210,14 +195,9 @@
           "title": "Data Model Objects Overview"
         },
         {
-          "url": "/docs/data/data-cloud-dmo-mapping/guide/c360dm-mapping-overview.htm",
-          "outputFile": "mappings.mdx",
-          "title": "Mapping Overview"
-        },
-        {
-          "url": "/docs/data/data-cloud-dmo-mapping/guide/c360dm-relationships.htm",
-          "outputFile": "relationships.mdx",
-          "title": "Relationships"
+          "url": "/docs/data/data-cloud-dmo-mapping/guide/c360dm-model-data.html",
+          "outputFile": "model-data.mdx",
+          "title": "Model Data in Data 360"
         }
       ]
     },
@@ -228,16 +208,6 @@
           "url": "/docs/data/data-cloud-int/guide/c360-a-data-cloud-integrations.html",
           "outputFile": "index.mdx",
           "title": "Integrations Overview"
-        },
-        {
-          "url": "/docs/data/data-cloud-int/guide/c360-a-data-streams-introduction.html",
-          "outputFile": "data-streams.mdx",
-          "title": "Data Streams"
-        },
-        {
-          "url": "/docs/data/data-cloud-int/guide/c360-a-connector-salesforce-crm.html",
-          "outputFile": "salesforce-crm.mdx",
-          "title": "Salesforce CRM Connector"
         },
         {
           "url": "/docs/data/data-cloud-int/guide/c360-a-admin-web-sdk-setup.html",
@@ -253,11 +223,6 @@
           "url": "/docs/data/data-cloud-ref/guide/c360a-api-intro-cdpapis.html",
           "outputFile": "index.mdx",
           "title": "API Reference Overview"
-        },
-        {
-          "url": "/docs/data/data-cloud-ref/guide/c360a-api-limits.html",
-          "outputFile": "limits.mdx",
-          "title": "API Limits"
         }
       ]
     }

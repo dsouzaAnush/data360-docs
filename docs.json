@@ -44,6 +44,13 @@
             ]
           },
           {
+            "group": "Connect REST API Guide",
+            "pages": [
+              "developer-guide/connect-api/overview",
+              "developer-guide/connect-api/index"
+            ]
+          },
+          {
             "group": "Platform Guides",
             "pages": [
               "developer-guide/data-ingestion-guide",
@@ -92,18 +99,39 @@
       },
       {
         "tab": "API Reference",
-        "openapi": "openapi/data360-api.yaml",
+        "openapi": "openapi/data360-api.mintlify.yaml",
         "groups": [
           {
             "group": "Connect REST API",
             "pages": [
               "apis/connect-api/index",
-              "apis/connect-api/data-ingestion",
+              "apis/connect-api/activation-targets",
+              "apis/connect-api/activations",
+              "apis/connect-api/calculated-insights",
+              "apis/connect-api/clean-rooms",
+              "apis/connect-api/connections",
+              "apis/connect-api/connectors",
+              "apis/connect-api/data-action-targets",
+              "apis/connect-api/data-actions",
+              "apis/connect-api/data-graphs",
+              "apis/connect-api/data-kits",
+              "apis/connect-api/data-lake-objects",
+              "apis/connect-api/data-model-objects",
+              "apis/connect-api/data-spaces",
               "apis/connect-api/data-streams",
-              "apis/connect-api/identity-resolution",
+              "apis/connect-api/data-transforms",
+              "apis/connect-api/document-ai",
+              "apis/connect-api/identity-resolutions",
+              "apis/connect-api/insights",
+              "apis/connect-api/machine-learning",
+              "apis/connect-api/metadata",
+              "apis/connect-api/private-network-routes",
+              "apis/connect-api/profile",
+              "apis/connect-api/query-v1-and-v2",
+              "apis/connect-api/query-current",
+              "apis/connect-api/search-index",
               "apis/connect-api/segments",
-              "apis/connect-api/sql-segment-rules",
-              "apis/connect-api/activations"
+              "apis/connect-api/universal-id-lookup"
             ]
           },
           {
@@ -150,7 +178,11 @@
           {
             "group": "Mobile SDK",
             "pages": [
-              "sdks/mobile-sdk/index"
+              "sdks/mobile-sdk/index",
+              "sdks/mobile-sdk/version-3",
+              "sdks/mobile-sdk/api-reference",
+              "sdks/mobile-sdk/events",
+              "sdks/mobile-sdk/schema-mappings"
             ]
           },
           {
@@ -180,6 +212,7 @@
             "group": "Data Model Objects",
             "pages": [
               "data-models/index",
+              "data-models/model-data",
               "data-models/categories"
             ]
           }

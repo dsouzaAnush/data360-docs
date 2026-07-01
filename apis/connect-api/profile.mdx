@@ -1,0 +1,28 @@
+---
+title: "Profile"
+description: "Connect REST API endpoints for Data 360 profile:"
+openapi: "GET /ssot/profile/metadata"
+---
+
+# Profile
+
+<Note>
+Generated from the official Salesforce Data 360 Connect REST API spec (67.0). Run `npm run sync:apis` to refresh this page and `openapi/data360-api.yaml`.
+</Note>
+
+Connect REST API endpoints for Data 360 profile:
+
+## Operations
+
+| Method | Path | Summary | Available Version |
+| --- | --- | --- | --- |
+| `GET` | `/ssot/profile/metadata` | Get profile metadata | 52.0 |
+| `GET` | `/ssot/profile/metadata/{dataModelName}` | Get profile data model object metadata | 52.0 |
+| `GET` | `/ssot/profile/{dataModelName}` | Get profile data model object | 52.0 |
+| `GET` | `/ssot/profile/{dataModelName}/{id}` | Get profile data model object with search key | 52.0 |
+| `GET` | `/ssot/profile/{dataModelName}/{id}/calculated-insights/{ciName}` | Get profile data model object and calculated insight with search key | 52.0 |
+| `GET` | `/ssot/profile/{dataModelName}/{id}/{childDataModelName}` | Get profile data model object and child object with search key | 52.0 |
+
+## Source
+
+- [Official Data 360 Connect REST API reference](https://developer.salesforce.com/docs/data/connectapi/references/spec)

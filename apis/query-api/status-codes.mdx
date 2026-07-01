@@ -1,6 +1,11 @@
 ---
 title: "Query Services Status Codes"
-description: "HTTP status codes, error responses, and troubleshooting for Query API requests."
+description: "Data 360 REST API Reference"
+source_url: "https://developer.salesforce.com/docs/data/data-cloud-query-guide/references/data-cloud-query-api-reference/c360a-api-queryservices-statuscodes.html"
+source_hash: "dc31a0b63edc18be3ad97cde7835a719c935728e8d1a844d50d0c5177f132dbd"
+source_etag: "W/\"0256734e47947f76c3b481bbd653a463\""
+source_last_modified: "Wed, 01 Jul 2026 01:38:24 GMT"
+sync_status: "official-salesforce-doc"
 ---
 
 # Query Services Status Codes
@@ -13,8 +18,8 @@ The Query Services APIs return standard HTTP status codes to indicate the succes
 | 400 Bad Request | Invalid request | The request was malformed or contained invalid parameters. Check the request syntax and parameters. |
 | 403 Forbidden | Authorization failed | The request failed to pass authorization. Verify your authentication credentials and permissions. |
 | 404 Not Found | Resource not found | The requested resource (callback ID, verification key, or both) was not found. |
-| 422 Unprocessable Entity | Invalid attribute | The attribute name used in fields/filter parameter doesn't exist. Verify the field names in your query. |
-| 429 Too Many Requests | Rate limit exceeded | Too many requests were made in a given time period. Query API supports up to 15 concurrent requests. |
+| 422 Unprocessable Entity | Invalid attribute | The attribute name used in fields/filter parameter doesn’t exist. Verify the field names in your query. |
+| 429 Too Many Requests | Rate limit exceeded | Too many requests were made in a given time period. |
 | 500 Server Error | Internal error | An unexpected error occurred on the server. Contact support if the issue persists. |
 
 When an error occurs, the response includes:

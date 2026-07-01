@@ -1,0 +1,49 @@
+---
+title: "Mobile SDK API Reference"
+description: "This section provides comprehensive documentation for the Engagement Mobile SDK APIs and features."
+source_url: "https://developer.salesforce.com/docs/data/data-cloud-engagement-mobile-sdk/guide/c360a-api-engagement-mobile-sdk-api-reference.html"
+source_hash: "f81ccd650ea9cea762fef3191abd19beaf36424f8d2c5f4628a37978bd34f301"
+source_etag: "W/\"e2f6f4020d7899a145787d9cd4c62171\""
+source_last_modified: "Wed, 01 Jul 2026 01:38:41 GMT"
+sync_status: "official-salesforce-doc"
+---
+
+# API Reference
+
+This section provides comprehensive documentation for the Engagement Mobile SDK APIs and features.
+
+[**Initialization**](https://developer.salesforce.com/docs/data/data-cloud-engagement-mobile-sdk/guide/c360a-api-engagement-mobile-sdk-initialization.html)
+
+Configure the Data Cloud Module before using any API services. Use `CdpConfigBuilder` (iOS) or `CdpConfig.Builder` (Android) to build your SDK configuration with required settings like `appId` and endpoint from your Mobile Connector. Optionally, configure the `trackScreens`, `trackLifecycle`, and `sessionTimeoutInSeconds` settings.
+
+[**Capturing Engagement Data**](https://developer.salesforce.com/docs/data/data-cloud-engagement-mobile-sdk/guide/c360a-api-engagement-mobile-sdk-capturing-engagement-data.html)
+
+Collect granular data about customer mobile app interactions through comprehensive event tracking capabilities.
+
+[**Capturing Profile Data**](https://developer.salesforce.com/docs/data/data-cloud-engagement-mobile-sdk/guide/c360a-api-engagement-mobile-sdk-capturing-profile-data.html)
+
+Gather profile data through the SDK's Identity APIs to build comprehensive customer profiles.
+
+[**Capturing Behavior Data**](https://developer.salesforce.com/docs/data/data-cloud-engagement-mobile-sdk/guide/c360a-api-engagement-mobile-sdk-capturing-behavior-data.html)
+
+Track detailed customer behavior patterns and mobile app interactions through advanced event tracking.
+
+[**Consent Management**](https://developer.salesforce.com/docs/data/data-cloud-engagement-mobile-sdk/guide/c360a-api-engagement-mobile-sdk-consent-management.html)
+
+Implement managed consent solutions for data collection. Your mobile application handles presenting opt-in or opt-out choices to users and sets the Data 360 Module consent property accordingly.
+
+[**Location Tracking**](https://developer.salesforce.com/docs/data/data-cloud-engagement-mobile-sdk/guide/c360a-api-engagement-mobile-sdk-location-tracking.html)
+
+Enable location tracking for all events using the `setLocation` method. Configure `coordinates` and `expiresIn` parameters for precise location data collection.
+
+[**Logging and Debugging**](https://developer.salesforce.com/docs/data/data-cloud-engagement-mobile-sdk/guide/c360a-api-engagement-mobile-sdk-logging-and-debugging.html)
+
+Configure SDK logging for development and debugging. Use `setLogger` (iOS) or `setLogging` (Android) on the `SFMCSdk` instance to enable logging with customizable logging levels and output destinations. Logs are captured using the native unified logging system.
+
+[**Post Data from an Authenticated Server-to-Server Connection**](https://developer.salesforce.com/docs/data/data-cloud-engagement-mobile-sdk/guide/c360a-api-engagement-web-mobile-sdk-authenticated-server-to-server.html)
+
+Use the `POST` method to send event data through an authenticated server-to-server connection. Use a server-to-server connection when your server already collects engagement data that you want to forward to Data 360 or when you require an authenticated connection.
+
+[**Post Data from an Unauthenticated Server-to-Server Connection**](https://developer.salesforce.com/docs/data/data-cloud-engagement-mobile-sdk/guide/c360a-api-engagement-web-mobile-sdk-unauthenticated-server-to-server.html)
+
+Use the `POST` method to send event data through an unauthenticated server-to-server connection. Use an unauthenticated server-to-server connection when your server already collects engagement data that you want to forward to Data 360 and you don’t require an authenticated connection.
